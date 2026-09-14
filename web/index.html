@@ -37,7 +37,20 @@ import { subscribe, isApp } from "./events.js";
 
 if (isApp) document.body.classList.add("app");
 
-const pet = mount(document.getElementById("pet"), { state: "idle" });
+const petEl = document.getElementById("pet");
+const pet = mount(petEl, { state: "idle" });
+
+// Grab the mascot to move the window. data-tauri-drag-region would do this
+// for free, but only when the mousedown lands on the element that carries
+// it, and mount() fills #pet with a div and an SVG that every click lands
+// on instead. Asking for the drag ourselves works whatever the target. The
+// avatar's own pointerdown still fires first, so a click is also a poke.
+if (isApp) {
+  const win = window.__TAURI__.window.getCurrentWindow();
+  petEl.addEventListener("mousedown", (e) => {
+    if (e.button === 0) win.startDragging();
+  });
+}
 const why = document.getElementById("why");
 
 let events = [];

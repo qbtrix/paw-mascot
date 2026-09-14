@@ -9,14 +9,16 @@
   },
   "app": {
     "macOSPrivateApi": true,
+    "withGlobalTauri": true,
     "windows": [
       {
         "label": "main",
         "title": "Paw",
+        "backgroundThrottling": "throttle",
         "url": "index.html",
         "width": 180,
-        "height": 180,
-        "resizable": false,
+        "height": 204,
+        "resizable": true,
         "decorations": false,
         "transparent": true,
         "alwaysOnTop": true,

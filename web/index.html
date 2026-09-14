@@ -16,11 +16,25 @@
 <link rel="stylesheet" href="/_fx/effects/paw-avatar/style.css">
 <style>
   html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; }
-  body { display: grid; place-items: center; -webkit-user-select: none; user-select: none; }
-  /* The whole window is a drag handle, so the pet can be moved by grabbing it. */
-  #pet { --fx-paw-size: 100vmin; cursor: grab; }
+  body { display: flex; flex-direction: column; align-items: center; justify-content: center;
+         gap: 2px; -webkit-user-select: none; user-select: none; }
+  /* The whole window is a drag handle, so the pet can be moved by grabbing it.
+   *
+   * No floor glow: the window is transparent, so there is no floor. It would
+   * be a glow on whatever wallpaper happens to be behind, and it is also the
+   * most expensive thing the avatar draws -- its blur re-rasterises with the
+   * paths every frame. Wrong and costly is an easy call. */
+  #pet { --fx-paw-size: min(100vw, calc(100vh - 28px)); cursor: grab; --fx-paw-ground: none; }
   #pet:active { cursor: grabbing; }
-  /* A one-line readout while developing; hidden in the app. */
+  /* The state, in a word, under the mascot. One word and not the reason:
+   * "working" is for the person glancing over; "using Edit" is for the
+   * person tuning the mapping, and that one stays in the dev readout. */
+  #stage { font: 500 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .04em;
+           color: rgba(214, 222, 255, .78); background: rgba(8, 10, 20, .55);
+           border: 1px solid rgba(140, 160, 255, .22); border-radius: 999px;
+           padding: 4px 9px; pointer-events: none; transition: opacity .25s; }
+  #stage:empty { opacity: 0; }
+  /* The reason, for developing; hidden in the app. */
   #why { position: fixed; left: 8px; bottom: 6px; font: 11px ui-monospace, monospace;
          color: rgba(200, 210, 240, .55); pointer-events: none; }
   body.app #why { display: none; }
@@ -28,17 +42,43 @@
 </head>
 <body>
 <div id="pet" data-tauri-drag-region></div>
+<div id="stage"></div>
 <div id="why"></div>
 
 <script type="module">
 import { mount } from "/_fx/effects/paw-avatar/index.js";
-import { derive, trim, parseLine } from "./mapping.js";
 import { subscribe, isApp } from "./events.js";
+
+// The mapping is the file that changes every few minutes while it is being
+// tuned, and a browser caches an imported module by its own URL -- a
+// cache-buster on the page never reaches it, so an edited mapping keeps
+// running as yesterday's. In the app the files come from the bundle and
+// cannot go stale, so the bust is dev-only.
+const { derive, trim, parseLine } = await import(isApp ? "./mapping.js" : `./mapping.js?t=${Date.now()}`);
 
 if (isApp) document.body.classList.add("app");
 
-const pet = mount(document.getElementById("pet"), { state: "idle" });
+const petEl = document.getElementById("pet");
+// 30 draws a second, and 8 once it is asleep. The pose is a function of
+// time, so a capped avatar is not a slower one: it shows the right frame
+// for the moment it is drawn, just less often. Measured on the Tauri
+// window, drawing the resting Paw at 60 was about 9% of a core -- most of
+// it breathing and drift that nobody can see at half the rate.
+const pet = mount(petEl, { state: "idle", fps: 30 });
+
+// Grab the mascot to move the window. data-tauri-drag-region would do this
+// for free, but only when the mousedown lands on the element that carries
+// it, and mount() fills #pet with a div and an SVG that every click lands
+// on instead. Asking for the drag ourselves works whatever the target. The
+// avatar's own pointerdown still fires first, so a click is also a poke.
+if (isApp) {
+  const win = window.__TAURI__.window.getCurrentWindow();
+  petEl.addEventListener("mousedown", (e) => {
+    if (e.button === 0) win.startDragging();
+  });
+}
 const why = document.getElementById("why");
+const stage = document.getElementById("stage");
 
 let events = [];
 let lastState = null;
@@ -63,6 +103,10 @@ function apply() {
     lastReact = tail.ts;
   }
   why.textContent = `${d.state} — ${d.why}`;
+  stage.textContent = d.state;
+  const asleep = d.state === "sleeping";
+  pace(asleep ? 2000 : 500);
+  pet.update({ fps: asleep ? 8 : 30 });
 }
 
 subscribe((line) => {
@@ -73,7 +117,16 @@ subscribe((line) => {
 });
 
 // Holds expire without an event to tell us, so re-derive on a slow clock.
-setInterval(apply, 500);
+// 500ms is fine while something is happening. Once the mascot has been
+// asleep for a while nothing can expire at all, so the tick backs off with
+// it -- a pet nobody is using should cost as close to nothing as a pet can.
+let tick = null;
+function pace(ms) {
+  if (tick && tick.ms === ms) return;
+  if (tick) clearInterval(tick.id);
+  tick = { ms, id: setInterval(apply, ms) };
+}
+pace(500);
 apply();
 </script>
 </body>

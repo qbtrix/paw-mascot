@@ -23,7 +23,17 @@ const file = argv.includes("--file") ? argv[argv.indexOf("--file") + 1] : join(h
 const TYPES = { ".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".png": "image/png" };
 const serve = (p) => {
   if (!existsSync(p) || statSync(p).isDirectory()) return null;
-  return new Response(readFileSync(p), { headers: { "Content-Type": `${TYPES[extname(p)] ?? "application/octet-stream"}; charset=utf-8` } });
+  return new Response(readFileSync(p), {
+    headers: {
+      "Content-Type": `${TYPES[extname(p)] ?? "application/octet-stream"}; charset=utf-8`,
+      // A cache-buster on the page does not reach the modules it imports:
+      // the browser caches those by their own URL and happily keeps serving
+      // yesterday's mapping.js behind a fresh index.html. Editing the
+      // mapping and seeing no change is the whole dev loop, so nothing here
+      // is cached at all.
+      "Cache-Control": "no-store"
+    }
+  });
 };
 
 /** The last `n` lines of the file, for catching up a session in flight. */

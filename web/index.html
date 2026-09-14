@@ -24,7 +24,17 @@
    * be a glow on whatever wallpaper happens to be behind, and it is also the
    * most expensive thing the avatar draws -- its blur re-rasterises with the
    * paths every frame. Wrong and costly is an easy call. */
-  #pet { --fx-paw-size: min(100vw, calc(100vh - 28px)); cursor: grab; --fx-paw-ground: none; }
+  /* GLOW_ROOM: the avatar's glow is a CSS drop-shadow, which paints OUTSIDE
+   * the avatar's own box. The window edge is a hard clip, so if the avatar is
+   * sized to fill the window the glow gets cut off square. `creative` is the
+   * worst case in the set -- its pulse peaks at 1.10, which the effect turns
+   * into a 30px blur -- and at the old 2px of slack the glow was still at
+   * nearly full strength where the window ended, which is the visible box.
+   * 40px puts it at about 1% alpha there instead, so it fades out rather than
+   * stopping. The window in tauri.conf.json is sized to hold this: avatar +
+   * 2 * GLOW_ROOM, plus 28px for the label. Change one and change the other. */
+  #pet { --fx-paw-size: min(calc(100vw - 80px), calc(100vh - 108px));
+         cursor: grab; --fx-paw-ground: none; }
   #pet:active { cursor: grabbing; }
   /* The state, in a word, under the mascot. One word and not the reason:
    * "working" is for the person glancing over; "using Edit" is for the

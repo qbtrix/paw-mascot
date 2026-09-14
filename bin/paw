@@ -1,0 +1,79 @@
+#!/bin/bash
+# paw — drive the mascot by hand.
+#
+# The hooks reach about a dozen states, because about a dozen is what a
+# Claude Code session actually expresses. The other sixteen exist for
+# packs, for the mood space, and for the launch clips -- and they need a
+# way to be seen. This is it.
+#
+#   paw say firedUp        hold one state for six seconds
+#   paw demo               walk every state, three seconds each
+#   paw demo 1.5           walk every state, faster
+#   paw list               print the states
+#   paw watch              tail the event file, decoded
+#
+# A forced state LETS GO after six seconds (T.forced in mapping.js). Close
+# the terminal in the middle of a demo and the mascot returns to whatever
+# the session is doing rather than sitting there stranded.
+set -u
+PAW_DIR="${PAW_HOME:-$HOME/.paw}"
+FILE="$PAW_DIR/events.jsonl"
+
+# The state table, in the order it reads best on screen: the original
+# sixteen, then the anime shorthand. Kept here rather than read out of the
+# effect because this is a shell script and the effect is an ES module; if
+# they drift, `paw list` is where you will notice.
+STATES=(
+  idle happy excited curious thinking working focused surprised
+  sleeping wink confused sad love celebrating creative listening
+  awkward annoyed gloomy dizzy starstruck crying overheated firedUp
+  powering shocked smug deadpan
+)
+
+say() {
+  mkdir -p "$PAW_DIR" 2>/dev/null || return 0
+  printf '{"ts":%s,"session":"cli","event":"__force","state":"%s"}\n' "$(date +%s)" "$1" >> "$FILE"
+}
+
+case "${1:-}" in
+  say)
+    [ $# -ge 2 ] || { echo "usage: paw say <state>" >&2; exit 2; }
+    # Not fatal if it is not in the list: a pack can add states this script
+    # has never heard of, and refusing them would make the script a gate.
+    case " ${STATES[*]} " in *" $2 "*) ;; *) echo "note: '$2' is not in the built-in list" >&2 ;; esac
+    say "$2"
+    echo "$2"
+    ;;
+  demo)
+    # Re-say on a shorter interval than the hold, so nothing lapses between
+    # states. The mascot morphs; the walk should not flicker back to idle.
+    hold="${2:-3}"
+    for s in "${STATES[@]}"; do
+      printf '%-12s' "$s"
+      say "$s"
+      sleep "$hold"
+      say "$s"
+      echo "✓"
+    done
+    echo "done — letting go in 6s"
+    ;;
+  list)
+    printf '%s\n' "${STATES[@]}"
+    ;;
+  watch)
+    [ -f "$FILE" ] || { echo "no events yet at $FILE" >&2; exit 1; }
+    tail -f "$FILE" | while read -r line; do
+      printf '%s\n' "$line" | python3 -c 'import json,sys,time
+for l in sys.stdin:
+    try: e = json.loads(l)
+    except Exception: continue
+    t = time.strftime("%H:%M:%S", time.localtime(e.get("ts", 0)))
+    what = e.get("state") or e.get("tool") or e.get("notification") or e.get("agent") or ""
+    print(f"{t}  {e.get(\"event\",\"?\"):<20} {what}")' 2>/dev/null
+    done
+    ;;
+  *)
+    sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'
+    exit 2
+    ;;
+esac

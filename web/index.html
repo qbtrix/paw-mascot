@@ -42,8 +42,14 @@
 
 <script type="module">
 import { mount } from "/_fx/effects/paw-avatar/index.js";
-import { derive, trim, parseLine } from "./mapping.js";
 import { subscribe, isApp } from "./events.js";
+
+// The mapping is the file that changes every few minutes while it is being
+// tuned, and a browser caches an imported module by its own URL -- a
+// cache-buster on the page never reaches it, so an edited mapping keeps
+// running as yesterday's. In the app the files come from the bundle and
+// cannot go stale, so the bust is dev-only.
+const { derive, trim, parseLine } = await import(isApp ? "./mapping.js" : `./mapping.js?t=${Date.now()}`);
 
 if (isApp) document.body.classList.add("app");
 

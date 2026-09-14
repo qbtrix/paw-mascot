@@ -34,7 +34,8 @@ export const T = {
   idleToSleep: 300,   // nothing for five minutes
   failWindow: 60,     // failures within this window count together
   failsToAnnoy: 3,
-  rateWindow: 60      // arousal is events per this window
+  rateWindow: 60,     // arousal is events per this window
+  forced: 6           // how long `paw say` holds before letting go
 };
 
 /** Something notable that happened at `ts`, as the mascot should take it. */
@@ -56,6 +57,16 @@ export function derive(events, now) {
 
   const last = events[events.length - 1];
   const age = now - last.ts;
+
+  // --- a state asked for by hand ----------------------------------------
+  // `paw say <state>` writes one of these. It wins for T.forced seconds and
+  // then lets go, so a forced state cannot strand the mascot -- close the
+  // terminal mid-demo and it returns to whatever the session is doing. The
+  // hooks reach about a dozen states; this is how the other sixteen get
+  // seen, tuned and recorded.
+  if (last.event === "__force" && age < T.forced) {
+    return { state: last.state, why: `forced (${Math.ceil(T.forced - age)}s)`, react: null, mood: null };
+  }
 
   // --- things that override everything ---------------------------------
   if (last.event === "SessionEnd") return out("sleeping", "session ended");
@@ -142,7 +153,10 @@ export function trim(events, now, windowSec = T.idleToSleep + 5) {
 export function parseLine(line) {
   try {
     const e = JSON.parse(line);
-    return typeof e.ts === "number" && typeof e.event === "string" ? e : null;
+    if (typeof e.ts !== "number" || typeof e.event !== "string") return null;
+    // A forced line without a state is not a forced line.
+    if (e.event === "__force" && typeof e.state !== "string") return null;
+    return e;
   } catch {
     return null;
   }

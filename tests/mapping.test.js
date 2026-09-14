@@ -109,3 +109,17 @@ test("a bad line is skipped rather than crashing the tail", () => {
   expect(parseLine('{"ts":"nope","event":"Stop"}')).toBeNull();
   expect(parseLine('{"ts":5,"event":"Stop"}')).toEqual({ ts: 5, event: "Stop" });
 });
+
+test("a forced state wins, then lets go", () => {
+  // `paw say` is how the sixteen states the hooks never reach get seen and
+  // recorded. It has to expire: close the terminal mid-demo and the mascot
+  // should return to the session, not sit stranded on `firedUp`.
+  const h = [ev("PreToolUse", 10, { tool: "Edit" }), { ts: 12, event: "__force", state: "firedUp" }];
+  expect(derive(h, 12.5).state).toBe("firedUp");
+  expect(derive(h, 12 + T.forced + 0.5).state).not.toBe("firedUp");
+});
+
+test("a forced line with no state is not a forced line", () => {
+  expect(parseLine('{"ts":5,"event":"__force"}')).toBeNull();
+  expect(parseLine('{"ts":5,"event":"__force","state":"dizzy"}')).toEqual({ ts: 5, event: "__force", state: "dizzy" });
+});

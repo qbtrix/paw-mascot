@@ -24,17 +24,42 @@
    * be a glow on whatever wallpaper happens to be behind, and it is also the
    * most expensive thing the avatar draws -- its blur re-rasterises with the
    * paths every frame. Wrong and costly is an easy call. */
-  /* GLOW_ROOM: the avatar's glow is a CSS drop-shadow, which paints OUTSIDE
-   * the avatar's own box. The window edge is a hard clip, so if the avatar is
-   * sized to fill the window the glow gets cut off square. `creative` is the
-   * worst case in the set -- its pulse peaks at 1.10, which the effect turns
-   * into a 30px blur -- and at the old 2px of slack the glow was still at
-   * nearly full strength where the window ended, which is the visible box.
-   * 40px puts it at about 1% alpha there instead, so it fades out rather than
-   * stopping. The window in tauri.conf.json is sized to hold this: avatar +
-   * 2 * GLOW_ROOM, plus 28px for the label. Change one and change the other. */
-  #pet { --fx-paw-size: min(calc(100vw - 80px), calc(100vh - 108px));
-         cursor: grab; --fx-paw-ground: none; }
+  /* The avatar is 10px in from each side and 16px above the label, so the
+   * box is 160px in the 180x204 window. That is not padding for its own
+   * sake: it is glow room, and the number was measured, not guessed.
+   *
+   * The glow is a CSS drop-shadow, so it paints OUTSIDE the avatar's own box,
+   * and the window edge is a hard clip. The drawing reaches to within 25
+   * viewBox units of its box on the sides and 24 above (svg.getBBox() in
+   * `creative`, the widest state), which at 176px was 13px of room -- and at
+   * the 14px peak blur below the glow was still at ~5-9% alpha where the
+   * window cut it, a visible edge. At 160px the head has ~22px of room on
+   * every side, three sigma, and the glow is under 1% alpha by the time it
+   * meets the window. So it fades instead of stopping.
+   *
+   * The effect's own blur peaks at 30px (`creative` pulses to 1.10, and the
+   * effect reads that as 8px + 20px * pulse), which no 180px window can hold
+   * at any avatar size worth having -- so the blur is scaled down too.
+   *
+   * The window could have been grown to fit it, and briefly was: 256x284.
+   * That doubled the area of a transparent window, and macOS recomposites one
+   * of those in full every display frame, so idle cost went 5.3% -> 8.3% of a
+   * core. A pet that runs all day does not get to spend 3% of a core on a
+   * wider halo, and the bigger rectangle also swallowed more desktop clicks.
+   *
+   * So the glow is scaled to fit the window instead: same curve, same
+   * breathing, same ordering between states, about 46% of the size. Peaks at
+   * 13.9px, which fits with room to fade.
+   *
+   * This restates the effect's own rule rather than tuning a variable,
+   * because the blur is hardcoded in paw-fx's stylesheet and only the colour
+   * is exposed. If paw-fx ever takes a --fx-paw-glow-size, use that instead
+   * and delete this. */
+  #pet { --fx-paw-size: min(calc(100vw - 20px), calc(100vh - 44px)); cursor: grab; --fx-paw-ground: none; }
+  #pet .fx-paw-svg {
+    filter: drop-shadow(0 0 calc(4px + 9px * var(--fx-paw-pulse, 0.5))
+                        var(--fx-paw-glow, rgba(140, 170, 255, 0.5)));
+  }
   #pet:active { cursor: grabbing; }
   /* The state, in a word, under the mascot. One word and not the reason:
    * "working" is for the person glancing over; "using Edit" is for the

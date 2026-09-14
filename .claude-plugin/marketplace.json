@@ -1,0 +1,14 @@
+{
+  "name": "paw-mascot",
+  "owner": {
+    "name": "qbtrix"
+  },
+  "plugins": [
+    {
+      "name": "paw-mascot",
+      "source": "./plugin",
+      "description": "Forwards Claude Code hook events to the Paw desktop mascot, so it reacts while you work."
+    }
+  ],
+  "description": "The Paw desktop mascot and the bridge that makes it react while your coding agent works."
+}

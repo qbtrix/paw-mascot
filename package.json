@@ -10,6 +10,7 @@
     "sync-fx": "if [ -d ../paw-fx/effects/paw-avatar ]; then cp ../paw-fx/effects/paw-avatar/index.js ../paw-fx/effects/paw-avatar/style.css web/_fx/effects/paw-avatar/ && echo 'synced from ../paw-fx'; else echo 'no ../paw-fx checkout - keeping the vendored copy'; fi",
     "tauri": "bunx --bun @tauri-apps/cli@^2",
     "app:dev": "bunx --bun @tauri-apps/cli@^2 dev",
-    "app:build": "bunx --bun @tauri-apps/cli@^2 build"
+    "app:build": "bunx --bun @tauri-apps/cli@^2 build",
+    "sync-bridge": "cp skills/paw-mascot/scripts/paw-event.sh plugin/hooks/paw-event.sh && chmod +x plugin/hooks/paw-event.sh && echo 'plugin bridge synced from skills/'"
   }
 }

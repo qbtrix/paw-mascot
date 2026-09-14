@@ -1,5 +1,11 @@
 // dev-server.mjs — the pet in a browser tab, before there is a window.
 //
+// The avatar effect is vendored at web/_fx/, so it is served like any other
+// file under web/ and this repo runs with nothing beside it. It used to be
+// read out of a sibling ../../paw-fx checkout, which meant the dev server only
+// worked on a machine that happened to have both repos cloned next to each
+// other -- see web/_fx/README.md for how the copy is refreshed.
+//
 // Serves web/ and the avatar effect, and tails ~/.paw/events.jsonl over
 // SSE at /events, which is exactly what the Tauri side will do over its own
 // channel. Run it, open the tab, run Claude Code in another terminal, and
@@ -9,13 +15,10 @@
 //
 //   bun web/dev-server.mjs [--port 8799] [--file ~/.paw/events.jsonl]
 import { readFileSync, existsSync, statSync, openSync, readSync, closeSync, watch } from "node:fs";
-import { join, extname, resolve } from "node:path";
+import { join, extname } from "node:path";
 import { homedir } from "node:os";
 
 const ROOT = new URL(".", import.meta.url).pathname;
-// The effect is served straight out of the sibling checkout while developing;
-// the app bundles a copy (see sync-fx). Same path either way: /_fx/...
-const FX = resolve(ROOT, "../../paw-fx/effects");
 const argv = process.argv;
 const port = Number(argv[argv.indexOf("--port") + 1]) || 8799;
 const file = argv.includes("--file") ? argv[argv.indexOf("--file") + 1] : join(homedir(), ".paw/events.jsonl");
@@ -81,7 +84,8 @@ Bun.serve({
       return new Response(stream, { headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", Connection: "keep-alive" } });
     }
 
-    if (path.startsWith("/_fx/effects/")) return serve(join(FX, path.slice("/_fx/effects/".length))) ?? new Response("not found", { status: 404 });
+    // /_fx/... needs no special case any more: it lives under web/ like
+    // everything else, so the static fall-through below finds it.
     if (path === "/") return serve(join(ROOT, "index.html"));
     return serve(join(ROOT, path)) ?? new Response("not found", { status: 404 });
   }

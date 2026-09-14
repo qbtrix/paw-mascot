@@ -7,9 +7,9 @@
   "scripts": {
     "dev": "bun web/dev-server.mjs",
     "test": "bun test",
-    "sync-fx": "mkdir -p web/_fx/effects/paw-avatar && cp ../paw-fx/effects/paw-avatar/index.js ../paw-fx/effects/paw-avatar/style.css web/_fx/effects/paw-avatar/",
+    "sync-fx": "if [ -d ../paw-fx/effects/paw-avatar ]; then cp ../paw-fx/effects/paw-avatar/index.js ../paw-fx/effects/paw-avatar/style.css web/_fx/effects/paw-avatar/ && echo 'synced from ../paw-fx'; else echo 'no ../paw-fx checkout - keeping the vendored copy'; fi",
     "tauri": "bunx --bun @tauri-apps/cli@^2",
-    "app:dev": "bun run sync-fx && bunx --bun @tauri-apps/cli@^2 dev",
-    "app:build": "bun run sync-fx && bunx --bun @tauri-apps/cli@^2 build"
+    "app:dev": "bunx --bun @tauri-apps/cli@^2 dev",
+    "app:build": "bunx --bun @tauri-apps/cli@^2 build"
   }
 }

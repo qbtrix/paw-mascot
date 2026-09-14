@@ -40,7 +40,7 @@ Install the plugin in Claude Code, run a session in another terminal, and watch 
 ## The app
 
 ```bash
-bun run app:dev          # copies the effect in from ../paw-fx, then tauri dev
+bun run app:dev          # tauri dev (the effect is vendored; nothing to copy)
 bun run app:build        # a .app and a .dmg
 ```
 

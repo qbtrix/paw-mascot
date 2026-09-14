@@ -6,6 +6,7 @@ app/src-tauri/gen/
 node_modules/
 bun.lock
 
-# The effect is copied in from ../paw-fx by `bun run sync-fx` for the bundle.
-# It is generated, not authored here; paw-fx is the source.
-web/_fx/
+# web/_fx/ is deliberately NOT ignored. The avatar effect is vendored and
+# committed so this repo builds on its own, with no sibling checkout required.
+# `bun run sync-fx` refreshes it from ../paw-fx when that is present.
+# See web/_fx/README.md.

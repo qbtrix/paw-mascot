@@ -1,0 +1,66 @@
+# Build the app on a version tag and attach it to a draft GitHub Release.
+#
+# Push `v0.1.0` and this produces the .dmg and .app for both Mac
+# architectures, attached to a release that is left as a DRAFT. Someone still
+# has to read it and press publish, which is the point: a tag is easy to push
+# by accident, a release should not be.
+#
+# The build is UNSIGNED, deliberately for now. Signing needs a Developer ID
+# certificate, which needs the paid Apple Developer Program. Until then macOS
+# tells whoever downloads it that the app "is damaged", and the README explains
+# the right-click-Open way past that. When a certificate exists, add the
+# APPLE_* secrets to the env block below and tauri-action starts signing and
+# notarizing on its own -- it skips both when APPLE_SIGNING_IDENTITY is unset,
+# so this file does not need an `if` around them.
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: aarch64-apple-darwin   # Apple silicon
+          - target: x86_64-apple-darwin    # Intel, still a lot of desks
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: app/src-tauri
+
+      - uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # src-tauri lives under app/, not at the repo root.
+          projectPath: app
+          tagName: v__VERSION__
+          releaseName: Paw v__VERSION__
+          releaseBody: |
+            The mascot that reacts while your coding agent works.
+
+            Download the .dmg below. macOS will say the app is damaged, because
+            this build is not signed yet: right-click it and choose Open, and
+            that dialog does not come back. The README has the details.
+
+            Then wire up the bridge so it can see your session:
+            https://github.com/qbtrix/paw-mascot#install
+          releaseDraft: true
+          prerelease: false
+          args: --target ${{ matrix.target }}

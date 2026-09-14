@@ -1,0 +1,156 @@
+/* paw-avatar — the Paw's glass, as custom properties.
+ *
+ * The material comes from the drawing (art/paw-os-glass-puppy.svg): its
+ * gradients, sheen, glints and ground pool live in the SVG the engine emits,
+ * and every colour in them is a --fx-paw-* property with the art's own value
+ * as the fallback. Swapping those re-skins the character without touching
+ * index.js, which is bloub's skins idea done in CSS instead of the sampler. */
+
+/* --fx-paw-size is read with a fallback rather than declared here, so an
+ * ancestor can set it and the wrapper inherits it. */
+/* Nothing is DECLARED here. Every --fx-paw-* below is read with a fallback,
+ * and the drawing's own colours are the fallbacks, written into the SVG by
+ * the art generator. Declaring them on .fx-paw instead would win over any
+ * ancestor -- which is exactly what a site theming its mascot, or a second
+ * mascot on the same page, needs to be able to do. */
+.fx-paw {
+  display: inline-flex;
+  width: var(--fx-paw-size, 240px);
+  height: var(--fx-paw-size, 240px);
+  line-height: 0;
+}
+
+.fx-paw-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  /* --fx-paw-pulse (0..1) is written per frame by the engine: states pulse
+   * it (excited, love) or dim it (sleeping), and every state breathes. */
+  filter: drop-shadow(0 0 calc(8px + 20px * var(--fx-paw-pulse, 0.5)) var(--fx-paw-glow, rgba(140, 170, 255, 0.5)));
+}
+
+.fx-paw-rim {
+  stroke-width: var(--fx-paw-rim-width, 2.6);
+  stroke-linejoin: round;
+  /* The art's rim fades out as the second one comes up, so the two never
+   * stack into a thicker edge. */
+  opacity: calc(1 - var(--fx-paw-alt-rim, 0));
+}
+
+/* The second rim: the spectrum, or a tint. Its opacity, fill and stroke are
+ * all set per frame, so nothing here may name them -- a CSS opacity would
+ * beat the attribute and pin it. Only the stroke geometry lives here. */
+.fx-paw-rim-alt {
+  stroke-width: var(--fx-paw-rim-width, 2.6);
+  stroke-linejoin: round;
+}
+
+/* Mark colours. Named for what they mean, not for the hue, so a re-skin
+ * moves them together. */
+.fx-paw-hot { fill: var(--fx-paw-hot, #ff6a4d); }
+.fx-paw-cool { fill: var(--fx-paw-cool, #7fc4ff); }
+.fx-paw-stroke .fx-paw-hot,
+.fx-paw-stroke.fx-paw-hot > path { stroke: var(--fx-paw-hot, #ff6a4d); }
+
+.fx-paw-glyph .fx-paw-cool { fill: var(--fx-paw-cool, #7fc4ff); }
+.fx-paw-stroke .fx-paw-cool { stroke: var(--fx-paw-cool, #7fc4ff); fill: none; }
+.fx-paw-stroke .fx-paw-hot { stroke: var(--fx-paw-hot, #ff6a4d); fill: none; }
+.fx-paw-warmline { stroke: var(--fx-paw-warm, #ff8cc4); fill: none; }
+/* A flash is nearly white with a warm cast. Hot red at low opacity on a dark
+ * ground is not a flash, it is a stain. */
+.fx-paw-flash { fill: var(--fx-paw-flash, #ffe4c8); }
+
+.fx-paw-catch {
+  fill: #ffffff;
+  opacity: 0.38;
+}
+
+.fx-paw-part + .fx-paw-part .fx-paw-rim,
+.fx-paw-part:first-of-type .fx-paw-rim {
+  stroke-width: var(--fx-paw-ear-rim-width, 2.4);
+}
+
+.fx-paw-part:last-of-type .fx-paw-rim {
+  stroke-width: var(--fx-paw-rim-width, 2.6);
+}
+
+/* The floor glow reads as light spilling off the glass, so it breathes with
+ * the same pulse the bloom does.
+ *
+ * It is also the single most expensive thing here: it is drawn with the
+ * drawing's own feGaussianBlur, and because the paths beside it change every
+ * frame the whole filtered subtree is re-rasterised with them. Measured on a
+ * page holding 34 avatars, removing it alone took 30fps to 60. So it is a
+ * token: a hero sitting on a surface wants it, a 2rem chip inside a button
+ * has no surface to sit on and should not pay for one.
+ *
+ * Set --fx-paw-ground: none to drop it. The token is a `display` value and
+ * not a 0..1 amount on purpose: opacity 0 still rasterises the filter, so an
+ * invisible floor glow costs exactly what a visible one does. Measured, after
+ * shipping the opacity version and finding it changed nothing. */
+.fx-paw-ground {
+  display: var(--fx-paw-ground, inline);
+  opacity: calc(0.55 + 0.45 * var(--fx-paw-pulse, 0.5));
+}
+
+.fx-paw {
+  container-type: inline-size;
+}
+
+/* Below about 5rem there is no room for a floor glow to read as one, so it
+ * turns itself off rather than waiting to be told. */
+@container (max-width: 5rem) {
+  .fx-paw-ground {
+    display: none;
+  }
+}
+
+/* The mouth takes the eye colour: it is the same lit face material, and a
+ * mouth in a different white reads as a sticker. */
+.fx-paw-mouth path {
+  fill: var(--fx-paw-eye, #f7fbff);
+}
+
+.fx-paw-eye {
+  fill: var(--fx-paw-eye, #f7fbff);
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.75));
+}
+
+.fx-paw-glyph {
+  fill: var(--fx-paw-eye, #f7fbff);
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.55));
+}
+
+/* Marks that read as handwriting rather than as solid shapes. */
+.fx-paw-stroke {
+  fill: none;
+  stroke: var(--fx-paw-eye, #f7fbff);
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fx-paw-warm {
+  fill: var(--fx-paw-warm, #ff8cc4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-paw-svg {
+    filter: drop-shadow(0 0 14px var(--fx-paw-glow, rgba(140, 170, 255, 0.5)));
+  }
+}
+
+/* The section the snippet ships as: a dark stage the glass reads against.
+ * Drop .fx-paw on its own into any layout if you only want the avatar. */
+.fx-paw-stage {
+  display: grid;
+  place-items: center;
+  min-height: 68vh;
+  padding: 8vh 6vw;
+  background:
+    radial-gradient(120% 90% at 50% 0%, #17203f 0%, #0b0f1e 55%, #05070f 100%);
+}
+
+.fx-paw-stage .fx-paw {
+  --fx-paw-size: min(46vh, 380px);
+}

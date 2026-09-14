@@ -19,6 +19,17 @@ next refresh will quietly overwrite your change. Fix it in paw-fx, then:
 bun run sync-fx    # copies from ../paw-fx if that checkout exists; no-op if not
 ```
 
+**Check the diff before you commit a sync.** The copy here can be *ahead* of
+paw-fx's `main`: right now it carries the `fps` option that `web/index.html`
+passes as `fps: 30`, and that option only exists on paw-fx's unmerged
+`feat/paw-avatar-mood` branch. Syncing from a paw-fx checkout sitting on `main`
+would therefore replace this file with an older one, `fps` would be silently
+ignored, and the mascot would go back to drawing at 60 and burning the CPU that
+cap was added to save. Nothing enforces this, which is why the files are
+committed: a bad sync shows up as a large diff on a tracked file instead of
+vanishing into an ignored directory. Once paw-fx merges that branch, the
+hazard goes away on its own.
+
 Two files, kept byte-identical to upstream so the refresh is a clean diff:
 
 | file | what it is |

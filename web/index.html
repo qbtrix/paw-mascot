@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>paw</title>
+<!--
+  The pet. One transparent window, one mascot, nothing else.
+
+  The same page runs in two places and cannot tell which: in a browser tab
+  during development, fed by dev-server.mjs over SSE, and inside the Tauri
+  webview, fed by the Rust side tailing the same file. events.js picks the
+  source; everything below it is identical. That is what lets the mapping be
+  tuned against real sessions in a tab before there is a window to put it in.
+-->
+<link rel="stylesheet" href="/_fx/effects/paw-avatar/style.css">
+<style>
+  html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; }
+  body { display: grid; place-items: center; -webkit-user-select: none; user-select: none; }
+  /* The whole window is a drag handle, so the pet can be moved by grabbing it. */
+  #pet { --fx-paw-size: 100vmin; cursor: grab; }
+  #pet:active { cursor: grabbing; }
+  /* A one-line readout while developing; hidden in the app. */
+  #why { position: fixed; left: 8px; bottom: 6px; font: 11px ui-monospace, monospace;
+         color: rgba(200, 210, 240, .55); pointer-events: none; }
+  body.app #why { display: none; }
+</style>
+</head>
+<body>
+<div id="pet" data-tauri-drag-region></div>
+<div id="why"></div>
+
+<script type="module">
+import { mount } from "/_fx/effects/paw-avatar/index.js";
+import { derive, trim, parseLine } from "./mapping.js";
+import { subscribe, isApp } from "./events.js";
+
+if (isApp) document.body.classList.add("app");
+
+const pet = mount(document.getElementById("pet"), { state: "idle" });
+const why = document.getElementById("why");
+
+let events = [];
+let lastState = null;
+let lastReact = 0;
+
+/** Re-derive from what we know. Called on every event and on a slow tick. */
+function apply() {
+  const now = Date.now() / 1000;
+  events = trim(events, now);
+  const d = derive(events, now);
+
+  // The state changes only when the answer does; the mood nudges every tick.
+  if (d.state !== lastState) {
+    pet.update({ state: d.state });
+    lastState = d.state;
+  }
+  // Reactions are one-shots keyed on the event that caused them, so a slow
+  // tick landing inside the same half-second does not fire it twice.
+  const tail = events[events.length - 1];
+  if (d.react && tail && tail.ts !== lastReact) {
+    pet.engine.react(d.react, pet.clock());
+    lastReact = tail.ts;
+  }
+  why.textContent = `${d.state} — ${d.why}`;
+}
+
+subscribe((line) => {
+  const e = parseLine(line);
+  if (!e) return;
+  events.push(e);
+  apply();
+});
+
+// Holds expire without an event to tell us, so re-derive on a slow clock.
+setInterval(apply, 500);
+apply();
+</script>
+</body>
+</html>

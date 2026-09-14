@@ -1,0 +1,15 @@
+{
+  "name": "paw-mascot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A mascot on your desktop that reacts while Claude works.",
+  "scripts": {
+    "dev": "bun web/dev-server.mjs",
+    "test": "bun test",
+    "sync-fx": "mkdir -p web/_fx/effects/paw-avatar && cp ../paw-fx/effects/paw-avatar/index.js ../paw-fx/effects/paw-avatar/style.css web/_fx/effects/paw-avatar/",
+    "tauri": "bunx --bun @tauri-apps/cli@^2",
+    "app:dev": "bun run sync-fx && bunx --bun @tauri-apps/cli@^2 dev",
+    "app:build": "bun run sync-fx && bunx --bun @tauri-apps/cli@^2 build"
+  }
+}

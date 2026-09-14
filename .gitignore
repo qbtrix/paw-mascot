@@ -1,0 +1,11 @@
+# Rust build output
+app/src-tauri/target/
+app/src-tauri/gen/
+
+# bun
+node_modules/
+bun.lock
+
+# The effect is copied in from ../paw-fx by `bun run sync-fx` for the bundle.
+# It is generated, not authored here; paw-fx is the source.
+web/_fx/

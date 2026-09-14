@@ -18,8 +18,13 @@
   html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; }
   body { display: flex; flex-direction: column; align-items: center; justify-content: center;
          gap: 2px; -webkit-user-select: none; user-select: none; }
-  /* The whole window is a drag handle, so the pet can be moved by grabbing it. */
-  #pet { --fx-paw-size: min(100vw, calc(100vh - 28px)); cursor: grab; }
+  /* The whole window is a drag handle, so the pet can be moved by grabbing it.
+   *
+   * No floor glow: the window is transparent, so there is no floor. It would
+   * be a glow on whatever wallpaper happens to be behind, and it is also the
+   * most expensive thing the avatar draws -- its blur re-rasterises with the
+   * paths every frame. Wrong and costly is an easy call. */
+  #pet { --fx-paw-size: min(100vw, calc(100vh - 28px)); cursor: grab; --fx-paw-ground: none; }
   #pet:active { cursor: grabbing; }
   /* The state, in a word, under the mascot. One word and not the reason:
    * "working" is for the person glancing over; "using Edit" is for the
@@ -54,7 +59,12 @@ const { derive, trim, parseLine } = await import(isApp ? "./mapping.js" : `./map
 if (isApp) document.body.classList.add("app");
 
 const petEl = document.getElementById("pet");
-const pet = mount(petEl, { state: "idle" });
+// 30 draws a second, and 8 once it is asleep. The pose is a function of
+// time, so a capped avatar is not a slower one: it shows the right frame
+// for the moment it is drawn, just less often. Measured on the Tauri
+// window, drawing the resting Paw at 60 was about 9% of a core -- most of
+// it breathing and drift that nobody can see at half the rate.
+const pet = mount(petEl, { state: "idle", fps: 30 });
 
 // Grab the mascot to move the window. data-tauri-drag-region would do this
 // for free, but only when the mousedown lands on the element that carries
@@ -94,6 +104,9 @@ function apply() {
   }
   why.textContent = `${d.state} — ${d.why}`;
   stage.textContent = d.state;
+  const asleep = d.state === "sleeping";
+  pace(asleep ? 2000 : 500);
+  pet.update({ fps: asleep ? 8 : 30 });
 }
 
 subscribe((line) => {
@@ -104,7 +117,16 @@ subscribe((line) => {
 });
 
 // Holds expire without an event to tell us, so re-derive on a slow clock.
-setInterval(apply, 500);
+// 500ms is fine while something is happening. Once the mascot has been
+// asleep for a while nothing can expire at all, so the tick backs off with
+// it -- a pet nobody is using should cost as close to nothing as a pet can.
+let tick = null;
+function pace(ms) {
+  if (tick && tick.ms === ms) return;
+  if (tick) clearInterval(tick.id);
+  tick = { ms, id: setInterval(apply, ms) };
+}
+pace(500);
 apply();
 </script>
 </body>

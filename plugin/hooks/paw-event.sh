@@ -15,7 +15,18 @@
 # a mascot is never a reason to block anything.
 set -u
 PAW_DIR="${PAW_HOME:-$HOME/.paw}"
+FILE="$PAW_DIR/events.jsonl"
 mkdir -p "$PAW_DIR" 2>/dev/null || exit 0
+
+# The file is append-only and nothing ever reads more than the last few
+# minutes of it, so left alone it would grow forever for no one. Every so
+# often, keep the tail and drop the rest. The check is a stat, not a read.
+if [ -f "$FILE" ]; then
+  SIZE=$(wc -c < "$FILE" 2>/dev/null || echo 0)
+  if [ "$SIZE" -gt 262144 ]; then
+    tail -n 500 "$FILE" > "$FILE.tmp" 2>/dev/null && mv "$FILE.tmp" "$FILE" 2>/dev/null || true
+  fi
+fi
 
 # jq if we have it, python if not, and nothing if neither -- silently.
 if command -v jq >/dev/null 2>&1; then

@@ -6,6 +6,21 @@
 //!   2. a tray item, which is where you find the pet when it is hidden;
 //!   3. a transparent, frameless, always-on-top window for the page.
 //!
+//! Two things about the window config are deliberate and both cost CPU if
+//! you get them wrong, so they are written down here -- tauri.conf.json is
+//! JSON and cannot hold a comment, and an unknown `_comment` field inside a
+//! window object is a hard build error rather than something ignored.
+//!
+//!   resizable is TRUE. `resizable: false` is a known macOS CPU bug
+//!   (tauri-apps/tauri#11308), and the pet is frameless, so there are no
+//!   resize handles to grab regardless.
+//!
+//!   transparent is TRUE and that is not free: on macOS it forces a
+//!   full-window recomposite every display frame even when nothing has
+//!   changed (tauri-apps/tauri#15471). That is the price of a pet with no
+//!   box around it, and it is why the page draws as little as it can --
+//!   no floor glow, no marks it is not showing.
+//!
 //! The mapping from events to states is NOT here. It lives in web/mapping.js
 //! where it can be tuned in a browser tab against a real session, and tested
 //! in Bun with no window at all. Rust that knew what "working" meant would
@@ -28,9 +43,18 @@ use tauri::{
 /// caught up rather than beginning from "idle".
 const REPLAY: usize = 200;
 /// The tail is a poll, not a watcher. One small append-only file and one
-/// reader: a 250ms poll is trivially cheap and behaves the same on every
-/// OS, where filesystem watchers do not.
-const POLL_MS: u64 = 250;
+/// reader: a poll is trivially cheap and behaves the same on every OS,
+/// where filesystem watchers do not.
+///
+/// It backs off. A session mid-flight writes several events a second and
+/// wants to be seen immediately; a machine with no session running wants to
+/// be left alone, and polling a file four times a second forever is how a
+/// desktop pet earns a reputation for eating battery. So: fast while
+/// anything is happening, slow once it plainly is not.
+const POLL_FAST_MS: u64 = 250;
+const POLL_SLOW_MS: u64 = 2000;
+/// How long without a line before backing off.
+const QUIET_SECS: u64 = 30;
 
 fn events_path() -> PathBuf {
     if let Ok(dir) = std::env::var("PAW_HOME") {
@@ -55,8 +79,10 @@ fn tail(app: AppHandle) {
         offset = text.len() as u64;
     }
 
+    let mut last_line = std::time::Instant::now();
     loop {
-        thread::sleep(Duration::from_millis(POLL_MS));
+        let quiet = last_line.elapsed().as_secs() >= QUIET_SECS;
+        thread::sleep(Duration::from_millis(if quiet { POLL_SLOW_MS } else { POLL_FAST_MS }));
         let size = match fs::metadata(&path) {
             Ok(m) => m.len(),
             Err(_) => continue, // not written yet; the bridge creates it
@@ -78,6 +104,7 @@ fn tail(app: AppHandle) {
         offset = size;
         for line in buf.lines() {
             if !line.trim().is_empty() {
+                last_line = std::time::Instant::now();
                 let _ = app.emit("paw://line", line.to_string());
             }
         }

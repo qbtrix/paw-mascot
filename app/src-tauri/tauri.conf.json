@@ -14,10 +14,11 @@
       {
         "label": "main",
         "title": "Paw",
+        "backgroundThrottling": "throttle",
         "url": "index.html",
         "width": 180,
         "height": 204,
-        "resizable": false,
+        "resizable": true,
         "decorations": false,
         "transparent": true,
         "alwaysOnTop": true,

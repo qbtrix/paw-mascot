@@ -1,18 +1,83 @@
 # paw-mascot
 
-A mascot on your desktop that reacts while Claude works. Idle when it is waiting, thinking when it is reasoning, working when it is editing files, a wink when it finishes, and a startle when it needs you.
+A mascot on your desktop that reacts while your coding agent works. Idle when it is waiting, thinking when it is reasoning, working when it is editing files, a wink when it finishes, and a startle when it needs you.
 
-The character is [paw-avatar](https://github.com/qbtrix/paw-fx) from paw-fx: twenty-eight states, a mood space, pointer tracking, and a drawing you can swap for your own. This repo is the two things around it — the bridge from Claude Code, and the window it lives in.
+The character is [paw-avatar](https://github.com/qbtrix/paw-fx) from paw-fx: twenty-eight states, a mood space, pointer tracking, and a drawing you can swap for your own. This repo is the two things around it — the bridge from the agent, and the window it lives in.
 
 ```
-Claude Code ──hook──▶ paw-event.sh ──▶ ~/.paw/events.jsonl ──tail──▶ the pet
+your agent ──hook──▶ paw-event.sh ──▶ ~/.paw/events.jsonl ──tail──▶ the pet
 ```
+
+Works with **Claude Code** and **Codex CLI**. Anything that fires lifecycle hooks can drive it; anything that cannot, cannot (see [Which agents](#which-agents)).
+
+## Install
+
+macOS, Apple silicon or Intel. Two steps: get the app, then let it see your session.
+
+**1. The app.** Download the `.dmg` from
+[Releases](https://github.com/qbtrix/paw-mascot/releases/latest) and drag Paw to
+Applications.
+
+The first open, macOS will say *"Paw is damaged and can't be opened."* It is not
+damaged. The build is not signed yet — that needs a paid Apple Developer
+account, and this is a free mascot. Right-click the app and choose **Open**, and
+the dialog offers to open it anyway. You only do this once. If you would rather
+do it in one line:
+
+```bash
+xattr -d com.apple.quarantine /Applications/Paw.app
+```
+
+**2. The bridge.** The app reads `~/.paw/events.jsonl`. Something has to write it.
+
+For **Claude Code**, inside a session:
+
+```
+/plugin marketplace add qbtrix/paw-mascot
+/plugin install paw-mascot@paw-mascot
+```
+
+For **Codex CLI**, or to set up several agents at once:
+
+```bash
+npx skills add qbtrix/paw-mascot
+```
+
+That prints where it installed the skill. Run the installer from there:
+
+```bash
+<that path>/scripts/install.sh
+```
+
+Or skip the skills CLI entirely — clone this repo and run
+`skills/paw-mascot/scripts/install.sh`. The installer merges into whatever
+config it finds, never clobbers what is already there, and is safe to run twice.
+It needs `jq` or `python3`, which macOS has. Pass `--dry-run` to see what it
+would write first.
+
+Run one command in your agent. The mascot should react. If it does not,
+`tail -3 ~/.paw/events.jsonl` — no new line means the bridge is not wired, and
+`skills/paw-mascot/references/harnesses.md` walks through why.
+
+## Which agents
+
+| Agent | Works | Notes |
+|-------|-------|-------|
+| Claude Code | yes | all eleven events |
+| Codex CLI | yes | no `Notification` or `PostToolUseFailure`, so no "waiting for you" and no flinch on a failed tool |
+| DeepSeek Harness | probably | it runs a Claude Code `hooks.json` through a compatibility package; we have not run it end to end |
+| Cursor, Gemini CLI, OpenCode, Copilot, … | no | the skill installs, but these have no lifecycle hooks, so the mascot never hears from them |
+
+A mascot cannot watch an agent that does not tell it anything. That is a limit of
+those agents, not a setting you can find.
 
 ## Layout
 
 ```
 plugin/     the Claude Code plugin: eleven hooks routed through one script
             that appends a line per event to ~/.paw/events.jsonl
+skills/     the same bridge as a portable Agent Skill, plus an installer that
+            writes the right hooks config for whichever agent it lands in
 web/        the pet page, the event→state mapping, and a dev server that
             tails the same file over SSE so all of it runs in a browser tab
 app/        the Tauri shell: transparent always-on-top window, a tray item,
@@ -50,7 +115,11 @@ The Rust side is deliberately small: it tails the file on a 250ms poll — one s
 
 ## The bridge
 
-`plugin/hooks/paw-event.sh` is the whole of it. Claude Code hands it the hook payload on stdin; it appends one line with the bulky fields dropped and exits 0 no matter what, because a hook that fails can block Claude Code and a mascot is never a reason to block anything. `jq` if present, `python3` if not, and silence if neither.
+`skills/paw-mascot/scripts/paw-event.sh` is the whole of it. The agent hands it the hook payload on stdin; it appends one line with the bulky fields dropped and exits 0 no matter what, because a hook that fails can block the agent and a mascot is never a reason to block anything. `jq` if present, `python3` if not, and silence if neither.
+
+It needed no fork for Codex. Codex sends the same payload fields as Claude Code — `session_id`, `hook_event_name`, `tool_name` — and reads the same `hooks.json` shape, so one script covers both and only the config path differs.
+
+The plugin carries a byte-identical copy at `plugin/hooks/paw-event.sh`, because Claude Code resolves `${CLAUDE_PLUGIN_ROOT}` against the plugin and a symlink does not survive every installer. `bun run sync-bridge` copies it across and a test fails if the two ever drift.
 
 ## Licence
 

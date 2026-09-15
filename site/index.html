@@ -79,8 +79,9 @@
   .cta:active { transform: scale(.98); }
 
   /* --- the grid: twenty-eight live states ---------------------------------- */
-  main { max-width: 1240px; margin: 0 auto; padding: clamp(1.25rem, 3vw, 2.5rem) clamp(1rem, 3vw, 2.5rem) 4rem; }
-  .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem;
+  main { max-width: 1240px; margin: 0 auto; padding: clamp(2rem, 4vw, 3.5rem) clamp(1rem, 3vw, 2.5rem) 5rem; }
+  .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+          column-gap: clamp(1.5rem, 4vw, 3.5rem); row-gap: clamp(2rem, 4vw, 3.25rem);
           /* No purple on this page, the mascot included. The character's rim is
              a var() ramp, so it is re-tokened here and the app keeps its own. */
           --fx-paw-rim-a: #ffffff; --fx-paw-rim-b: #e6f1ff; --fx-paw-rim-c: #a9d1ff;
@@ -89,23 +90,22 @@
           --fx-paw-floor-a: #bcdcff; --fx-paw-floor-b: #86bdf4; --fx-paw-floor-c: #4f8fd1;
           --fx-paw-ground: none; }
   @media (max-width: 1000px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-  @media (max-width: 680px)  { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; } }
-  .card {
-    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: .75rem; display: flex; flex-direction: column; gap: .7rem;
-    transition: border-color .2s;
-  }
-  .card:hover { border-color: var(--line-hi); }
+  @media (max-width: 680px)  { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 1.25rem; row-gap: 2rem; } }
+  /* No boxes. The mascots sit on the bare ground and the spacing does the
+     work a border was doing: each cell is the creature plus its name, and the
+     gap between cells is wide enough that nothing needs an edge. */
+  /* gap stays near zero: the engine's own square box already leaves air under
+     the drawing, and that air IS the spacing between creature and name. */
+  .card { display: flex; flex-direction: column; align-items: center; gap: .1rem; }
   .card[hidden] { display: none; }
-  .well {
-    background: var(--well); border: 1px solid var(--line); border-radius: calc(var(--radius) - 4px);
-    aspect-ratio: 1 / 1; display: grid; place-items: center; overflow: hidden;
-  }
+  .well { display: grid; place-items: center; width: 100%; aspect-ratio: 1 / 1; }
   /* The host gets a real width. --fx-paw-size is a percentage of the host,
      and a grid item with no width of its own gives a percentage nothing to
      resolve against: 28 tiles, 28 mascots, all at 0px. */
-  .well .host { width: 62%; --fx-paw-size: 100%; cursor: pointer; }
-  .label { font: 500 12.5px/1 var(--mono); color: var(--dim); padding: 0 .25rem .2rem; letter-spacing: .01em; }
+  .well .host { width: 78%; --fx-paw-size: 100%; cursor: pointer; }
+  .label { font: 500 13px/1 var(--mono); color: var(--dim); letter-spacing: .02em;
+           transition: color .2s; }
+  .card:hover .label { color: var(--ink); }
 
   /* --- footer band: how to get it ----------------------------------------- */
   footer {

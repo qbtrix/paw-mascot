@@ -6,7 +6,8 @@
 //
 //   bun run site            -> dist/site
 //   wrangler deploy         -> serves dist/site (see wrangler.toml)
-import { cpSync, mkdirSync, rmSync, existsSync, readdirSync } from "node:fs";
+import { cpSync, mkdirSync, rmSync, existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { join } from "node:path";
 
 const ROOT = new URL("..", import.meta.url).pathname;
@@ -25,6 +26,25 @@ cpSync(join(ROOT, "web/mapping.js"), join(OUT, "mapping.js"));
 // mood, so the page ships at both spellings: pro.html and pro/index.html.
 mkdirSync(join(OUT, "pro"), { recursive: true });
 cpSync(join(OUT, "pro.html"), join(OUT, "pro/index.html"));
+
+// The effect is served immutable for a year, which is only safe if its URL
+// changes when its bytes do. Without this, a reader who saw the page once
+// keeps the engine they cached until 2027, and every fix we ship upstream
+// quietly never reaches them. The hash goes in the query so the file itself
+// stays at the path the app uses.
+const fx = join(OUT, "_fx/effects/paw-avatar");
+const stamp = createHash("sha256")
+  .update(readFileSync(join(fx, "index.js")))
+  .update(readFileSync(join(fx, "style.css")))
+  .digest("hex")
+  .slice(0, 8);
+for (const page of ["index.html", "pro.html", "pro/index.html"]) {
+  const at = join(OUT, page);
+  writeFileSync(at, readFileSync(at, "utf8").replaceAll(
+    /\/_fx\/effects\/paw-avatar\/(index\.js|style\.css)/g,
+    `/_fx/effects/paw-avatar/$1?v=${stamp}`
+  ));
+}
 
 // Cloudflare serves these headers for static assets; long cache on the effect,
 // none on the page, so a new deploy is seen immediately but the engine is not

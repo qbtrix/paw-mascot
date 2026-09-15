@@ -227,7 +227,21 @@
   }
   .band { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr .6fr; gap: 2rem; align-items: start; }
   @media (max-width: 760px) { .band { grid-template-columns: 1fr; } }
+  .steps { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr);
+           gap: 1rem; margin-bottom: .75rem; }
+  @media (max-width: 760px) { .steps { grid-template-columns: 1fr; } }
+  .step { display: flex; gap: .8rem; align-items: baseline; font-size: 13.5px; color: var(--dim); }
+  .step b { font: 500 12px/1.6 var(--mono); color: var(--ink); background: var(--well);
+            border: 1px solid var(--line); border-radius: 6px; padding: .15rem .5rem; }
+  .step span { line-height: 1.5; }
+  .step code { font: 12px var(--mono); color: var(--ink); }
   .cmds { display: grid; gap: .5rem; }
+  .or { grid-column: 1 / -1; margin: 1.25rem 0 .5rem; font: 500 11px/1 var(--mono);
+        letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
+  .prompt { display: grid; grid-template-columns: 1fr auto; gap: .75rem; align-items: start;
+            background: var(--well); border: 1px solid var(--line); border-radius: 10px;
+            padding: .8rem .9rem; grid-column: 1 / -1; }
+  .prompt code { font: 12.5px/1.7 var(--mono); color: var(--dim); white-space: pre-wrap; }
   .cmd {
     display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .75rem;
     background: var(--well); border: 1px solid var(--line); border-radius: 10px; padding: .6rem .75rem;
@@ -308,11 +322,22 @@
 <footer>
   <div class="band">
     <div class="badge" style="grid-column: 1 / -1">install</div>
+    <ol class="steps">
+      <li class="step"><b>1</b><span>Download the app, drag it to Applications, right-click and Open once.</span></li>
+      <li class="step"><b>2</b><span>Wire your agent with one of the commands below, or paste the prompt.</span></li>
+      <li class="step"><b>3</b><span>Run a session. It reacts. If not: <code>tail -3 ~/.paw/events.jsonl</code></span></li>
+    </ol>
     <div class="cmds" id="cmds">
       <div class="cmd"><span class="for"><svg aria-hidden="true"><use href="#i-anthropic"/></svg>Claude Code</span><code>/plugin marketplace add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
       <div class="cmd"><span class="for"></span><code>/plugin install paw-mascot@paw-mascot</code><button class="copy">Copy</button></div>
       <div class="cmd"><span class="for"><svg aria-hidden="true"><use href="#i-openai"/></svg>Codex</span><code>codex plugin marketplace add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
       <div class="cmd"><span class="for"><svg aria-hidden="true"><use href="#i-paw"/></svg>Any agent</span><code>npx skills add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
+      <div class="or">or paste this into your agent</div>
+      <div class="prompt"><code>Set up the Paw desktop mascot (github.com/qbtrix/paw-mascot) on this machine:
+1. Clone https://github.com/qbtrix/paw-mascot somewhere sensible.
+2. Run skills/paw-mascot/scripts/install.sh - it detects Claude Code and Codex, merges hook config without clobbering anything, and never needs sudo. Follow what it prints; in Claude Code prefer the two /plugin commands it suggests.
+3. Verify: run one trivial command, then tail -3 ~/.paw/events.jsonl - a new line means the bridge is live.
+4. Remind me to download the app itself: github.com/qbtrix/paw-mascot/releases/latest</code><button class="copy">Copy</button></div>
     </div>
     <div class="side">
       <a class="cta" href="https://github.com/qbtrix/paw-mascot/releases/latest">Download for macOS</a>

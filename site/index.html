@@ -190,11 +190,16 @@
   .term {
     background: var(--well); border: 1px solid var(--line); border-radius: var(--radius);
     padding: 1.1rem 1.25rem; font: 13px/2 var(--mono); overflow: hidden;
-    height: 21rem; display: flex; flex-direction: column; justify-content: flex-end;
+    /* exactly nine lines tall, and the log is seeded nine deep on load, so the
+       box is always full: no void above the first events of a young session */
+    height: calc(9 * 2em + 2.2rem); display: flex; flex-direction: column; justify-content: flex-end;
   }
   .term .ln { display: flex; gap: 1.25rem; white-space: nowrap; color: var(--dim); opacity: .5; }
   .term .ln:last-child { color: var(--ink); opacity: 1; }
-  .term .ev { min-width: 12ch; }
+  .term .ln.fail span:last-child { color: #d98f6c; }
+  /* wide enough for PostToolUseFailure, the longest event, so the second
+     column is actually a column instead of drifting per row */
+  .term .ev { min-width: 19ch; }
 
   /* --- footer band: how to get it ----------------------------------------- */
   footer {
@@ -334,6 +339,20 @@ const SCRIPT = [
   [4.0, null], // hold the sleep, then the loop starts the next session
 ];
 
+function logLine(event, detail, failed) {
+  const ln = document.createElement("div");
+  ln.className = failed ? "ln fail" : "ln";
+  ln.innerHTML = `<span class="ev">${event}</span><span>${detail}</span>`;
+  term.append(ln);
+  while (term.children.length > 9) term.firstChild.remove();
+}
+// Seed the log with the tail of the previous session, so the panel is full on
+// first paint instead of nine lines arriving into a void. Display only: the
+// seeded lines never enter the mapping's event list.
+for (const [, event, tool, notification] of SCRIPT.slice(-9, -1)) {
+  if (event) logLine(event, tool ?? notification ?? "", event === "PostToolUseFailure");
+}
+
 let demoEvents = [], demoIdx = 0, lastReact = 0;
 function demoApply() {
   const now = Date.now() / 1000;
@@ -354,11 +373,7 @@ function demoStep() {
       demoEvents.push({ ts: Date.now() / 1000, session: "demo", event,
                         tool: tool ?? null, notification: notification ?? null,
                         agent: null, ok: event !== "PostToolUseFailure" });
-      const ln = document.createElement("div");
-      ln.className = "ln";
-      ln.innerHTML = `<span class="ev">${event}</span><span>${tool ?? notification ?? ""}</span>`;
-      term.append(ln);
-      while (term.children.length > 9) term.firstChild.remove();
+      logLine(event, tool ?? notification ?? "", event === "PostToolUseFailure");
       demoApply();
     }
     demoIdx = (demoIdx + 1) % SCRIPT.length;

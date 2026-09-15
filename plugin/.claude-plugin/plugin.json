@@ -4,6 +4,5 @@
   "description": "A mascot on your desktop that reacts while Claude works. This plugin is the bridge: it forwards hook events to the app.",
   "author": {
     "name": "qbtrix"
-  },
-  "hooks": "./hooks/claude.json"
+  }
 }

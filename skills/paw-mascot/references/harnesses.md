@@ -12,7 +12,7 @@ harness below fires the same script; only the config file differs.
 
 - **Native path (preferred):** `/plugin marketplace add qbtrix/paw-mascot` then
   `/plugin install paw-mascot@paw-mascot`. The plugin carries
-  `hooks/claude.json` and Claude Code substitutes `${CLAUDE_PLUGIN_ROOT}`.
+  `hooks/hooks.json` and Claude Code substitutes `${CLAUDE_PLUGIN_ROOT}`.
 - **Settings path (only if you skip the plugin):** merge into
   `~/.claude/settings.json` under `hooks`. `scripts/install.sh --claude-settings`
   does it.
@@ -25,8 +25,8 @@ harness below fires the same script; only the config file differs.
 - **Plugin (preferred):** `codex plugin marketplace add qbtrix/paw-mascot` then
   install `paw-mascot`. The repo carries a root `plugin/plugin.json` in the
   vendor-neutral [Agent Plugins](https://agent-plugins.org) format with an
-  `extensions.com.openai` block, and Codex default-discovers `hooks/hooks.json`
-  beside it, substituting `${PLUGIN_ROOT}`.
+  `extensions.com.openai` block pointing at `hooks/codex.json`, where it
+  substitutes `${PLUGIN_ROOT}`.
 - **Config (manual):** `~/.codex/hooks.json`, or `<repo>/.codex/hooks.json` for
   one project. Hooks are on by default; `[features] hooks = false` in
   `~/.codex/config.toml` turns them off.
@@ -67,6 +67,14 @@ root variable -- `${CLAUDE_PLUGIN_ROOT}` against `${PLUGIN_ROOT}`. The other is
 that Codex has no `Notification` or `PostToolUseFailure`, so its file declares
 nine events where Claude's declares eleven. Listing an event a harness never
 fires is harmless; listing one it rejects is not.
+
+Which side gets the DEFAULT filename is deliberate. Both harnesses
+auto-discover `hooks/hooks.json`, and both replace that discovery when the
+manifest names a path -- but Claude Code additionally *warns* about the ignored
+folder in `claude plugin list`, and that warning would greet every person who
+installs this. So Claude gets the default name and no manifest key at all,
+which cannot warn; Codex names `./hooks/codex.json` explicitly, which its docs
+guarantee replaces discovery. The uncertainty sits where it is documented.
 
 ## Everything else
 

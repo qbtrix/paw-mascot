@@ -23,7 +23,8 @@
         "displayName": "Paw Mascot",
         "category": "Productivity",
         "description": "Watch a little glass creature react while Codex works."
-      }
+      },
+      "hooks": "./hooks/codex.json"
     }
   }
 }

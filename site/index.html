@@ -394,6 +394,7 @@ const groups = { all: () => true, classic: (id) => !ANIME.has(id), anime: (id) =
 
 const grid = document.getElementById("grid");
 const cards = new Map();
+const tiles = new Map();
 for (const id of STATE_IDS) {
   const card = document.createElement("article");
   card.className = "card";
@@ -401,8 +402,43 @@ for (const id of STATE_IDS) {
   grid.append(card);
   // 24 draws a second is plenty for a tile this size, and the engine already
   // skips tiles that are off screen, so a long page costs what is visible.
-  mount(card.querySelector(".host"), { state: id, fps: 24 });
+  const ctl = mount(card.querySelector(".host"), { state: id, fps: 24 });
   cards.set(id, card);
+  tiles.set(id, ctl);
+  // Hover replays the tile you are looking at, which is the one moment you
+  // can be sure somebody is looking.
+  card.addEventListener("pointerenter", () => replay(id));
+}
+
+// Entering a state is a one-shot: the wink winks once, creative spins once,
+// the startled states blink once on arrival, and after that the tile just
+// holds its pose. Replaying means ARRIVING again -- and the engine refuses to
+// set the state it is already in, so the way back in is through another state
+// at the same instant. Both calls share one timestamp, so no frame is ever
+// drawn as idle: the tile fades from whatever is on screen into a fresh
+// arrival, spin, blink and all.
+function replay(id) {
+  const ctl = tiles.get(id);
+  if (!ctl || id === "idle") return; // idle has no arrival to replay
+  const now = ctl.clock();
+  ctl.engine.setState("idle", now);
+  ctl.engine.setState(id, now);
+}
+
+// And a slow wave across the grid, so the page is never a wall of statues:
+// one tile arrives again every third of a second, skipping whatever the
+// filter has hidden. Twenty-eight tiles make a lap about nine seconds long.
+if (matchMedia("(prefers-reduced-motion: no-preference)").matches) {
+  let at = 0;
+  setInterval(() => {
+    for (let i = 0; i < STATE_IDS.length; i++) {
+      const id = STATE_IDS[(at + i) % STATE_IDS.length];
+      if (cards.get(id).hidden) continue;
+      at = (at + i + 1) % STATE_IDS.length;
+      replay(id);
+      return;
+    }
+  }, 320);
 }
 mount(document.querySelector(".mark .paw"), { state: "idle", fps: 12, track: false });
 

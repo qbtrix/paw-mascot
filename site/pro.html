@@ -79,7 +79,19 @@
   @media (max-width: 900px) { .friends { grid-template-columns: repeat(2, 1fr); } }
   .friend { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
             padding: 1rem; display: grid; justify-items: center; gap: .2rem; }
-  .friend img { width: 100%; max-width: 240px; height: auto; }
+  .friend .art { width: 100%; max-width: 240px; }
+  .friend .art svg { width: 100%; height: auto; display: block; }
+  /* Alive, quietly. The whole head bobs on a slow drift, staggered per friend
+     so the grid never pulses in unison; eyes blink on their own clocks. Both
+     are transforms only, and both sit out reduced-motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    .friend .art { animation: bob 5.2s ease-in-out infinite; animation-delay: var(--d, 0s); }
+    .friend:hover .art { animation-play-state: paused; transform: rotate(-2deg) scale(1.04); transition: transform .25s; }
+    .eye { transform-box: fill-box; transform-origin: center;
+           animation: blink 5.6s infinite; animation-delay: var(--b, 0s); }
+  }
+  @keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-7px) } }
+  @keyframes blink { 0%, 91%, 100% { transform: scaleY(1) } 94%, 96% { transform: scaleY(.06) } }
   .friend b { font: 500 13.5px/1.4 var(--mono); }
   .friend i { font-style: normal; color: var(--dim); font-size: 12px; }
   .note { color: var(--dim); font-size: 13.5px; line-height: 1.7; max-width: 58ch; }
@@ -136,23 +148,40 @@ const PREORDER = "https://github.com/qbtrix/paw-mascot/issues/new?" + new URLSea
 });
 for (const id of ["cta-top", "cta-card"]) document.getElementById(id).href = PREORDER;
 
-// Rasters, deliberately: the pack's source is premium and this repo is MIT,
-// so a mountable copy of the art never enters it. The puppy is the exception
-// and it lives on the landing page, alive.
+// Inlined, so the drawings can live a little: an <img> is a sealed box, but
+// an inline SVG lets CSS reach the eye paths. Eyes are found by geometry at
+// runtime -- near-white fill, small relative to the head, roundish -- because
+// the browser's getBBox() is the one parser that never lies about a path.
 const FRIENDS = [
   ["cat", "curious & independent"], ["fox", "clever & adaptive"], ["bunny", "energetic & positive"],
   ["bear", "calm & reliable"], ["panda", "kind & balanced"], ["axolotl", "creative & unique"],
   ["penguin", "focused & determined"], ["capybara", "chill & supportive"], ["dragon", "bold & imaginative"],
 ];
 const grid = document.getElementById("friends");
-for (const [name, tag] of FRIENDS) {
+await Promise.all(FRIENDS.map(async ([name, tag], i) => {
   const el = document.createElement("div");
   el.className = "friend";
-  // Vectors served directly: crisp at any zoom and DPR. These are the flat
-  // marketing heads, not the engine-mountable pack art, which stays private.
-  el.innerHTML = `<img src="/friends/${name}.svg" width="360" height="330" alt="${name}, one of the Pro friends"><b>${name}</b><i>${tag}</i>`;
+  const svg = await (await fetch(`/friends/${name}.svg`)).text();
+  el.innerHTML = `<div class="art" role="img" aria-label="${name}, one of the Pro friends">${svg}</div><b>${name}</b><i>${tag}</i>`;
+  el.style.setProperty("--d", `${(i * 0.7) % 5.2}s`);
+  el.style.setProperty("--b", `${(i * 1.13) % 5.6}s`);
   grid.append(el);
-}
+  // Eyes, by measurement: in every friend they are the near-white paths with
+  // a tall-oval aspect around 0.57 and a sane share of the head's width
+  // (dragon's wings make his eyes RELATIVELY tiny, hence the low floor).
+  // Computed fill, not the attribute: the attribute lies about format.
+  const root = el.querySelector("svg");
+  const rb = root.getBBox();
+  for (const path of root.querySelectorAll("path")) {
+    const m = getComputedStyle(path).fill.match(/\d+/g);
+    if (!m) continue;
+    const [r, g, b] = m.map(Number);
+    if ((r + g + b) / 3 < 245) continue;
+    const bb = path.getBBox();
+    const rel = bb.width / rb.width, ar = bb.width / bb.height;
+    if (rel >= 0.03 && rel <= 0.30 && ar >= 0.5 && ar <= 0.75) path.classList.add("eye");
+  }
+}));
 </script>
 </body>
 </html>

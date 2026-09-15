@@ -227,10 +227,11 @@
   }
   .band { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr .6fr; gap: 2rem; align-items: start; }
   @media (max-width: 760px) { .band { grid-template-columns: 1fr; } }
-  .steps { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr);
-           gap: 1rem; margin-bottom: .75rem; }
-  @media (max-width: 760px) { .steps { grid-template-columns: 1fr; } }
-  .step { display: flex; gap: .8rem; align-items: baseline; font-size: 13.5px; color: var(--dim); }
+  /* The steps live in the side column, under the download button: a quiet
+     vertical checklist at label size, not a banner across the band. */
+  .steps { display: grid; gap: .9rem; margin: 1.25rem 0 0; padding: 1.25rem 0 0;
+           border-top: 1px solid var(--line); list-style: none; max-width: 24rem; }
+  .step { display: flex; gap: .7rem; align-items: baseline; font-size: 13px; color: var(--dim); }
   .step b { font: 500 12px/1.6 var(--mono); color: var(--ink); background: var(--well);
             border: 1px solid var(--line); border-radius: 6px; padding: .15rem .5rem; }
   .step span { line-height: 1.5; }
@@ -322,11 +323,7 @@
 <footer>
   <div class="band">
     <div class="badge" style="grid-column: 1 / -1">install</div>
-    <ol class="steps">
-      <li class="step"><b>1</b><span>Download the app, drag it to Applications, right-click and Open once.</span></li>
-      <li class="step"><b>2</b><span>Wire your agent with one of the commands below, or paste the prompt.</span></li>
-      <li class="step"><b>3</b><span>Run a session. It reacts. If not: <code>tail -3 ~/.paw/events.jsonl</code></span></li>
-    </ol>
+
     <div class="cmds" id="cmds">
       <div class="cmd"><span class="for"><svg aria-hidden="true"><use href="#i-anthropic"/></svg>Claude Code</span><code>/plugin marketplace add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
       <div class="cmd"><span class="for"></span><code>/plugin install paw-mascot@paw-mascot</code><button class="copy">Copy</button></div>
@@ -343,6 +340,11 @@
       <a class="cta" href="https://github.com/qbtrix/paw-mascot/releases/latest">Download for macOS</a>
       <a href="https://github.com/qbtrix/paw-mascot">GitHub</a>
       <a href="https://github.com/qbtrix/paw-mascot/blob/main/LICENSE">MIT</a>
+      <ol class="steps">
+        <li class="step"><b>1</b><span>Download the app, drag it to Applications, right-click and Open once.</span></li>
+        <li class="step"><b>2</b><span>Wire your agent with a command on the left, or paste the prompt.</span></li>
+        <li class="step"><b>3</b><span>Run a session. It reacts. If not: <code>tail -3 ~/.paw/events.jsonl</code></span></li>
+      </ol>
     </div>
   </div>
 </footer>

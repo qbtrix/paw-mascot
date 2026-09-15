@@ -3,9 +3,37 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Paw</title>
-<meta name="description" content="A mascot on your desktop that reacts while your coding agent works. Free, open source, macOS.">
+<title>Paw - a desktop pet that reacts while your coding agent works</title>
+<meta name="description" content="Paw is a free, open-source desktop pet for macOS. It watches Claude Code or Codex through their hooks and reacts live: thinking, working, a flinch when a tool fails, asleep when you are. Twenty-eight states, MIT licensed.">
+<link rel="canonical" href="https://pet.pocketpaw.xyz/">
+<meta name="theme-color" content="#252621">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Paw">
+<meta property="og:title" content="Paw - a desktop pet for coding agents">
+<meta property="og:description" content="It watches Claude Code or Codex through their hooks and reacts live. Free, open source, macOS.">
+<meta property="og:url" content="https://pet.pocketpaw.xyz/">
+<meta property="og:image" content="https://pet.pocketpaw.xyz/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Paw - a desktop pet for coding agents">
+<meta name="twitter:description" content="It watches Claude Code or Codex through their hooks and reacts live. Free, open source, macOS.">
+<meta name="twitter:image" content="https://pet.pocketpaw.xyz/og.png">
 <link rel="icon" href="/favicon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Paw",
+  "description": "A desktop pet that reacts while your coding agent works. It reads Claude Code and Codex hook events and shows what the agent is doing.",
+  "url": "https://pet.pocketpaw.xyz/",
+  "downloadUrl": "https://github.com/qbtrix/paw-mascot/releases/latest",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "macOS",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "license": "https://github.com/qbtrix/paw-mascot/blob/main/LICENSE"
+}
+</script>
 <!--
   Creative Direction Declaration
   Archetype: Playfulness held inside Technology. Richness: Minimalist.
@@ -29,7 +57,7 @@
 -->
 <link rel="stylesheet" href="/_fx/effects/paw-avatar/style.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600&family=Manrope:wght@400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600&family=Instrument+Sans:wght@500;600&family=Manrope:wght@400;500&display=swap');
 
   :root {
     /* The ground is the captain's swatch: a warm olive charcoal, read off the
@@ -113,7 +141,11 @@
     background: color-mix(in srgb, var(--bg) 88%, transparent);
     backdrop-filter: blur(10px); border-bottom: 1px solid var(--line);
   }
-  .mark { display: flex; align-items: center; gap: .6rem; font: 600 17px/1 var(--display); letter-spacing: -.02em; text-decoration: none; }
+  /* The wordmark alone gets the soft round face: it is a pet, and the one
+     word on the page that is a name gets to look like one. Everything else
+     stays in the working faces. */
+  .mark { display: flex; align-items: center; gap: .6rem; text-decoration: none;
+          font: 600 21px/1 "Baloo 2", var(--display); letter-spacing: 0; }
   .mark .paw { --fx-paw-size: 28px; --fx-paw-ground: none; }
   .pills { display: flex; gap: .4rem; justify-content: center; }
   .pill {

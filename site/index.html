@@ -252,25 +252,6 @@
      column is actually a column instead of drifting per row */
   .lines .ev { min-width: 19ch; }
 
-  /* --- pro: what the paid layer is, and the founder pre-order --------------- */
-  .pro { border-top: 1px solid var(--line); }
-  .pro-inner { max-width: 1240px; margin: 0 auto; display: grid;
-               grid-template-columns: 1.2fr .8fr; gap: clamp(2rem, 5vw, 4rem);
-               padding: clamp(2.5rem, 5vw, 4rem) clamp(1rem, 3vw, 2.5rem); align-items: start; }
-  @media (max-width: 820px) { .pro-inner { grid-template-columns: 1fr; } }
-  .offers { display: grid; }
-  .offer { display: grid; grid-template-columns: 7.5rem 1fr; gap: 1rem; align-items: baseline;
-           padding: 1rem 0; border-top: 1px solid var(--line); }
-  .offer:first-child { border-top: 0; }
-  .offer .k { font: 500 13px/1 var(--mono); color: var(--ink); letter-spacing: .02em; }
-  .offer span:last-child { color: var(--dim); font-size: 13.5px; line-height: 1.5; }
-  .price-card { background: var(--well); border: 1px solid var(--line); border-radius: var(--radius);
-                padding: 1.75rem; display: grid; gap: .9rem; justify-items: start; }
-  .amount { font: 600 44px/1 var(--display); letter-spacing: -.02em; }
-  .amount small { font: 500 13px/1 var(--mono); color: var(--dim); letter-spacing: .04em; margin-left: .5rem; }
-  .price-card .cta { padding: .85rem 1.4rem; }
-  .fine { color: var(--dim); font-size: 12.5px; line-height: 1.6; max-width: 26ch; }
-
   /* --- footer band: how to get it ----------------------------------------- */
   footer {
     border-top: 1px solid var(--line); background: var(--panel);
@@ -368,27 +349,6 @@
           <svg aria-hidden="true"><use href="#i-openai"/></svg>Codex</button>
       </div>
       <div class="lines" id="term"></div>
-    </div>
-  </div>
-</section>
-
-<section class="pro" id="pro">
-  <div class="pro-inner">
-    <div>
-      <div class="badge">pro</div>
-      <div class="offers">
-        <div class="offer"><span class="k">hub</span><span>every running session on your desk, one glance</span></div>
-        <div class="offer"><span class="k">control</span><span>start and stop sessions from the pet</span></div>
-        <div class="offer"><span class="k">voice</span><span>launch a Claude Code or Codex session by talking</span></div>
-        <div class="offer"><span class="k">packs</span><span>more friends: cat, fox, bunny, bear, panda and the rest</span></div>
-        <div class="offer"><span class="k">signed</span><span>notarized app, no warning dialog</span></div>
-      </div>
-    </div>
-    <div class="price-card">
-      <div class="amount">$19<small>FOUNDER &middot; LIFETIME</small></div>
-      <a class="cta" href="https://github.com/qbtrix/paw-mascot/issues/new?title=Pro+founder+pre-order&body=Count+me+in+at+the+founder+price.+Ping+me+here+when+checkout+opens.%0A%0A%28Filed+from+pet.pocketpaw.xyz%29&labels=pre-order">Pre-order Pro</a>
-      <div class="fine">Price locks now; Pro ships later, macOS first. The free pet is yours today and stays MIT forever.</div>
-      <a href="/pro" style="color:var(--dim);font-size:12.5px">everything in Pro &rarr;</a>
     </div>
   </div>
 </section>

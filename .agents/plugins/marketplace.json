@@ -1,0 +1,11 @@
+{
+  "name": "paw-mascot",
+  "description": "The Paw desktop mascot and the bridge that makes it react while your coding agent works.",
+  "plugins": [
+    {
+      "name": "paw-mascot",
+      "description": "Forwards Codex lifecycle events to the Paw desktop mascot.",
+      "source": { "path": "./plugin" }
+    }
+  ]
+}

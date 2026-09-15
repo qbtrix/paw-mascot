@@ -37,7 +37,13 @@ For **Claude Code**, inside a session:
 /plugin install paw-mascot@paw-mascot
 ```
 
-For **Codex CLI**, or to set up several agents at once:
+For **Codex CLI**:
+
+```
+codex plugin marketplace add qbtrix/paw-mascot
+```
+
+then install `paw-mascot` from it. Or, to set up several agents at once:
 
 ```bash
 npx skills add qbtrix/paw-mascot
@@ -64,7 +70,7 @@ Run one command in your agent. The mascot should react. If it does not,
 | Agent | Works | Notes |
 |-------|-------|-------|
 | Claude Code | yes | all eleven events |
-| Codex CLI | yes | no `Notification` or `PostToolUseFailure`, so no "waiting for you" and no flinch on a failed tool |
+| Codex CLI | yes | ships as an [Agent Plugins](https://agent-plugins.org) package; no `Notification` or `PostToolUseFailure`, so no "waiting for you" and no flinch on a failed tool |
 | DeepSeek Harness | probably | it runs a Claude Code `hooks.json` through a compatibility package; we have not run it end to end |
 | Cursor, Gemini CLI, OpenCode, Copilot, … | no | the skill installs, but these have no lifecycle hooks, so the mascot never hears from them |
 

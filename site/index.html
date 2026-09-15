@@ -48,6 +48,46 @@
     --body: "Manrope", "Helvetica Neue", Arial, sans-serif;
     --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
   }
+  /* Six rooms for the same creatures. A theme is nothing but tokens: the
+     page's ground and the mascot's material are both CSS vars, so one
+     attribute on <html> rethemes all twenty-eight at once. That is also the
+     sales pitch: this is the exact theming a host page gets from paw-fx. */
+  :root[data-theme="ink"] {
+    --bg: #141a27; --panel: #1a2131; --well: #10151f;
+    --line: #252d40; --line-hi: #364259; --ink: #e9edf7; --dim: #8a94ab;
+  }
+  :root[data-theme="ember"] {
+    --bg: #241f1a; --panel: #2a241e; --well: #1c1815;
+    --line: #3a322a; --line-hi: #4c4236; --ink: #f0eae2; --dim: #a2988a;
+    --accent: #ffb454;
+    --paw-rim-a: #fff7ec; --paw-rim-b: #ffe2b8; --paw-rim-c: #ffc478;
+    --paw-rim-d: #ffb454; --paw-rim-e: #ffd9a0;
+    --paw-glow: rgba(255, 180, 84, .38); --paw-halo: #d99a4e; --paw-eye: #fff6e8;
+  }
+  :root[data-theme="moss"] {
+    --bg: #1c211b; --panel: #222821; --well: #161a15;
+    --line: #303a2f; --line-hi: #40503e; --ink: #e9efe6; --dim: #93a08e;
+    --accent: #9fe8b0;
+    --paw-rim-a: #f2fff4; --paw-rim-b: #d1ffd9; --paw-rim-c: #a9f0b8;
+    --paw-rim-d: #8fe6a4; --paw-rim-e: #c8f7d0;
+    --paw-glow: rgba(140, 230, 170, .36); --paw-halo: #6fbf88; --paw-eye: #f2fff5;
+  }
+  :root[data-theme="rose"] {
+    --bg: #231d1f; --panel: #292225; --well: #1b1618;
+    --line: #3a3034; --line-hi: #4c3f45; --ink: #f4ecef; --dim: #a3939a;
+    --accent: #ff9db8;
+    --paw-rim-a: #fff2f6; --paw-rim-b: #ffd6e2; --paw-rim-c: #ffadc6;
+    --paw-rim-d: #ff9db8; --paw-rim-e: #ffc9d9;
+    --paw-glow: rgba(255, 157, 184, .34); --paw-halo: #d97d97; --paw-eye: #fff3f7;
+  }
+  :root[data-theme="graphite"] {
+    --bg: #202124; --panel: #26272b; --well: #1a1b1e;
+    --line: #343640; --line-hi: #464956; --ink: #f0f1f4; --dim: #9a9ca6;
+    --accent: #e8eaf0;
+    --paw-rim-a: #ffffff; --paw-rim-b: #f2f4f8; --paw-rim-c: #d9dde6;
+    --paw-rim-d: #c4c9d6; --paw-rim-e: #e6e9f0;
+    --paw-glow: rgba(230, 235, 245, .32); --paw-halo: #aab0c0; --paw-eye: #ffffff;
+  }
   * { box-sizing: border-box; }
   html { color-scheme: dark; }
   body {
@@ -59,7 +99,7 @@
   /* --- header: wordmark, filters, the one CTA, one line -------------------- */
   header {
     position: sticky; top: 0; z-index: 5; height: 72px;
-    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 1.5rem;
+    display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 1.5rem;
     padding: 0 clamp(1rem, 3vw, 2.5rem);
     background: color-mix(in srgb, var(--bg) 88%, transparent);
     backdrop-filter: blur(10px); border-bottom: 1px solid var(--line);
@@ -74,6 +114,15 @@
   }
   .pill:hover { color: var(--ink); border-color: var(--line-hi); }
   .pill[aria-pressed="true"] { color: var(--bg); background: var(--ink); border-color: var(--ink); }
+  .themes { display: flex; gap: .5rem; align-items: center; }
+  .swatch {
+    width: 20px; height: 20px; border-radius: 50%; cursor: pointer; padding: 0;
+    background: var(--sw-accent); border: 1px solid var(--line-hi);
+    box-shadow: inset 0 0 0 5px var(--sw-ground);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .swatch:hover { transform: scale(1.15); }
+  .swatch[aria-pressed="true"] { box-shadow: inset 0 0 0 5px var(--sw-ground), 0 0 0 2px var(--ink); }
   .cta {
     font: 600 13.5px/1 var(--display); color: var(--bg); background: var(--accent);
     border: 0; border-radius: 999px; padding: .7rem 1.05rem; text-decoration: none; white-space: nowrap;
@@ -86,12 +135,15 @@
   main { max-width: 1240px; margin: 0 auto; padding: clamp(2rem, 4vw, 3.5rem) clamp(1rem, 3vw, 2.5rem) 5rem; }
   .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
           column-gap: clamp(1.5rem, 4vw, 3.5rem); row-gap: clamp(2rem, 4vw, 3.25rem);
-          /* No purple on this page, the mascot included. The character's rim is
-             a var() ramp, so it is re-tokened here and the app keeps its own. */
-          --fx-paw-rim-a: #ffffff; --fx-paw-rim-b: #e6f1ff; --fx-paw-rim-c: #a9d1ff;
-          --fx-paw-rim-d: #8cc6ff; --fx-paw-rim-e: #cfe5ff;
-          --fx-paw-glow: rgba(140, 198, 255, .45); --fx-paw-halo: #6aa9e6;
-          --fx-paw-floor-a: #bcdcff; --fx-paw-floor-b: #86bdf4; --fx-paw-floor-c: #4f8fd1;
+          /* No purple on this page, the mascot included. The character's rim
+             is a var() ramp, so it is re-tokened here (ice by default, the
+             theme's ramp when one is set) and the app keeps its own. */
+          --fx-paw-rim-a: var(--paw-rim-a, #ffffff); --fx-paw-rim-b: var(--paw-rim-b, #e6f1ff);
+          --fx-paw-rim-c: var(--paw-rim-c, #a9d1ff); --fx-paw-rim-d: var(--paw-rim-d, #8cc6ff);
+          --fx-paw-rim-e: var(--paw-rim-e, #cfe5ff);
+          --fx-paw-glow: var(--paw-glow, rgba(140, 198, 255, .45));
+          --fx-paw-halo: var(--paw-halo, #6aa9e6);
+          --fx-paw-eye: var(--paw-eye, #f7fbff);
           --fx-paw-ground: none; }
   @media (max-width: 1000px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   @media (max-width: 680px)  { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 1.25rem; row-gap: 2rem; } }
@@ -147,6 +199,7 @@
 <header>
   <a class="mark" href="/"><span class="paw" data-state="idle" aria-hidden="true"></span>Paw</a>
   <nav class="pills" id="pills" aria-label="Filter states"></nav>
+  <div class="themes" id="themes" aria-label="Theme"></div>
   <a class="cta" href="https://github.com/qbtrix/paw-mascot/releases/latest">Download for macOS</a>
 </header>
 
@@ -205,6 +258,36 @@ for (const g of Object.keys(groups)) {
   };
   pills.append(b);
 }
+
+// --- themes ------------------------------------------------------------------
+// Each dot is ground + accent; clicking sets one attribute and every token,
+// the mascots' material included, follows. The choice survives a reload, and
+// a bad read of localStorage is just the default theme.
+const THEMES = [
+  ["charcoal", "#252621", "#8cc6ff"],
+  ["ink",      "#141a27", "#8cc6ff"],
+  ["graphite", "#202124", "#e8eaf0"],
+  ["ember",    "#241f1a", "#ffb454"],
+  ["moss",     "#1c211b", "#9fe8b0"],
+  ["rose",     "#231d1f", "#ff9db8"],
+];
+const themeBar = document.getElementById("themes");
+function setTheme(name) {
+  if (name === "charcoal") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.dataset.theme = name;
+  for (const b of themeBar.children) b.setAttribute("aria-pressed", String(b.dataset.t === name));
+  try { localStorage.setItem("paw-theme", name); } catch {}
+}
+for (const [name, ground, accent] of THEMES) {
+  const b = document.createElement("button");
+  b.className = "swatch"; b.dataset.t = name; b.title = name;
+  b.style.setProperty("--sw-ground", ground); b.style.setProperty("--sw-accent", accent);
+  b.onclick = () => setTheme(name);
+  themeBar.append(b);
+}
+let saved = "charcoal";
+try { saved = localStorage.getItem("paw-theme") || "charcoal"; } catch {}
+setTheme(THEMES.some(([n]) => n === saved) ? saved : "charcoal");
 
 for (const btn of document.querySelectorAll(".copy")) {
   btn.onclick = async () => {

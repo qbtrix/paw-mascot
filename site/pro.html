@@ -148,7 +148,9 @@ const grid = document.getElementById("friends");
 for (const [name, tag] of FRIENDS) {
   const el = document.createElement("div");
   el.className = "friend";
-  el.innerHTML = `<img src="/friends/${name}.png" width="360" height="330" alt="${name}, one of the Pro friends"><b>${name}</b><i>${tag}</i>`;
+  // Vectors served directly: crisp at any zoom and DPR. These are the flat
+  // marketing heads, not the engine-mountable pack art, which stays private.
+  el.innerHTML = `<img src="/friends/${name}.svg" width="360" height="330" alt="${name}, one of the Pro friends"><b>${name}</b><i>${tag}</i>`;
   grid.append(el);
 }
 </script>

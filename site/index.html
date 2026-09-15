@@ -12,7 +12,8 @@
   Critique: the trap here is a hero that explains the mascot in words. The
   mascot explains itself, so the page is the twenty-eight states, live, and
   the only sentence on it is the download button. Family: Clean-Tech, off-black
-  ground, hairline cards, one ice-blue accent and no purple anywhere: the
+  ground, hairline cards, one ice-blue accent and purple only where a theme
+  asks for it: the
   character's own rim ramp is re-tokened on this page so the violet stop in the
   shipped drawing never appears here. Reading this as: a dev-tool landing page
   for a desktop pet, matching the captain's reference grid one for one, driving
@@ -87,6 +88,14 @@
     --paw-rim-a: #ffffff; --paw-rim-b: #f2f4f8; --paw-rim-c: #d9dde6;
     --paw-rim-d: #c4c9d6; --paw-rim-e: #e6e9f0;
     --paw-glow: rgba(230, 235, 245, .32); --paw-halo: #aab0c0; --paw-eye: #ffffff;
+  }
+  :root[data-theme="violet"] {
+    --bg: #1e1a27; --panel: #241f2f; --well: #171320;
+    --line: #332c44; --line-hi: #453b5c; --ink: #eeeaf7; --dim: #988fad;
+    --accent: #b8a3ff;
+    --paw-rim-a: #f8f5ff; --paw-rim-b: #e4d9ff; --paw-rim-c: #c3aaff;
+    --paw-rim-d: #ab8dff; --paw-rim-e: #d6c4ff;
+    --paw-glow: rgba(171, 141, 255, .38); --paw-halo: #8a6fd9; --paw-eye: #f7f3ff;
   }
   * { box-sizing: border-box; }
   html { color-scheme: dark; }
@@ -270,6 +279,7 @@ const THEMES = [
   ["ember",    "#241f1a", "#ffb454"],
   ["moss",     "#1c211b", "#9fe8b0"],
   ["rose",     "#231d1f", "#ff9db8"],
+  ["violet",   "#1e1a27", "#b8a3ff"],
 ];
 const themeBar = document.getElementById("themes");
 function setTheme(name) {

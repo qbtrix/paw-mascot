@@ -172,6 +172,14 @@
            transition: color .2s; }
   .card:hover .label { color: var(--ink); }
 
+  /* --- section badges: one word, so the eye knows where it is --------------- */
+  .badge {
+    justify-self: start; align-self: start; width: fit-content;
+    font: 500 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase;
+    color: var(--dim); background: var(--well); border: 1px solid var(--line);
+    border-radius: 999px; padding: .4rem .8rem; margin-bottom: 1.75rem;
+  }
+
   /* --- the demo: a session, replayed against the real mapping -------------- */
   .demo { border-top: 1px solid var(--line); background: var(--panel); }
   .demo-inner {
@@ -225,7 +233,9 @@
     background: var(--well); border: 1px solid var(--line); border-radius: 10px; padding: .6rem .75rem;
     font: 13px/1.4 var(--mono);
   }
-  .cmd .for { color: var(--dim); font-family: var(--body); font-size: 12.5px; min-width: 6.5rem; }
+  .cmd .for { display: flex; align-items: center; gap: .55rem;
+              color: var(--dim); font-family: var(--body); font-size: 12.5px; min-width: 8rem; }
+  .cmd .for svg { width: 14px; height: 14px; fill: currentColor; flex: none; }
   .cmd code { color: var(--ink); overflow-x: auto; white-space: nowrap; }
   .copy {
     font: 500 12px/1 var(--body); color: var(--dim); background: transparent;
@@ -245,6 +255,25 @@
 </head>
 <body>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-anthropic" viewBox="0 0 24 24"><path d="M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.5409Zm-.3712 10.2232 2.2914-5.9456 2.2914 5.9456Z"/></symbol>
+    <symbol id="i-openai" viewBox="0 0 24 24"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z"/></symbol>
+    <!-- the Paw itself, for "any agent": the tray silhouette, eyes punched out -->
+    <symbol id="i-paw" viewBox="0 0 320 270">
+      <mask id="i-paw-m">
+        <rect width="320" height="270" fill="black"/>
+        <path fill="white" d="M76 74 C51 77 35 95 31 119 C27 141 35 161 51 168 C67 175 83 160 88 138 C93 116 95 91 88 80 C85 75 81 73 76 74Z"/>
+        <path fill="white" d="M244 74 C269 77 285 95 289 119 C293 141 285 161 269 168 C253 175 237 160 232 138 C227 116 225 91 232 80 C235 75 239 73 244 74Z"/>
+        <path fill="white" d="M160 29 C119 28 84 46 68 78 C54 107 54 149 66 181 C76 208 107 225 160 226 C213 225 244 208 254 181 C266 149 266 107 252 78 C236 46 201 28 160 29Z"/>
+        <rect x="105" y="91" width="25" height="51" rx="12.5" fill="black"/>
+        <rect x="190" y="91" width="25" height="51" rx="12.5" fill="black"/>
+      </mask>
+      <rect width="320" height="270" fill="currentColor" mask="url(#i-paw-m)"/>
+    </symbol>
+  </defs>
+</svg>
+
 <header>
   <a class="mark" href="/"><span class="paw" data-state="idle" aria-hidden="true"></span>Paw</a>
   <nav class="pills" id="pills" aria-label="Filter states"></nav>
@@ -253,11 +282,13 @@
 </header>
 
 <main>
+  <div class="badge">states</div>
   <div class="grid" id="grid"></div>
 </main>
 
 <section class="demo">
   <div class="demo-inner">
+    <div class="badge" style="grid-column: 1 / -1">demo</div>
     <div class="demo-pet">
       <div class="host" id="demoHost"></div>
       <div class="state-pill" id="demoState">idle</div>
@@ -265,9 +296,9 @@
     <div class="term" aria-label="Hook events">
       <div class="agents" id="agents">
         <button class="agent" data-a="claude" aria-pressed="true">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.5409Zm-.3712 10.2232 2.2914-5.9456 2.2914 5.9456Z"/></svg>Claude Code</button>
+          <svg aria-hidden="true"><use href="#i-anthropic"/></svg>Claude Code</button>
         <button class="agent" data-a="codex" aria-pressed="false">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z"/></svg>Codex</button>
+          <svg aria-hidden="true"><use href="#i-openai"/></svg>Codex</button>
       </div>
       <div class="lines" id="term"></div>
     </div>
@@ -276,11 +307,12 @@
 
 <footer>
   <div class="band">
+    <div class="badge" style="grid-column: 1 / -1">install</div>
     <div class="cmds" id="cmds">
-      <div class="cmd"><span class="for">Claude Code</span><code>/plugin marketplace add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
+      <div class="cmd"><span class="for"><svg aria-hidden="true"><use href="#i-anthropic"/></svg>Claude Code</span><code>/plugin marketplace add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
       <div class="cmd"><span class="for"></span><code>/plugin install paw-mascot@paw-mascot</code><button class="copy">Copy</button></div>
-      <div class="cmd"><span class="for">Codex</span><code>codex plugin marketplace add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
-      <div class="cmd"><span class="for">Any agent</span><code>npx skills add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
+      <div class="cmd"><span class="for"><svg aria-hidden="true"><use href="#i-openai"/></svg>Codex</span><code>codex plugin marketplace add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
+      <div class="cmd"><span class="for"><svg aria-hidden="true"><use href="#i-paw"/></svg>Any agent</span><code>npx skills add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
     </div>
     <div class="side">
       <a class="cta" href="https://github.com/qbtrix/paw-mascot/releases/latest">Download for macOS</a>

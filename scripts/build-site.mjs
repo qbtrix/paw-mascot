@@ -21,6 +21,10 @@ cpSync(join(ROOT, "app/src-tauri/icons/32x32.png"), join(OUT, "favicon.png"));
 // The demo section drives a mascot with the SAME mapping the desktop app
 // runs, so what the page shows is the product, not a re-enactment of it.
 cpSync(join(ROOT, "web/mapping.js"), join(OUT, "mapping.js"));
+// /pro must resolve on any static host without guessing its html_handling
+// mood, so the page ships at both spellings: pro.html and pro/index.html.
+mkdirSync(join(OUT, "pro"), { recursive: true });
+cpSync(join(OUT, "pro.html"), join(OUT, "pro/index.html"));
 
 // Cloudflare serves these headers for static assets; long cache on the effect,
 // none on the page, so a new deploy is seen immediately but the engine is not

@@ -1,0 +1,11 @@
+# wrangler.toml — the landing page as an assets-only Cloudflare Worker.
+#
+# Created 2026-09-15. Same shape paw-fx uses for its registry site: no Worker
+# code, just a directory of static files. `bun run site` builds dist/site,
+# `wrangler deploy` ships it. The custom domain (pet.pocketpaw.xyz) is
+# attached in the Cloudflare dashboard, not here.
+name = "paw-mascot-site"
+compatibility_date = "2026-09-01"
+
+[assets]
+directory = "./dist/site"

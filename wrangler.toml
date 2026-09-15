@@ -1,11 +1,27 @@
-# wrangler.toml — the landing page as an assets-only Cloudflare Worker.
+# wrangler.toml — the landing page as a Cloudflare Worker: static assets,
+# plus one POST endpoint for the pre-order list.
 #
-# Created 2026-09-15. Same shape paw-fx uses for its registry site: no Worker
-# code, just a directory of static files. `bun run site` builds dist/site,
-# `wrangler deploy` ships it. The custom domain (pet.pocketpaw.xyz) is
-# attached in the Cloudflare dashboard, not here.
+# Created 2026-09-15 as assets-only, the same shape paw-fx uses for its
+# registry site. It grew exactly one endpoint the same day (see `main`).
+# `bun run site` builds dist/site, `wrangler deploy` ships it. The custom
+# domain (pet.pocketpaw.xyz) is attached in the Cloudflare dashboard, not here.
 name = "paw-mascot-site"
 compatibility_date = "2026-09-01"
+# One endpoint's worth of server: POST /api/preorder. Cloudflare serves a
+# matching static asset FIRST and only calls the Worker when nothing matches,
+# so adding this changed nothing about how the pages are served.
+main = "./worker/index.js"
 
 [assets]
 directory = "./dist/site"
+binding = "ASSETS"
+
+# The pre-order list. Create it once with:
+#   wrangler d1 create paw-preorders
+#   wrangler d1 execute paw-preorders --remote --file ./schema.sql
+# Read it back with:
+#   wrangler d1 execute paw-preorders --remote --command "SELECT * FROM preorders"
+[[d1_databases]]
+binding = "DB"
+database_name = "paw-preorders"
+database_id = "PASTE_AFTER_d1_create"

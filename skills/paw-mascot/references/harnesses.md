@@ -11,8 +11,8 @@ harness below fires the same script; only the config file differs.
 ## Claude Code
 
 - **Native path (preferred):** `/plugin marketplace add qbtrix/paw-mascot` then
-  `/plugin install paw-mascot@paw-mascot`. The plugin carries `hooks/hooks.json`
-  and Claude Code substitutes `${CLAUDE_PLUGIN_ROOT}`.
+  `/plugin install paw-mascot@paw-mascot`. The plugin carries
+  `hooks/claude.json` and Claude Code substitutes `${CLAUDE_PLUGIN_ROOT}`.
 - **Settings path (only if you skip the plugin):** merge into
   `~/.claude/settings.json` under `hooks`. `scripts/install.sh --claude-settings`
   does it.
@@ -22,8 +22,13 @@ harness below fires the same script; only the config file differs.
 
 ## Codex CLI
 
-- **Config:** `~/.codex/hooks.json`, or `<repo>/.codex/hooks.json` for one
-  project. Hooks are on by default; `[features] hooks = false` in
+- **Plugin (preferred):** `codex plugin marketplace add qbtrix/paw-mascot` then
+  install `paw-mascot`. The repo carries a root `plugin/plugin.json` in the
+  vendor-neutral [Agent Plugins](https://agent-plugins.org) format with an
+  `extensions.com.openai` block, and Codex default-discovers `hooks/hooks.json`
+  beside it, substituting `${PLUGIN_ROOT}`.
+- **Config (manual):** `~/.codex/hooks.json`, or `<repo>/.codex/hooks.json` for
+  one project. Hooks are on by default; `[features] hooks = false` in
   `~/.codex/config.toml` turns them off.
 - **Shape:** identical to Claude Code — a top-level `hooks` object, event names
   as keys, each a list of `{matcher, hooks: [{type: "command", command}]}`.
@@ -48,6 +53,20 @@ harness below fires the same script; only the config file differs.
   The installer prints guidance for dsh rather than guessing a path and writing
   to the wrong file. Its README calls the package "only a compatibility path", so
   treat this route as something that could change under us.
+
+## Why two plugin manifests
+
+Claude Code reads `.claude-plugin/plugin.json`. Codex reads a root `plugin.json`
+in the Agent Plugins format. Anthropic is not on that spec's steering committee
+(Amazon, Cursor, Microsoft, OpenAI and Vercel are), so there is no one file that
+serves both, and this repo simply carries both. They share everything that
+matters: one `paw-event.sh`, one event stream, one mascot.
+
+The hooks files are separate for two reasons, not one. The obvious one is the
+root variable -- `${CLAUDE_PLUGIN_ROOT}` against `${PLUGIN_ROOT}`. The other is
+that Codex has no `Notification` or `PostToolUseFailure`, so its file declares
+nine events where Claude's declares eleven. Listing an event a harness never
+fires is harmless; listing one it rejects is not.
 
 ## Everything else
 

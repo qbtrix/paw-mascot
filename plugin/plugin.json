@@ -1,0 +1,29 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "paw-mascot",
+  "version": "0.1.0",
+  "description": "A mascot on your desktop that reacts while your coding agent works. This plugin is the bridge: it forwards lifecycle events to the app.",
+  "author": {
+    "name": "qbtrix",
+    "url": "https://github.com/qbtrix/paw-mascot"
+  },
+  "homepage": "https://github.com/qbtrix/paw-mascot",
+  "repository": "https://github.com/qbtrix/paw-mascot",
+  "license": "MIT",
+  "keywords": [
+    "mascot",
+    "desktop",
+    "hooks",
+    "status",
+    "fun"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Paw Mascot",
+        "category": "Productivity",
+        "description": "Watch a little glass creature react while Codex works."
+      }
+    }
+  }
+}

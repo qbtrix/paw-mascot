@@ -18,6 +18,9 @@ mkdirSync(join(OUT, "_fx/effects"), { recursive: true });
 cpSync(join(ROOT, "site"), OUT, { recursive: true });
 cpSync(join(ROOT, "web/_fx/effects/paw-avatar"), join(OUT, "_fx/effects/paw-avatar"), { recursive: true });
 cpSync(join(ROOT, "app/src-tauri/icons/32x32.png"), join(OUT, "favicon.png"));
+// The demo section drives a mascot with the SAME mapping the desktop app
+// runs, so what the page shows is the product, not a re-enactment of it.
+cpSync(join(ROOT, "web/mapping.js"), join(OUT, "mapping.js"));
 
 // Cloudflare serves these headers for static assets; long cache on the effect,
 // none on the page, so a new deploy is seen immediately but the engine is not

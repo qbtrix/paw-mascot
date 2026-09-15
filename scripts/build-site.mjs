@@ -27,7 +27,11 @@ cpSync(join(ROOT, "web/mapping.js"), join(OUT, "mapping.js"));
 // refetched on every visit.
 const headers = `/_fx/*
   Cache-Control: public, max-age=31536000, immutable
+/friends/*
+  Cache-Control: public, max-age=86400
 /
+  Cache-Control: no-cache
+/pro
   Cache-Control: no-cache
 `;
 await Bun.write(join(OUT, "_headers"), headers);

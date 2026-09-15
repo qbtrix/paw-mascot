@@ -129,4 +129,11 @@ The plugin carries a byte-identical copy at `plugin/hooks/paw-event.sh`, because
 
 ## Licence
 
-MIT.
+Code MIT, art CC BY 4.0.
+
+Every line of code here -- the engine, the app, the bridge, the site -- is
+MIT, in [LICENSE](LICENSE). The Paw character itself, and the friends' heads
+on the site, are Creative Commons BY 4.0, in [LICENSE-ART.md](LICENSE-ART.md):
+use the art anywhere, commercially included, with visible credit -- "Paw
+character by qbtrix", linked back here. The Paw name, and the character used
+as a product's identity, stay the project's.

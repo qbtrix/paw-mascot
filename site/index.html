@@ -31,13 +31,16 @@
   @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600&family=Manrope:wght@400;500&display=swap');
 
   :root {
-    --bg: #0b0e13;
-    --panel: #10141b;
-    --well: #0d1117;
-    --line: #1c2230;
-    --line-hi: #2a3446;
-    --ink: #eef2f8;
-    --dim: #7f8a9c;
+    /* The ground is the Paw-OS sheet's own ink, sampled from the concept art
+       (rgb 20 26 39), not a tuned-by-eye near-black. Everything else keys off
+       that: panel a step up, lines a step past the panel. */
+    --bg: #141a27;
+    --panel: #1a2131;
+    --well: #10151f;
+    --line: #252d40;
+    --line-hi: #364259;
+    --ink: #e9edf7;
+    --dim: #8a94ab;
     --accent: #8cc6ff;
     --radius: 14px;
     --display: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;

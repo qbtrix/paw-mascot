@@ -13,6 +13,6 @@
     "app:build": "bunx --bun @tauri-apps/cli@^2 build",
     "sync-bridge": "cp skills/paw-mascot/scripts/paw-event.sh plugin/hooks/paw-event.sh && chmod +x plugin/hooks/paw-event.sh && echo 'plugin bridge synced from skills/'",
     "site": "bun scripts/build-site.mjs",
-    "site:deploy": "bun run site && wrangler deploy"
+    "site:deploy": "bun run site && wrangler deploy --config ./wrangler.toml"
   }
 }

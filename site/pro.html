@@ -87,11 +87,21 @@
   @media (prefers-reduced-motion: no-preference) {
     .friend .art { animation: bob 5.2s ease-in-out infinite; animation-delay: var(--d, 0s); }
     .friend:hover .art { animation-play-state: paused; transform: rotate(-2deg) scale(1.04); transition: transform .25s; }
-    .eye { transform-box: fill-box; transform-origin: center;
-           animation: blink 5.6s infinite; animation-delay: var(--b, 0s); }
   }
   @keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-7px) } }
-  @keyframes blink { 0%, 91%, 100% { transform: scaleY(1) } 94%, 96% { transform: scaleY(.06) } }
+  /* The engine's live eyes ride on top of the traced heads: a full paw-avatar
+     mounts per friend and every group except the face is switched off, so
+     what remains is the pair of engine eyes -- the ones that blink, squash
+     with state and follow the pointer. The traced sockets underneath go
+     hidden once the overlay lands. */
+  .art { position: relative; }
+  .eyes-overlay { position: absolute; inset: 0; pointer-events: none; }
+  .eyes-overlay .fx-paw { position: absolute; }
+  .eyes-overlay .fx-paw-svg { filter: none; overflow: visible; }
+  .eyes-overlay .fx-paw-ground, .eyes-overlay .fx-paw-back,
+  .eyes-overlay .fx-paw-part, .eyes-overlay .fx-paw-mouth,
+  .eyes-overlay .fx-paw-marks { display: none; }
+  .art .eye.socketed { visibility: hidden; }
   .friend b { font: 500 13.5px/1.4 var(--mono); }
   .friend i { font-style: normal; color: var(--dim); font-size: 12px; }
   .note { color: var(--dim); font-size: 13.5px; line-height: 1.7; max-width: 58ch; }
@@ -141,6 +151,34 @@
 import { mount } from "/_fx/effects/paw-avatar/index.js";
 mount(document.querySelector(".mark .paw"), { state: "idle", fps: 12, track: false });
 
+// After a friend's traced eyes are tagged, park an engine instance over them:
+// measure the socket pair, measure the engine's face group, then scale and
+// translate the whole engine so its face sits exactly in the sockets.
+function socketEyes(el) {
+  const art = el.querySelector(".art");
+  const eyes = [...art.querySelectorAll(".eye")];
+  if (eyes.length !== 2) return; // no confident sockets, leave the traced eyes be
+  const a = art.getBoundingClientRect();
+  const r0 = eyes[0].getBoundingClientRect(), r1 = eyes[1].getBoundingClientRect();
+  const left = Math.min(r0.left, r1.left) - a.left, right = Math.max(r0.right, r1.right) - a.left;
+  const top = Math.min(r0.top, r1.top) - a.top, bottom = Math.max(r0.bottom, r1.bottom) - a.top;
+  const overlay = document.createElement("div");
+  overlay.className = "eyes-overlay";
+  const host = document.createElement("div");
+  overlay.append(host); art.append(overlay);
+  const pet = mount(host, { state: "idle", fps: 20 });
+  const paw = host.querySelector(".fx-paw") || host;
+  paw.style.setProperty("--fx-paw-size", `${a.width}px`);
+  requestAnimationFrame(() => {
+    const face = host.querySelector(".fx-paw-face");
+    const f = face.getBoundingClientRect(), h = host.getBoundingClientRect();
+    const scale = (right - left) / f.width;
+    paw.style.transformOrigin = "0 0";
+    paw.style.transform = `translate(${left - (f.left - h.left) * scale}px, ${(top + bottom) / 2 - (f.top - h.top + f.height / 2) * scale}px) scale(${scale})`;
+    for (const e of eyes) e.classList.add("socketed");
+  });
+}
+
 const PREORDER = "https://github.com/qbtrix/paw-mascot/issues/new?" + new URLSearchParams({
   title: "Pro founder pre-order",
   body: "Count me in at the founder price. Ping me here when checkout opens.\n\n(Filed from pet.pocketpaw.xyz/pro)",
@@ -181,6 +219,7 @@ await Promise.all(FRIENDS.map(async ([name, tag], i) => {
     const rel = bb.width / rb.width, ar = bb.width / bb.height;
     if (rel >= 0.03 && rel <= 0.30 && ar >= 0.5 && ar <= 0.75) path.classList.add("eye");
   }
+  socketEyes(el);
 }));
 </script>
 </body>

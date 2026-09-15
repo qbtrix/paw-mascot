@@ -1033,12 +1033,29 @@ const STATES = {
 
   wink: {
     morph: 0.2,
-    pose: () => basePose({
-      rot: 0.05,
-      ears: { l: ear(-0.12), r: ear(-0.28, 0.04) },
-      eyes: [eye(1, 1), eye(1.15, 0.45, 0.02)],
-      glyphs: { spark: 0.7 }
-    })
+    /**
+     * A wink is a gesture, not a face. Held as a pose it stops being a wink
+     * and becomes an eye that is simply shut -- which is what it looked like
+     * on any surface that sits in one state rather than passing through it.
+     *
+     * So it winks on a loop: shut on arrival, because a wink fired by a hook
+     * has to land on the beat the event did, open again after half a second,
+     * then go round once more. Two and a half seconds apart, so a reader
+     * catches the second one without feeling blinked at.
+     */
+    pose: (t) => {
+      const k = t % 2.5;
+      const shut = k < 0.55 ? 1
+        : k < 0.8 ? 1 - (k - 0.55) / 0.25
+        : k < 2.4 ? 0
+        : (k - 2.4) / 0.1;
+      return basePose({
+        rot: 0.05,
+        ears: { l: ear(-0.12), r: ear(-0.28, 0.04) },
+        eyes: [eye(1, 1), eye(1 + 0.15 * shut, 1 - 0.55 * shut, 1 - 0.98 * shut)],
+        glyphs: { spark: 0.25 + 0.45 * shut }
+      });
+    }
   },
 
   confused: {

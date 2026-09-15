@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paw</title>
+<meta name="description" content="A mascot on your desktop that reacts while your coding agent works. Free, open source, macOS.">
+<link rel="icon" href="/favicon.png">
+<!--
+  Creative Direction Declaration
+  Archetype: Playfulness held inside Technology. Richness: Minimalist.
+  Critique: the trap here is a hero that explains the mascot in words. The
+  mascot explains itself, so the page is the twenty-eight states, live, and
+  the only sentence on it is the download button. Family: Clean-Tech, off-black
+  ground, hairline cards, one ice-blue accent and no purple anywhere: the
+  character's own rim ramp is re-tokened on this page so the violet stop in the
+  shipped drawing never appears here. Reading this as: a dev-tool landing page
+  for a desktop pet, matching the captain's reference grid one for one, driving
+  Playfulness through Clean-Tech with Instrument Sans over Manrope and a mono
+  for the state labels. Dials: VARIANCE 4 (the grid is the point), MOTION 3
+  (the mascots move; the page does not), DENSITY 4.
+
+  The site is the product's own engine: each card is a live paw-avatar holding
+  one state, the same vendored effect the app ships, served at /_fx/ exactly as
+  the app serves it. Nothing on this page is a screenshot.
+
+  Created 2026-09-15. Assembled into dist/site by scripts/build-site.mjs.
+-->
+<link rel="stylesheet" href="/_fx/effects/paw-avatar/style.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600&family=Manrope:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0b0e13;
+    --panel: #10141b;
+    --well: #0d1117;
+    --line: #1c2230;
+    --line-hi: #2a3446;
+    --ink: #eef2f8;
+    --dim: #7f8a9c;
+    --accent: #8cc6ff;
+    --radius: 14px;
+    --display: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+    --body: "Manrope", "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { color-scheme: dark; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.6 var(--body); -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+
+  /* --- header: wordmark, filters, the one CTA, one line -------------------- */
+  header {
+    position: sticky; top: 0; z-index: 5; height: 72px;
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 1.5rem;
+    padding: 0 clamp(1rem, 3vw, 2.5rem);
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px); border-bottom: 1px solid var(--line);
+  }
+  .mark { display: flex; align-items: center; gap: .6rem; font: 600 17px/1 var(--display); letter-spacing: -.02em; text-decoration: none; }
+  .mark .paw { --fx-paw-size: 28px; --fx-paw-ground: none; }
+  .pills { display: flex; gap: .4rem; justify-content: center; }
+  .pill {
+    font: 500 13px/1 var(--body); color: var(--dim); background: transparent;
+    border: 1px solid var(--line); border-radius: 999px; padding: .55rem .95rem; cursor: pointer;
+    transition: color .18s, border-color .18s, background .18s;
+  }
+  .pill:hover { color: var(--ink); border-color: var(--line-hi); }
+  .pill[aria-pressed="true"] { color: var(--bg); background: var(--ink); border-color: var(--ink); }
+  .cta {
+    font: 600 13.5px/1 var(--display); color: var(--bg); background: var(--accent);
+    border: 0; border-radius: 999px; padding: .7rem 1.05rem; text-decoration: none; white-space: nowrap;
+    transition: transform .15s, filter .15s;
+  }
+  .cta:hover { filter: brightness(1.06); }
+  .cta:active { transform: scale(.98); }
+
+  /* --- the grid: twenty-eight live states ---------------------------------- */
+  main { max-width: 1240px; margin: 0 auto; padding: clamp(1.25rem, 3vw, 2.5rem) clamp(1rem, 3vw, 2.5rem) 4rem; }
+  .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem;
+          /* No purple on this page, the mascot included. The character's rim is
+             a var() ramp, so it is re-tokened here and the app keeps its own. */
+          --fx-paw-rim-a: #ffffff; --fx-paw-rim-b: #e6f1ff; --fx-paw-rim-c: #a9d1ff;
+          --fx-paw-rim-d: #8cc6ff; --fx-paw-rim-e: #cfe5ff;
+          --fx-paw-glow: rgba(140, 198, 255, .45); --fx-paw-halo: #6aa9e6;
+          --fx-paw-floor-a: #bcdcff; --fx-paw-floor-b: #86bdf4; --fx-paw-floor-c: #4f8fd1;
+          --fx-paw-ground: none; }
+  @media (max-width: 1000px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 680px)  { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; } }
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: .75rem; display: flex; flex-direction: column; gap: .7rem;
+    transition: border-color .2s;
+  }
+  .card:hover { border-color: var(--line-hi); }
+  .card[hidden] { display: none; }
+  .well {
+    background: var(--well); border: 1px solid var(--line); border-radius: calc(var(--radius) - 4px);
+    aspect-ratio: 1 / 1; display: grid; place-items: center; overflow: hidden;
+  }
+  /* The host gets a real width. --fx-paw-size is a percentage of the host,
+     and a grid item with no width of its own gives a percentage nothing to
+     resolve against: 28 tiles, 28 mascots, all at 0px. */
+  .well .host { width: 62%; --fx-paw-size: 100%; cursor: pointer; }
+  .label { font: 500 12.5px/1 var(--mono); color: var(--dim); padding: 0 .25rem .2rem; letter-spacing: .01em; }
+
+  /* --- footer band: how to get it ----------------------------------------- */
+  footer {
+    border-top: 1px solid var(--line); background: var(--panel);
+    padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 3vw, 2.5rem);
+  }
+  .band { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr .6fr; gap: 2rem; align-items: start; }
+  @media (max-width: 760px) { .band { grid-template-columns: 1fr; } }
+  .cmds { display: grid; gap: .5rem; }
+  .cmd {
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .75rem;
+    background: var(--well); border: 1px solid var(--line); border-radius: 10px; padding: .6rem .75rem;
+    font: 13px/1.4 var(--mono);
+  }
+  .cmd .for { color: var(--dim); font-family: var(--body); font-size: 12.5px; min-width: 6.5rem; }
+  .cmd code { color: var(--ink); overflow-x: auto; white-space: nowrap; }
+  .copy {
+    font: 500 12px/1 var(--body); color: var(--dim); background: transparent;
+    border: 1px solid var(--line); border-radius: 8px; padding: .4rem .6rem; cursor: pointer;
+    transition: color .15s, border-color .15s;
+  }
+  .copy:hover { color: var(--ink); border-color: var(--line-hi); }
+  .side { display: grid; gap: .75rem; justify-items: start; }
+  .side a { color: var(--dim); text-decoration: none; font-size: 13.5px; }
+  .side a:hover { color: var(--ink); }
+  /* `.side a` out-specifies `.cta` on colour, which painted the second download
+     button dim-on-accent. Say it explicitly. */
+  .side a.cta { color: var(--bg); padding: .8rem 1.2rem; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="mark" href="/"><span class="paw" data-state="idle" aria-hidden="true"></span>Paw</a>
+  <nav class="pills" id="pills" aria-label="Filter states"></nav>
+  <a class="cta" href="https://github.com/qbtrix/paw-mascot/releases/latest">Download for macOS</a>
+</header>
+
+<main>
+  <div class="grid" id="grid"></div>
+</main>
+
+<footer>
+  <div class="band">
+    <div class="cmds" id="cmds">
+      <div class="cmd"><span class="for">Claude Code</span><code>/plugin marketplace add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
+      <div class="cmd"><span class="for"></span><code>/plugin install paw-mascot@paw-mascot</code><button class="copy">Copy</button></div>
+      <div class="cmd"><span class="for">Codex</span><code>codex plugin marketplace add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
+      <div class="cmd"><span class="for">Any agent</span><code>npx skills add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
+    </div>
+    <div class="side">
+      <a class="cta" href="https://github.com/qbtrix/paw-mascot/releases/latest">Download for macOS</a>
+      <a href="https://github.com/qbtrix/paw-mascot">GitHub</a>
+      <a href="https://github.com/qbtrix/paw-mascot/blob/main/LICENSE">MIT</a>
+    </div>
+  </div>
+</footer>
+
+<script type="module">
+import { mount, STATE_IDS } from "/_fx/effects/paw-avatar/index.js";
+
+// The first sixteen are the original set; the last twelve are the anime
+// shorthand. The split is the effect's own ordering, restated here so the
+// filter does not depend on how a future state is appended.
+const ANIME = new Set(["awkward","annoyed","gloomy","dizzy","starstruck","crying",
+                       "overheated","firedUp","powering","shocked","smug","deadpan"]);
+const groups = { all: () => true, classic: (id) => !ANIME.has(id), anime: (id) => ANIME.has(id) };
+
+const grid = document.getElementById("grid");
+const cards = new Map();
+for (const id of STATE_IDS) {
+  const card = document.createElement("article");
+  card.className = "card";
+  card.innerHTML = `<div class="well"><div class="host"></div></div><div class="label">${id}</div>`;
+  grid.append(card);
+  // 24 draws a second is plenty for a tile this size, and the engine already
+  // skips tiles that are off screen, so a long page costs what is visible.
+  mount(card.querySelector(".host"), { state: id, fps: 24 });
+  cards.set(id, card);
+}
+mount(document.querySelector(".mark .paw"), { state: "idle", fps: 12, track: false });
+
+const pills = document.getElementById("pills");
+for (const g of Object.keys(groups)) {
+  const b = document.createElement("button");
+  b.className = "pill"; b.textContent = g; b.dataset.g = g;
+  b.setAttribute("aria-pressed", String(g === "all"));
+  b.onclick = () => {
+    for (const p of pills.children) p.setAttribute("aria-pressed", String(p === b));
+    for (const [id, card] of cards) card.hidden = !groups[g](id);
+  };
+  pills.append(b);
+}
+
+for (const btn of document.querySelectorAll(".copy")) {
+  btn.onclick = async () => {
+    const code = btn.parentElement.querySelector("code").textContent;
+    try { await navigator.clipboard.writeText(code); btn.textContent = "Copied"; }
+    catch { btn.textContent = "Select it"; }
+    setTimeout(() => (btn.textContent = "Copy"), 1400);
+  };
+}
+</script>
+</body>
+</html>

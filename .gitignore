@@ -10,3 +10,6 @@ bun.lock
 # committed so this repo builds on its own, with no sibling checkout required.
 # `bun run sync-fx` refreshes it from ../paw-fx when that is present.
 # See web/_fx/README.md.
+
+# built site, wrangler serves it
+dist/

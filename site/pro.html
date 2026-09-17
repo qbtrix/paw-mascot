@@ -34,7 +34,9 @@
   ephemeral-UI plan, marked as after the first release; its internal name
   stays off the page. Every CTA says lock the price; the old ordering
   wording is gone from the page. The control demo's gear opens the pet's own
-  settings: characters are the flat CC BY friends (never engine art),
+  settings: picking a pet swaps the one beside it for a flat CC BY friend
+  wearing the engine's eyes, exactly as the grid below does (never
+  engine-mountable art),
   personality and memory are a .soul file on the Mac, and the stats are mock
   shapes, not anyone's real numbers.
 -->
@@ -217,6 +219,15 @@
            border-radius: 12px; box-shadow: 0 14px 28px -14px rgba(0, 0, 0, .6); }
   .control[data-view="prefs"] { grid-template-columns: auto minmax(0, 300px); justify-content: center; }
   .control[data-view="prefs"] .who { grid-column: 1; }
+  /* the picked pet takes paw's place, same footprint, so nothing shifts */
+  .control .who.worn > .host { display: none; }
+  .control .alt { display: grid; place-items: center; width: clamp(116px, 18vw, 156px); aspect-ratio: 1; }
+  .control .alt .art { width: 82%; }
+  .control .alt .art svg { display: block; width: 100%; height: auto; }
+  @media (prefers-reduced-motion: no-preference) {
+    .control .alt { animation: pop .3s ease-out; }
+    .control .alt .art { animation: bob 5.2s ease-in-out infinite; }
+  }
   .control[data-view="prefs"] .acts { display: none; }
   .control[data-view="prefs"] .prefs { display: grid; grid-column: 2; }
   @media (prefers-reduced-motion: no-preference) { .control[data-view="prefs"] .prefs { animation: pop .25s ease-out; } }
@@ -519,7 +530,7 @@
       <article class="feature">
         <span class="k">control</span>
         <h2>Hover the pet, act on its session.</h2>
-        <p>Focus, restart or stop a session from the pet that watches it. The gear opens the pet itself: its character, its personality, what it remembers, and your week at a glance. It all lives in a .soul file (Soul Protocol, an open format) on your Mac. Memory comes after Pro's first release.</p>
+        <p>Focus, restart or stop a session from the pet that watches it. The gear opens the pet's settings: switch to another pet, tune its personality, see what it remembers, and glance at your week. It all lives in a .soul file (Soul Protocol, an open format) on your Mac. Memory comes after Pro's first release.</p>
         <div class="demo control" aria-hidden="true" data-state="working">
           <div class="who">
             <div class="host"></div>
@@ -532,8 +543,8 @@
             <span class="act gear" data-act="settings"><svg class="ico"><use href="#i-gear"/></svg>Settings</span>
           </div>
           <div class="prefs">
-            <div class="tabs"><span data-tab="character">character</span><span data-tab="memory">memory</span><span data-tab="stats">stats</span><span class="close">done</span></div>
-            <div class="pane" data-pane="character">
+            <div class="tabs"><span data-tab="pet">pet</span><span data-tab="memory">memory</span><span data-tab="stats">stats</span><span class="close">done</span></div>
+            <div class="pane" data-pane="pet">
               <div class="chars">
                 <span class="char sel" data-name="paw"><img src="/favicon.png" alt=""></span>
                 <span class="char" data-name="cat"><img src="/friends/cat.svg" alt=""></span>
@@ -667,6 +678,23 @@
 import { mount } from "/_fx/effects/paw-avatar/index.js";
 mount(document.querySelector(".mark .paw"), { state: "idle", fps: 12, track: false });
 
+// Eyes, by measurement: in every friend they are the near-white paths with a
+// tall-oval aspect around 0.57 and a sane share of the head's width (dragon's
+// wings make his eyes RELATIVELY tiny, hence the low floor). Computed fill,
+// not the attribute: the attribute lies about format.
+function tagEyes(root) {
+  const rb = root.getBBox();
+  for (const path of root.querySelectorAll("path")) {
+    const m = getComputedStyle(path).fill.match(/\d+/g);
+    if (!m) continue;
+    const [r, g, b] = m.map(Number);
+    if ((r + g + b) / 3 < 245) continue;
+    const bb = path.getBBox();
+    const rel = bb.width / rb.width, ar = bb.width / bb.height;
+    if (rel >= 0.03 && rel <= 0.30 && ar >= 0.5 && ar <= 0.75) path.classList.add("eye");
+  }
+}
+
 // After a friend's traced eyes are tagged, park an engine instance over them:
 // measure the socket pair, measure the engine's face group, then scale and
 // translate the whole engine so its face sits exactly in the sockets.
@@ -693,6 +721,7 @@ function socketEyes(el) {
     paw.style.transform = `translate(${left - (f.left - h.left) * scale}px, ${(top + bottom) / 2 - (f.top - h.top + f.height / 2) * scale}px) scale(${scale})`;
     for (const e of eyes) e.classList.add("socketed");
   });
+  return pet;
 }
 
 // --- small tools every demo shares ------------------------------------------
@@ -945,10 +974,18 @@ const ctl = document.querySelector(".demo.control");
 const ctlPet = pet(ctl.querySelector(".host"), "working");
 const ctlLine = ctl.querySelector(".who .dot");
 let acting = 0;
-const show = (state, text) => { ctlPet.update({ state }); ctl.dataset.state = state; ctlLine.textContent = `api · ${text}`; };
+// a picked pet stands in for paw: a friend's flat head wearing live engine eyes
+let worn = null;
+const show = (state, text) => {
+  ctlPet.update({ state });
+  worn?.eyes?.update({ state });
+  ctl.dataset.state = state;
+  ctlLine.textContent = `api · ${text}`;
+};
+const pokeCtl = () => { poke(ctlPet); if (worn?.eyes) poke(worn.eyes); };
 async function act(name) {
   const mine = ++acting;
-  poke(ctlPet);
+  pokeCtl();
   if (name === "focus") show("curious", "focused");
   if (name === "stop") show("sleeping", "stopped");
   if (name === "restart") {
@@ -987,14 +1024,37 @@ function tab(name) {
     requestAnimationFrame(step);
   }
 }
+const ctlWho = ctl.querySelector(".who");
+const headSvg = new Map();
+let wearTok = 0;
+async function wear(name) {
+  const mine = ++wearTok;
+  let svg = "";
+  if (name !== "paw") {
+    if (!headSvg.has(name)) headSvg.set(name, fetch(`/friends/${name}.svg`).then((r) => r.text()));
+    svg = await headSvg.get(name);
+    if (mine !== wearTok) return; // a newer pick won the race
+  }
+  if (worn) { worn.eyes?.destroy(); worn.el.remove(); worn = null; }
+  ctlWho.classList.toggle("worn", name !== "paw");
+  if (name === "paw") return;
+  const el = document.createElement("div");
+  el.className = "alt";
+  el.innerHTML = `<div class="art">${svg}</div>`;
+  ctlWho.prepend(el);
+  tagEyes(el.querySelector("svg"));
+  worn = { el, eyes: socketEyes(el) };
+  worn.eyes?.update({ state: ctl.dataset.state });
+}
 function pickChar(i) {
   chars.forEach((c, j) => c.classList.toggle("sel", j === i));
   const name = charName();
+  wear(name);
   prefs.querySelector(".soulname").innerHTML = `<b>${name}</b> &middot; <span>${name}.soul</span>`;
   prefs.querySelector(".soulfile").textContent = `${name}.soul`;
   prefs.querySelectorAll(".trait i").forEach((bar, k) => bar.style.setProperty("--v", SOULS[name][k]));
   ctlLine.textContent = `${name} · settings`;
-  poke(ctlPet);
+  pokeCtl();
 }
 const MEMS = ["docs live in site/docs", "Codex handles the site repo", "you merge after lunch"];
 let memTok = 0, memNext = 0;
@@ -1016,12 +1076,12 @@ async function remember() {
   if (mems.children.length > 3) mems.lastElementChild.remove();
   box.removeAttribute("data-typed");
   field.textContent = "Remember something\u2026";
-  poke(ctlPet);
+  pokeCtl();
 }
 function openPrefs() {
   ctl.dataset.view = "prefs";
   ctl.classList.remove("on");
-  tab("character");
+  tab("pet");
   ctlLine.textContent = `${charName()} · settings`;
 }
 function closePrefs() {
@@ -1221,21 +1281,7 @@ await Promise.all(FRIENDS.map(async ([name, tag], i) => {
   el.style.setProperty("--d", `${(i * 0.7) % 5.2}s`);
   el.style.setProperty("--b", `${(i * 1.13) % 5.6}s`);
   grid.append(el);
-  // Eyes, by measurement: in every friend they are the near-white paths with
-  // a tall-oval aspect around 0.57 and a sane share of the head's width
-  // (dragon's wings make his eyes RELATIVELY tiny, hence the low floor).
-  // Computed fill, not the attribute: the attribute lies about format.
-  const root = el.querySelector("svg");
-  const rb = root.getBBox();
-  for (const path of root.querySelectorAll("path")) {
-    const m = getComputedStyle(path).fill.match(/\d+/g);
-    if (!m) continue;
-    const [r, g, b] = m.map(Number);
-    if ((r + g + b) / 3 < 245) continue;
-    const bb = path.getBBox();
-    const rel = bb.width / rb.width, ar = bb.width / bb.height;
-    if (rel >= 0.03 && rel <= 0.30 && ar >= 0.5 && ar <= 0.75) path.classList.add("eye");
-  }
+  tagEyes(el.querySelector("svg"));
   socketEyes(el);
 }));
 </script>

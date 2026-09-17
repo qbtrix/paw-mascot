@@ -1,11 +1,40 @@
-# wrangler.toml — the landing page as an assets-only Cloudflare Worker.
+# wrangler.toml — the landing page as a Cloudflare Worker: static assets,
+# plus the founder-list endpoints (sign up, confirm by email, count).
 #
-# Created 2026-09-15. Same shape paw-fx uses for its registry site: no Worker
-# code, just a directory of static files. `bun run site` builds dist/site,
-# `wrangler deploy` ships it. The custom domain (pet.pocketpaw.xyz) is
-# attached in the Cloudflare dashboard, not here.
+# 2026-09-17: added the SIGNUP_LIMIT rate limiter. Every signup POST now sends
+# a confirm email, so an unthrottled endpoint could be used to spam inboxes.
+# Mail goes out through Mailtrap's sending API: set the token with
+#   wrangler secret put MAILTRAP_API_TOKEN
+# Locally, .dev.vars sets MAIL_DEV=1 and the confirm link is logged instead.
+#
+# Created 2026-09-15 as assets-only, the same shape paw-fx uses for its
+# registry site. It grew exactly one endpoint the same day (see `main`).
+# `bun run site` builds dist/site, `wrangler deploy` ships it. The custom
+# domain (pet.pocketpaw.xyz) is attached in the Cloudflare dashboard, not here.
 name = "paw-mascot-site"
 compatibility_date = "2026-09-01"
+# One endpoint's worth of server: POST /api/preorder. Cloudflare serves a
+# matching static asset FIRST and only calls the Worker when nothing matches,
+# so adding this changed nothing about how the pages are served.
+main = "./worker/index.js"
 
 [assets]
 directory = "./dist/site"
+binding = "ASSETS"
+
+# The pre-order list. Create it once with:
+#   wrangler d1 create paw-preorders
+#   wrangler d1 execute paw-preorders --remote --file ./schema.sql
+# Read it back with:
+#   wrangler d1 execute paw-preorders --remote --command "SELECT * FROM preorders"
+[[d1_databases]]
+binding = "DB"
+database_name = "paw-preorders"
+database_id = "b77e0255-fed2-450c-9127-8bd30dae57e7"
+
+# Five signups a minute per IP. Plenty for a person, useless for a bot.
+# namespace_id is any number unique within this Cloudflare account.
+[[ratelimits]]
+name = "SIGNUP_LIMIT"
+namespace_id = "1701"
+simple = { limit = 5, period = 60 }

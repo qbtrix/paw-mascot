@@ -13,3 +13,9 @@ bun.lock
 
 # built site, wrangler serves it
 dist/
+
+# wrangler local state (miniflare D1, caches)
+.wrangler/
+
+# local worker secrets (MAIL_DEV, MAILTRAP_API_TOKEN)
+.dev.vars

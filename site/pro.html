@@ -149,10 +149,11 @@
   .aw-bar { display: flex; align-items: center; gap: .75rem; padding: .5rem .7rem; border-bottom: 1px solid var(--line); }
   .aw-lights { display: flex; gap: 5px; }
   .aw-lights i { width: 9px; height: 9px; border-radius: 50%; background: var(--line-hi); }
-  .aw-url { display: flex; align-items: center; gap: .4rem; width: min(220px, 55%); margin: 0 auto; padding: .38rem .7rem;
-            border-radius: 6px; background: var(--well); color: var(--dim); }
+  /* the one real text in the background: the address, so each skeleton reads as a place */
+  .aw-url { display: flex; align-items: center; gap: .4rem; width: min(240px, 60%); margin: 0 auto; padding: .3rem .7rem;
+            border-radius: 6px; background: var(--well); font: 400 11px/1 var(--mono); color: var(--dim); }
+  .aw-url span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
   .aw-url .ico { width: 10px; height: 10px; flex: none; }
-  .aw-url .sk-line { transition: width .4s; }
   .aw-page { position: relative; overflow: hidden; }
   .aw-scene { position: absolute; inset: 0; opacity: 0; transition: opacity .6s; }
   .aw-scene.on { opacity: 1; }
@@ -716,9 +717,9 @@
         <p>While Claude Code or Codex work, you're off watching, chatting, reading. The pet floats over it and shows how things stand; hover it for every session: what each one is on, what's done, what needs you. Answer there and keep going. No more watching a terminal.</p>
         <div class="demo aw" aria-hidden="true">
           <div class="aw-win">
-            <div class="aw-bar"><span class="aw-lights"><i></i><i></i><i></i></span><span class="aw-url"><svg class="ico"><use href="#i-lock"/></svg><i class="sk-line thin" style="--w:62%"></i></span></div>
+            <div class="aw-bar"><span class="aw-lights"><i></i><i></i><i></i></span><span class="aw-url"><svg class="ico"><use href="#i-lock"/></svg><span>video.example/watch</span></span></div>
             <div class="aw-page">
-              <div class="aw-scene aw-video on" data-url="62">
+              <div class="aw-scene aw-video on" data-url="video.example/watch">
                 <div>
                   <div class="sk-player"><div class="sk-bar"><i></i></div></div>
                   <div class="sk-meta"><i class="sk-line bold" style="--w:72%"></i><i class="sk-line thin" style="--w:38%"></i></div>
@@ -730,7 +731,7 @@
                   <div><i class="sk sk-thumb"></i><span><i class="sk-line" style="--w:70%"></i><i class="sk-line thin" style="--w:30%"></i></span></div>
                 </div>
               </div>
-              <div class="aw-scene aw-chat" data-url="44">
+              <div class="aw-scene aw-chat" data-url="chat.example/friends">
                 <div class="sk-contacts">
                   <div class="on"><i class="sk-dot"></i><span><i class="sk-line" style="--w:62%"></i><i class="sk-line thin" style="--w:88%"></i></span></div>
                   <div><i class="sk-dot"></i><span><i class="sk-line" style="--w:48%"></i><i class="sk-line thin" style="--w:76%"></i></span></div>
@@ -742,7 +743,7 @@
                   <div class="sk-thread"></div>
                 </div>
               </div>
-              <div class="aw-scene aw-article" data-url="78">
+              <div class="aw-scene aw-article" data-url="blog.example/slow-mornings">
                 <div class="sk-article"><i class="sk-line bold" style="--w:80%"></i><i class="sk sk-hero"></i><i class="sk-line thin" style="--w:30%"></i><i class="sk-line thin" style="--w:75%"></i><i class="gap"></i><i class="sk-line thin" style="--w:96%"></i><i class="sk-line thin" style="--w:92%"></i><i class="sk-line thin" style="--w:98%"></i><i class="sk-line thin" style="--w:70%"></i><i class="gap"></i><i class="sk-line thin" style="--w:94%"></i><i class="sk-line thin" style="--w:97%"></i><i class="sk-line thin" style="--w:88%"></i><i class="sk-line thin" style="--w:60%"></i><i class="gap"></i><i class="sk-line thin" style="--w:95%"></i><i class="sk-line thin" style="--w:91%"></i><i class="sk-line thin" style="--w:83%"></i></div>
               </div>
             </div>
@@ -1260,9 +1261,9 @@ const AW_BEATS = [
   async () => awDone("docs", "done · links fixed"),
   async (wait) => { await wait(1200); awReset(); },
 ];
-// what you're doing meanwhile, as skeletons: a video, a chat, a long read
+// what you're doing meanwhile, as skeletons with a real address: a video, a chat, a long read
 const awScenes = [...aw.querySelectorAll(".aw-scene")];
-const awUrl = aw.querySelector(".aw-url .sk-line");
+const awUrl = aw.querySelector(".aw-url span");
 const awThread = aw.querySelector(".sk-thread");
 const AW_BUBBLES = [["them", 58], ["me", 44], ["them", 74], ["me", 36], ["them", 50]];
 let awSceneN = 0, awChatTok = 0;
@@ -1289,7 +1290,7 @@ async function awChatPlay() {
 function awScene(n) {
   awSceneN = n % awScenes.length;
   awScenes.forEach((sc, i) => sc.classList.toggle("on", i === awSceneN));
-  awUrl.style.setProperty("--w", `${awScenes[awSceneN].dataset.url}%`);
+  awUrl.textContent = awScenes[awSceneN].dataset.url;
   if (awScenes[awSceneN].classList.contains("aw-chat")) awChatPlay();
 }
 let awBeat = 0;

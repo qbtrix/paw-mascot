@@ -64,6 +64,8 @@
   mascots a pale green rim to match its olive ground. The demo pet shares the
   grid's tokens, floor glow included, so no violet shows anywhere.
   The mark's eyes are nudged down so they sit level with the wordmark.
+  The paste-into-your-agent prompt builds the app from source (app bundle
+  only, tested from a fresh clone) instead of pointing at the release download.
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -326,7 +328,7 @@
   .prompt { display: grid; grid-template-columns: 1fr auto; gap: .75rem; align-items: start;
             background: var(--well); border: 1px solid var(--line); border-radius: 10px;
             padding: .8rem .9rem; grid-column: 1 / -1; }
-  .prompt code { font: 12.5px/1.7 var(--mono); color: var(--dim); white-space: pre-wrap; }
+  .prompt code { font: 12.5px/1.7 var(--mono); color: var(--dim); white-space: pre-wrap; overflow-wrap: anywhere; min-width: 0; }
   .cmd {
     display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .75rem;
     background: var(--well); border: 1px solid var(--line); border-radius: 10px; padding: .6rem .75rem;
@@ -415,11 +417,13 @@
       <div class="cmd"><span class="for"><svg aria-hidden="true"><use href="#i-openai"/></svg>Codex</span><code data-lenis-prevent>codex plugin marketplace add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
       <div class="cmd"><span class="for"><svg aria-hidden="true"><use href="#i-paw"/></svg>Any agent</span><code data-lenis-prevent>npx skills add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
       <div class="or">or paste this into your agent</div>
-      <div class="prompt"><code>Set up the Paw desktop mascot (github.com/qbtrix/paw-mascot) on this machine:
-1. Clone https://github.com/qbtrix/paw-mascot somewhere sensible.
-2. Run skills/paw-mascot/scripts/install.sh - it detects Claude Code and Codex, merges hook config without clobbering anything, and never needs sudo. Follow what it prints; in Claude Code prefer the two /plugin commands it suggests.
-3. Verify: run one trivial command, then tail -3 ~/.paw/events.jsonl - a new line means the bridge is live.
-4. Remind me to download the app itself: github.com/qbtrix/paw-mascot/releases/latest</code><button class="copy">Copy</button></div>
+      <div class="prompt"><code>Set up the Paw desktop mascot (github.com/qbtrix/paw-mascot) on this Mac, built from source:
+1. Clone https://github.com/qbtrix/paw-mascot into a folder that will stay put, like ~/src/paw-mascot. The hooks point into it, so not a temp folder.
+2. Check for Xcode Command Line Tools, Rust (cargo) and Bun. If any is missing, show me the install command and wait for my OK.
+3. In the clone, build the app: bunx --bun @tauri-apps/cli@^2 build --bundles app. The first build takes a few minutes.
+4. Copy app/src-tauri/target/release/bundle/macos/Paw.app to ~/Applications (create it if needed) and open it.
+5. Run skills/paw-mascot/scripts/install.sh. It detects Claude Code and Codex, merges hook config without clobbering anything, and never needs sudo. In Claude Code, prefer the two /plugin commands it prints.
+6. Verify: run one trivial command, then tail -3 ~/.paw/events.jsonl. A new line means the bridge is live and the pet reacts.</code><button class="copy">Copy</button></div>
     </div>
     <div class="side">
       <a class="cta" href="https://github.com/qbtrix/paw-mascot/releases/latest">Download for macOS</a>

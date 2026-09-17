@@ -1061,7 +1061,16 @@ function autoplay(stage, scene, { hold = true, onHold } = {}) {
 }
 
 // --- top: the pet in its native window, busy being built -------------------------
-pet(document.querySelector(".mac .host"), "working");
+// It takes turns: heads-down working, then creative (the full spin on arrival,
+// then an idea landing every few seconds). Reduced motion keeps it working.
+const mac = document.querySelector(".mac");
+const macPet = pet(mac.querySelector(".host"), "working");
+autoplay(mac, async (pause) => {
+  await pause(3500);
+  macPet.update({ state: "creative" });
+  await pause(5200);
+  macPet.update({ state: "working" });
+}, { hold: false });
 
 // --- the founder bar: the real count, or nothing --------------------------------
 const claimed = document.querySelector(".claimed");

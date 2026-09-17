@@ -13,6 +13,9 @@
 // batch. A per-IP rate limit (SIGNUP_LIMIT) stops the endpoint being used to
 // spam inboxes. Seats go in confirmation order, not signup order.
 //
+// Later on 2026-09-17: confirming now also mails a receipt (founder number, price, what
+// happens next), and both emails are plain text with a greeting and signature.
+//
 // 2026-09-17: mail moved from Mailtrap to Cloudflare Email Service, which the
 // Workers Paid plan already covers (3,000 a month). It sends from the
 // mail.pocketpaw.xyz subdomain so bounces and any spam complaints stay off
@@ -29,24 +32,59 @@ const json = (body, status = 200) =>
 // proof an address works is mail arriving at it (which is now the confirm).
 const looksLikeEmail = (s) => /^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(s) && s.length <= 254;
 
-// Sends the confirm link through Cloudflare Email Service (the EMAIL binding).
-// Local dev sets MAIL_DEV and only logs the link, so testing never mails
+// Sends one plain-text email through Cloudflare Email Service (the EMAIL
+// binding). Local dev sets MAIL_DEV and only logs it, so testing never mails
 // anyone. Fails loud: without the binding it throws rather than pretending a
 // mail went out. Replies go to paw@pocketpaw.xyz, which Email Routing forwards.
-async function sendConfirm(env, email, link) {
+async function sendMail(env, to, { subject, text }) {
   if (env.MAIL_DEV) {
-    console.log(`[MAIL_DEV] confirm link for ${email}: ${link}`);
+    console.log(`[MAIL_DEV] to ${to}: ${subject}\n${text}`);
     return;
   }
   if (!env.EMAIL) throw new Error("mail not configured");
   await env.EMAIL.send({
     from: { email: env.MAIL_FROM || "paw@mail.pocketpaw.xyz", name: "Paw" },
     replyTo: "paw@pocketpaw.xyz",
-    to: email,
-    subject: "Confirm your Paw Pro founder spot",
-    text: `Tap to lock your founder price:\n\n${link}\n\nIf you didn't ask for this, ignore it.\n`
+    to,
+    subject,
+    text
   });
 }
+
+const SIGNATURE = "Prakash\nPaw, pet.pocketpaw.xyz\n";
+
+const confirmMail = (link) => ({
+  subject: "Confirm your Paw Pro founder spot",
+  text:
+    "Hi there,\n\n" +
+    "Thanks for locking in the Paw Pro founder price.\n\n" +
+    "Please confirm your email to hold your spot:\n" +
+    `${link}\n\n` +
+    "Nothing is charged today. Once you confirm, you will get a short receipt, and one more email when checkout opens.\n\n" +
+    "If you did not request this, you can ignore this email.\n\n" +
+    SIGNATURE
+});
+
+// Seats 1-250 are $19, the next 200 are $29, the same ladder the card shows.
+const priceFor = (n) => (n <= 250 ? "$19" : n <= 450 ? "$29" : null);
+
+const receiptMail = (n) => {
+  const price = priceFor(n);
+  return {
+    subject: `You're Paw Pro founder #${n}`,
+    text:
+      "Hi there,\n\n" +
+      "You're confirmed. Here are your details:\n\n" +
+      `  Founder number:  #${n}\n` +
+      (price ? `  Your price:      ${price}, lifetime\n` : "") +
+      "  Charged today:   nothing\n\n" +
+      "What happens next\n" +
+      "Pro is being built as a native Mac app. When checkout opens, we will send one email with your link to buy" +
+      (price ? " at this price" : "") + ".\n\n" +
+      "Questions? Just reply to this email.\n\n" +
+      SIGNATURE
+  };
+};
 
 async function signup(request, env, origin) {
   if (env.SIGNUP_LIMIT) {
@@ -80,7 +118,7 @@ async function signup(request, env, origin) {
   if (row.confirmed_at) return json({ ok: true, state: "confirmed" });
 
   try {
-    await sendConfirm(env, email, `${origin}/confirm?t=${row.token}`);
+    await sendMail(env, email, confirmMail(`${origin}/confirm?t=${row.token}`));
   } catch (err) {
     // Email Service throws with a code (E_SENDER_NOT_VERIFIED, E_RATE_LIMIT_EXCEEDED,
     // ...). Logged so `wrangler tail` says why; the address is left out.
@@ -90,20 +128,27 @@ async function signup(request, env, origin) {
   return json({ ok: true, state: "sent" });
 }
 
-// Opened from the email. Sets confirmed_at once, then sends the person back
-// to the page with their founder number. The token never stays in the URL.
-async function confirm(env, url) {
+// Opened from the email. Sets confirmed_at once, mails a receipt with the
+// founder number, then sends the person back to the page with that number.
+// The token never stays in the URL. A second open finds nothing to update,
+// so the receipt goes out exactly once. The receipt is sent after the
+// redirect (waitUntil), and a failed send never undoes the seat.
+async function confirm(env, ctx, url) {
   const t = url.searchParams.get("t") || "";
   const back = (q) => Response.redirect(`${url.origin}/pro?confirmed=${q}`, 302);
   try {
     const now = new Date().toISOString();
-    const res = await env.DB.prepare(
-      "UPDATE preorders SET confirmed_at = ? WHERE token = ? AND confirmed_at IS NULL"
-    ).bind(now, t).run();
-    if (!res.meta.changes) return back("bad");
+    const row = await env.DB.prepare(
+      "UPDATE preorders SET confirmed_at = ? WHERE token = ? AND confirmed_at IS NULL RETURNING email"
+    ).bind(now, t).first();
+    if (!row) return back("bad");
     const rank = await env.DB.prepare(
       "SELECT COUNT(*) AS n FROM preorders WHERE confirmed_at IS NOT NULL AND confirmed_at <= ?"
     ).bind(now).first();
+    ctx.waitUntil(
+      sendMail(env, row.email, receiptMail(rank.n)).catch((err) =>
+        console.error("receipt mail failed:", err.code || "", err.message))
+    );
     return back(rank.n);
   } catch {
     return back("bad");
@@ -111,7 +156,7 @@ async function confirm(env, url) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const { pathname } = url;
     // The card's bar reads this. It counts confirmed signups only, so fake
@@ -129,7 +174,7 @@ export default {
     }
     if (pathname === "/confirm") {
       if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
-      return confirm(env, url);
+      return confirm(env, ctx, url);
     }
     if (pathname !== "/api/preorder") return new Response("Not found", { status: 404 });
     if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });

@@ -150,14 +150,65 @@
   .aw-url { display: inline-flex; align-items: center; gap: .35rem; min-width: 0; margin: 0 auto; padding: .3rem .7rem; border-radius: 6px;
             background: var(--well); font: 400 11px/1 var(--mono); color: var(--dim); white-space: nowrap; overflow: hidden; }
   .aw-url .ico { width: 10px; height: 10px; flex: none; }
-  .aw-page { position: relative; overflow: hidden; padding: 1.3rem 1.5rem; }
-  .aw-read { display: grid; gap: .55rem; width: min(100%, 360px); }
-  .aw-read i { display: block; height: 6px; width: var(--w, 100%); border-radius: 4px; background: var(--line); }
-  .aw-read i.h { width: 58%; height: 13px; margin-bottom: .5rem; background: var(--line-hi); }
-  .aw-read i.gap { height: 2px; background: none; }
-  .aw-read i.img { height: 80px; border-radius: 8px; background: color-mix(in srgb, var(--line) 65%, transparent); }
-  @media (prefers-reduced-motion: no-preference) { .aw-read { animation: read 22s ease-in-out infinite alternate; } }
-  @keyframes read { to { translate: 0 -38%; } }
+  /* behind the panel, what people actually do while agents work: a video, a
+     chat with friends, a long read. It rotates; the panel floats over all of
+     it. The focus of each scene sits left, clear of the panel. */
+  .aw-page { position: relative; overflow: hidden; }
+  .aw-scene { position: absolute; inset: 0; opacity: 0; transition: opacity .6s; }
+  .aw-scene.on { opacity: 1; }
+  .aw-video { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); align-content: start; gap: .9rem; padding: .9rem; }
+  .av-player { position: relative; overflow: hidden; aspect-ratio: 16 / 9; border-radius: 8px;
+               background: radial-gradient(circle at 72% 36%, #ffe3a6 0 7%, #ffb454 8% 11%, transparent 12%),
+                           linear-gradient(180deg, #2c4f73 0%, #6d8fb3 42%, #eaa56a 70%, #3a3226 71%, #1f1b14 100%); }
+  .av-player::before, .av-player::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; }
+  .av-player::before { height: 44%; background: #2b3d2e; clip-path: polygon(0 52%, 17% 28%, 35% 50%, 54% 16%, 73% 44%, 100% 22%, 100% 100%, 0 100%); }
+  .av-player::after { height: 30%; background: #1b281e; clip-path: polygon(0 42%, 24% 66%, 47% 34%, 69% 60%, 100% 36%, 100% 100%, 0 100%); }
+  .av-time { position: absolute; right: .5rem; bottom: .55rem; z-index: 1; padding: .15rem .35rem; border-radius: 4px;
+             background: rgba(0, 0, 0, .55); font: 500 10px/1 var(--mono); color: #fff; }
+  .av-bar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; height: 3px; background: rgba(255, 255, 255, .22); }
+  .av-bar i { display: block; width: 33%; height: 100%; background: var(--warn); }
+  .av-meta { display: grid; gap: .3rem; margin-top: .6rem; }
+  .av-meta b { font: 600 13px/1.25 var(--display); color: var(--ink); }
+  .av-meta small, .av-next small, .ac-list small { font: 400 10.5px/1.2 var(--body); color: var(--dim); }
+  .av-next { display: grid; align-content: start; gap: .55rem; }
+  .av-next > div { display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: start; gap: .5rem; }
+  .av-next i { aspect-ratio: 16 / 9; border-radius: 5px; background: var(--g); }
+  .av-next span { display: grid; gap: .2rem; }
+  .av-next b { font: 500 11px/1.25 var(--body); color: var(--ink); }
+  .aw-chat { display: grid; grid-template-columns: 132px minmax(0, 1fr); }
+  .ac-list { display: grid; align-content: start; gap: .2rem; padding: .55rem .4rem; border-right: 1px solid var(--line); }
+  .ac-list > div { display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: center; gap: .5rem; padding: .4rem; border-radius: 8px; }
+  .ac-list > div.on { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+  .ac-list img, .ac-head img { width: 28px; height: 28px; object-fit: contain; }
+  .ac-list span { display: grid; gap: .15rem; min-width: 0; }
+  .ac-list b { font: 500 12px/1.2 var(--body); color: var(--ink); }
+  .ac-list small { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .ac-main { display: grid; grid-template-rows: auto 1fr; min-width: 0; }
+  .ac-head { display: flex; align-items: center; gap: .5rem; padding: .5rem .8rem; border-bottom: 1px solid var(--line); font: 600 12.5px/1 var(--body); }
+  .ac-head img { width: 22px; height: 22px; }
+  /* narrow on purpose: your replies sit right-aligned, and must stay clear of the panel */
+  .ac-thread { display: grid; align-content: start; gap: .45rem; max-width: 226px; padding: .8rem; }
+  .ac-thread p { justify-self: start; max-width: 80%; margin: 0; padding: .5rem .7rem; border-radius: 14px 14px 14px 4px;
+                 background: var(--panel); font: 400 12.5px/1.35 var(--body); color: var(--ink); }
+  .ac-thread p.me { justify-self: end; border-radius: 14px 14px 4px 14px; background: color-mix(in srgb, var(--good) 26%, var(--panel)); }
+  .ac-thread p.typing { display: flex; gap: 3px; padding: .6rem .7rem; }
+  .ac-thread p.typing i { width: 5px; height: 5px; border-radius: 50%; background: var(--dim); }
+  .ar-body { display: grid; gap: .6rem; width: min(100%, 350px); padding: 1.1rem 1.4rem; }
+  .ar-body small { font: 500 10px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+  .ar-body h4 { margin: 0; font: 600 18px/1.2 var(--display); letter-spacing: -.01em; color: var(--ink); }
+  .ar-hero { height: 88px; border-radius: 8px;
+             background: radial-gradient(circle at 30% 60%, #ffe3a6 0 10%, transparent 11%), linear-gradient(160deg, #3d5f58, #c98b5c); }
+  .ar-body p { margin: 0; font: 400 12.5px/1.6 var(--body); color: color-mix(in srgb, var(--ink) 80%, var(--dim)); }
+  @media (prefers-reduced-motion: no-preference) {
+    .av-bar i { animation: play 45s linear infinite; }
+    .ac-thread p { animation: pop .3s ease-out; }
+    .ac-thread p.typing i { animation: wip 1s ease-in-out infinite; }
+    .ac-thread p.typing i:nth-child(2) { animation-delay: .15s; }
+    .ac-thread p.typing i:nth-child(3) { animation-delay: .3s; }
+    .aw-article.on .ar-body { animation: read 16s ease-in-out infinite alternate; }
+  }
+  @keyframes play { from { width: 18%; } to { width: 94%; } }
+  @keyframes read { to { translate: 0 -30%; } }
   .aw-panel { position: absolute; right: 1.75rem; bottom: 1.75rem; width: min(292px, calc(100% - 3.5rem)); display: grid; gap: .1rem;
               padding: .45rem; background: color-mix(in srgb, var(--panel) 90%, transparent); backdrop-filter: blur(10px);
               border: 1px solid var(--line-hi); border-radius: 12px; box-shadow: 0 18px 40px -16px rgba(0, 0, 0, .75); }
@@ -189,7 +240,11 @@
   @media (prefers-reduced-motion: no-preference) {
     .aw-row[data-s="run"] .aw-do::before { animation: wip 1.4s ease-in-out infinite; }
   }
-  @media (max-width: 560px) { .aw { min-height: 400px; } .aw-read { width: 100%; } }
+  @media (max-width: 560px) {
+    .aw { min-height: 400px; }
+    .aw-video, .aw-chat { grid-template-columns: minmax(0, 1fr); }
+    .av-next, .ac-list { display: none; }
+  }
 
   /* hub: one pet, every session in a list beside it -- the control menu's
      move, but a list, and it scrolls because people run a lot of sessions */
@@ -687,8 +742,42 @@
         <p>While Claude Code or Codex work, you're off reading or in another app. The pet floats over it with a small live panel: what each agent is on, how long it's been, when it's done, when it needs you. Answer there and keep going. No more watching a terminal.</p>
         <div class="demo aw" aria-hidden="true">
           <div class="aw-win">
-            <div class="aw-bar"><span class="aw-lights"><i></i><i></i><i></i></span><span class="aw-url"><svg class="ico"><use href="#i-lock"/></svg>docs.example.dev/guides/long-read</span></div>
-            <div class="aw-page"><div class="aw-read"><i class="h"></i><i style="--w:92%"></i><i style="--w:97%"></i><i style="--w:88%"></i><i style="--w:95%"></i><i style="--w:60%"></i><i class="gap"></i><i style="--w:96%"></i><i style="--w:90%"></i><i style="--w:94%"></i><i style="--w:72%"></i><i class="gap"></i><i style="--w:93%"></i><i style="--w:98%"></i><i style="--w:85%"></i><i style="--w:91%"></i><i style="--w:55%"></i><i class="gap"></i><i style="--w:95%"></i><i style="--w:89%"></i><i style="--w:97%"></i><i style="--w:80%"></i><i class="gap"></i><i style="--w:94%"></i><i style="--w:92%"></i><i style="--w:66%"></i><i class="img"></i></div></div>
+            <div class="aw-bar"><span class="aw-lights"><i></i><i></i><i></i></span><span class="aw-url"><svg class="ico"><use href="#i-lock"/></svg><span>video.example/watch</span></span></div>
+            <div class="aw-page">
+              <div class="aw-scene aw-video on" data-url="video.example/watch">
+                <div>
+                  <div class="av-player"><span class="av-time">6:12 / 18:40</span><div class="av-bar"><i></i></div></div>
+                  <div class="av-meta"><b>Building a tiny synth from scratch</b><small>maker's corner &middot; 18 min</small></div>
+                </div>
+                <div class="av-next">
+                  <div><i style="--g: linear-gradient(135deg, #2f5d50, #8fe6a4)"></i><span><b>Soldering, the gentle way</b><small>12 min</small></span></div>
+                  <div><i style="--g: linear-gradient(135deg, #7a4a2a, #ffb454)"></i><span><b>Why old radios hum</b><small>9 min</small></span></div>
+                  <div><i style="--g: linear-gradient(135deg, #24466b, #8cc6ff)"></i><span><b>A synth in a matchbox</b><small>21 min</small></span></div>
+                </div>
+              </div>
+              <div class="aw-scene aw-chat" data-url="chat.example/friends">
+                <div class="ac-list">
+                  <div class="on"><img src="/friends/bunny.svg" alt=""><span><b>bunny</b><small>typing&hellip;</small></span></div>
+                  <div><img src="/friends/bear.svg" alt=""><span><b>bear</b><small>see you saturday</small></span></div>
+                  <div><img src="/friends/capybara.svg" alt=""><span><b>capybara</b><small>haha same</small></span></div>
+                </div>
+                <div class="ac-main">
+                  <div class="ac-head"><img src="/friends/bunny.svg" alt="">bunny</div>
+                  <div class="ac-thread"></div>
+                </div>
+              </div>
+              <div class="aw-scene aw-article" data-url="blog.example/slow-mornings">
+                <div class="ar-body">
+                  <small>Essay &middot; 6 min read</small>
+                  <h4>Slow mornings are underrated</h4>
+                  <div class="ar-hero"></div>
+                  <p>There is a quiet that only exists before the first message arrives. Coffee, a window, nothing that needs an answer yet.</p>
+                  <p>Most of us give that hour away without noticing. The inbox gets it, or the news, or a tab we meant to close yesterday.</p>
+                  <p>Keeping it is easier than it sounds. Pick one thing that can wait until nine, and let it wait.</p>
+                  <p>The work still gets done. It just starts from a calmer place.</p>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="aw-panel">
             <div class="host"></div>
@@ -1185,9 +1274,41 @@ const AW_BEATS = [
   async () => awDone("docs", "Done · 9 links fixed"),
   async (wait) => { await wait(1200); awReset(); },
 ];
+// what you're doing meanwhile: a video, a chat with friends, a long read
+const awScenes = [...aw.querySelectorAll(".aw-scene")];
+const awUrl = aw.querySelector(".aw-url span");
+const awThread = aw.querySelector(".ac-thread");
+const AW_CHAT = [["them", "dinner tonight?"], ["me", "yes! ramen at 8?"], ["them", "perfect, booking it now"], ["me", "see you there"]];
+let awSceneN = 0, awChatTok = 0;
+async function awChatPlay() {
+  const mine = ++awChatTok;
+  awThread.innerHTML = "";
+  for (const [who, text] of AW_CHAT) {
+    const msg = document.createElement("p");
+    if (who === "them") {
+      msg.className = "typing";
+      msg.innerHTML = "<i></i><i></i><i></i>";
+      awThread.append(msg);
+      await sleep(calm ? 0 : 900);
+      if (mine !== awChatTok) return;
+    } else awThread.append(msg);
+    msg.className = who === "me" ? "me" : "";
+    msg.textContent = text;
+    await sleep(calm ? 0 : 1100);
+    if (mine !== awChatTok) return;
+  }
+}
+function awScene(n) {
+  awSceneN = n % awScenes.length;
+  awScenes.forEach((sc, i) => sc.classList.toggle("on", i === awSceneN));
+  awUrl.textContent = awScenes[awSceneN].dataset.url;
+  if (awScenes[awSceneN].classList.contains("aw-chat")) awChatPlay();
+}
 let awBeat = 0;
 awReset();
+awScene(0);
 autoplay(aw, async (pause) => {
+  if (awBeat % 4 === 3) awScene(awSceneN + 1);
   await AW_BEATS[awBeat++ % AW_BEATS.length](pause);
   await pause(1300);
 }, { onHold: () => { for (const b of aw.querySelectorAll(".aw-ask .hot")) b.classList.remove("hot"); } });

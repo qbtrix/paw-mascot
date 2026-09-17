@@ -38,7 +38,9 @@
   2026-09-17: signing up mails a confirm link, and only confirmed signups
   count toward the bar, so a bot posting fake addresses cannot fill it. The
   link comes back here as ?confirmed=<founder number> (or =bad).
-  Smooth scrolling comes from the vendored /lenis.mjs, off for reduced motion. The card's fine print is
+  Smooth scrolling comes from the vendored /lenis.mjs, off for reduced motion.
+  Every feature description is held to about twenty words; the long ones
+  added with the away, memory and team blocks were cut down to that. The card's fine print is
   three icon one-liners; macOS-first and ships-later live in the top band
   only, said once. The control demo's gear opens the pet's own
   settings: picking a pet swaps the one beside it for a flat CC BY friend
@@ -700,7 +702,7 @@
     <div>
       <span class="wip"><i></i>in the works</span>
       <h1>Pro is being built as a native Mac app.</h1>
-      <p>Swift, macOS first. The free pet runs today and stays open source. Everything below is a mock-up, driven by the real pet.</p>
+      <p>Swift, macOS first. Everything below is a mock-up driven by the real pet. The free pet stays open source.</p>
     </div>
     <div class="mac" aria-hidden="true">
       <div class="mac-bar"><span class="lights"><i></i><i></i><i></i></span><span>Paw Pro</span><span></span></div>
@@ -714,7 +716,7 @@
       <article class="feature">
         <span class="k">away</span>
         <h2>Agents take a while. Go do something else.</h2>
-        <p>While Claude Code or Codex work, you're off watching, chatting, reading. The pet floats over it and shows how things stand; hover it for every session: what each one is on, what's done, what needs you. Answer there and keep going. No more watching a terminal.</p>
+        <p>The pet floats on top. Hover it to see what's done and what needs you, then answer right there.</p>
         <div class="demo aw" aria-hidden="true">
           <div class="aw-win">
             <div class="aw-bar"><span class="aw-lights"><i></i><i></i><i></i></span><span class="aw-url"><svg class="ico"><use href="#i-lock"/></svg><span>video.example/watch</span></span></div>
@@ -762,7 +764,7 @@
       <article class="feature">
         <span class="k">hub</span>
         <h2>Every session, one pet.</h2>
-        <p>Hover the pet and every session lines up beside it. Chat right there, or jump into the app. Click the pet and it wakes to listen.</p>
+        <p>Hover for every session. Chat right there or jump into the app. Click the pet to talk.</p>
         <div class="demo hub" aria-hidden="true">
           <div class="who">
             <div class="host"></div>
@@ -781,7 +783,7 @@
       <article class="feature">
         <span class="k">control</span>
         <h2>Hover the pet, act on its session.</h2>
-        <p>Focus, restart or stop from the pet. The gear opens its settings: another pet, personality, memory, your week, all in a .soul file on your Mac (Soul Protocol, an open format).</p>
+        <p>Focus, restart or stop from the pet. The gear opens its settings, saved on your Mac as an open .soul file.</p>
         <div class="demo control" aria-hidden="true" data-state="working">
           <div class="who">
             <div class="host"></div>
@@ -855,7 +857,7 @@
       <article class="feature">
         <span class="k">memory</span>
         <h2>It remembers everything you do, and writes it down.</h2>
-        <p>Meetings, mail, chat, the apps you work in, pages, notes, terminal, sessions: it watches whatever you allow. What matters lands in memory pages you can read, search, edit and delete; hand it a note any time. Switch any source off. On your Mac by default. After the first release.</p>
+        <p>It watches only the sources you allow and writes memory pages you can read, edit or delete. On your Mac. After the first release.</p>
         <div class="demo mm" aria-hidden="true">
           <div class="mm-feed">
             <div class="mm-head"><span>seen</span><span><svg class="ico"><use href="#i-lock"/></svg> on this Mac</span></div>
@@ -886,7 +888,7 @@
       <article class="feature">
         <span class="k">together</span>
         <h2>Your pets, working as a team.</h2>
-        <p>An idea we're exploring. Teammates keep their own pets and share a space when they choose: see who's on what, hand a session over, ask the team's memory. It would need opt-in sync, since memory stays on your Mac by default.</p>
+        <p>An idea we're exploring: teammates share a space to see who's on what and hand sessions over. Opt-in, since memory stays on your Mac.</p>
         <div class="demo tg" aria-hidden="true">
           <div class="tg-team">
             <div class="tg-mate" data-mate="you" data-state="working"><div class="tg-pet"><div class="host"></div></div><b>you</b><span class="dot">on api</span></div>
@@ -904,7 +906,7 @@
       <article class="feature">
         <span class="k">surfaces</span>
         <h2>A panel for the moment, then gone.</h2>
-        <p>A change to approve, a design to pick, a number to watch. The pet draws a panel, you act, it's gone. After the first release.</p>
+        <p>Something to approve or pick? The pet draws a panel, you act, it's gone. After the first release.</p>
         <div class="demo surfaces" aria-hidden="true" data-step="idle">
           <div class="host"></div>
           <div class="surface"></div>
@@ -974,10 +976,8 @@
 
 <section>
   <div class="badge">artist series</div>
-  <p class="note"><b>Later, guest artists.</b> The engine takes any drawing that keeps its
-  contract, so a friend can be drawn by anyone. After Pro ships we want limited
-  friends drawn by artists we admire, and commissions of your own pet. Nothing
-  here is signed yet; locking the price is what makes it real.</p>
+  <p class="note"><b>Later, guest artists.</b> Limited friends drawn by artists we
+  admire, and commissions of your own pet. Nothing signed yet.</p>
 </section>
 
 <script type="module">

@@ -34,7 +34,10 @@
   ephemeral-UI plan, marked as after the first release; its internal name
   stays off the page. Every CTA says lock the price; the old ordering
   wording is gone from the page. The founder bar under the amount fetches
-  /api/preorder/count and stays hidden unless a real number comes back. The card's fine print is
+  /api/preorder/count and stays hidden unless a real number comes back.
+  2026-09-17: signing up mails a confirm link, and only confirmed signups
+  count toward the bar, so a bot posting fake addresses cannot fill it. The
+  link comes back here as ?confirmed=<founder number> (or =bad). The card's fine print is
   three icon one-liners; macOS-first and ships-later live in the top band
   only, said once. The control demo's gear opens the pet's own
   settings: picking a pet swaps the one beside it for a flat CC BY friend
@@ -764,7 +767,7 @@
       </form>
       <ul class="points">
         <li><svg class="ico"><use href="#i-lock"/></svg>Nothing charged today</li>
-        <li><svg class="ico"><use href="#i-mail"/></svg>One email, when checkout opens</li>
+        <li><svg class="ico"><use href="#i-mail"/></svg>Confirm by email, then one more when checkout opens</li>
         <li><svg class="ico"><use href="#i-check"/></svg>The free pet stays MIT forever</li>
       </ul>
     </div>
@@ -928,10 +931,14 @@ form.addEventListener("submit", async (ev) => {
     if (!res.ok) throw new Error(out.error || "That did not go through. Try again in a moment.");
     form.reset();
     form.dataset.done = "1";
-    drawCount();
-    cardPet.update({ state: "wink" });
-    poke(cardPet);
-    tell("Locked. One email when checkout opens.", "good");
+    if (out.state === "confirmed") {
+      cardPet.update({ state: "wink" });
+      poke(cardPet);
+      tell("You're already in. One email when checkout opens.", "good");
+    } else {
+      cardPet.update({ state: "listening" });
+      tell("Check your inbox (or spam) to lock it in.", "good");
+    }
   } catch (err) {
     flinch("confused");
     tell(err.message, "bad");
@@ -939,6 +946,23 @@ form.addEventListener("submit", async (ev) => {
     form.removeAttribute("data-busy");
   }
 });
+// Back from the confirm email: ?confirmed=<founder number>, or =bad.
+{
+  const q = new URLSearchParams(location.search).get("confirmed");
+  if (q) {
+    history.replaceState(null, "", location.pathname);
+    document.querySelector(".price-card").scrollIntoView({ block: "center" });
+    if (/^\d+$/.test(q)) {
+      form.dataset.done = "1";
+      cardPet.update({ state: "wink" });
+      poke(cardPet);
+      tell(`Locked in. You're founder #${q}. One email when checkout opens.`, "good");
+    } else {
+      flinch("confused");
+      tell("That link was already used or is wrong. Enter your email again.", "bad");
+    }
+  }
+}
 document.querySelector('header .cta').addEventListener("click", () => setTimeout(() => form.email.focus({ preventScroll: true }), 350));
 
 // --- hub: one pet, every session beside it -------------------------------------

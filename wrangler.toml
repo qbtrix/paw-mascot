@@ -1,5 +1,11 @@
 # wrangler.toml — the landing page as a Cloudflare Worker: static assets,
-# plus one POST endpoint for the pre-order list.
+# plus the founder-list endpoints (sign up, confirm by email, count).
+#
+# 2026-09-17: added the SIGNUP_LIMIT rate limiter. Every signup POST now sends
+# a confirm email, so an unthrottled endpoint could be used to spam inboxes.
+# Mail goes out through Resend: set the key with
+#   wrangler secret put RESEND_API_KEY
+# Locally, .dev.vars sets MAIL_DEV=1 and the confirm link is logged instead.
 #
 # Created 2026-09-15 as assets-only, the same shape paw-fx uses for its
 # registry site. It grew exactly one endpoint the same day (see `main`).
@@ -25,3 +31,10 @@ binding = "ASSETS"
 binding = "DB"
 database_name = "paw-preorders"
 database_id = "PASTE_AFTER_d1_create"
+
+# Five signups a minute per IP. Plenty for a person, useless for a bot.
+# namespace_id is any number unique within this Cloudflare account.
+[[ratelimits]]
+name = "SIGNUP_LIMIT"
+namespace_id = "1701"
+simple = { limit = 5, period = 60 }

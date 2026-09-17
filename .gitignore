@@ -16,3 +16,6 @@ dist/
 
 # wrangler local state (miniflare D1, caches)
 .wrangler/
+
+# local worker secrets (MAIL_DEV, RESEND_API_KEY)
+.dev.vars

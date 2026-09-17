@@ -15,14 +15,17 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.png">
 <!--
-  The Pro page. Created 2026-09-15, launch day.
+  The Pro page. Created 2026-09-15, launch day. Rebuilt 2026-09-17 so every
+  Pro feature is its own block with a live mock-up under it, and the waitlist
+  card has a pet that reacts to the form.
 
   Same room as the landing page: tokens copied, not shared, because two files
-  beat a build step for a two-page site. The friends appear as RASTERS on
-  purpose -- the pack's source SVGs are premium and this repo is MIT, so a
-  mountable copy of the art can never enter it. A PNG markets the pack; an
-  SVG would give it away. The artist series promises nothing that does not
-  exist: no names, no dates, just the shape of the plan.
+  beat a build step for a two-page site. Pro does not exist yet, so nothing
+  here is a screenshot -- each demo is a mock-up of the plan, driven by the
+  real engine pet, and the sticky card keeps "Pro ships later" in view the
+  whole way down. The friends are the flat CC BY heads in site/friends/,
+  wearing the MIT engine's eyes; the engine-mountable pack art stays private.
+  The artist series promises nothing that does not exist: no names, no dates.
 -->
 <link rel="stylesheet" href="/_fx/effects/paw-avatar/style.css">
 <style>
@@ -30,7 +33,12 @@
   :root {
     --bg: #252621; --panel: #2b2c26; --well: #1f201b;
     --line: #36372f; --line-hi: #47483e; --ink: #edeee6; --dim: #9b9d90;
-    --accent: #8cc6ff; --radius: 14px;
+    --accent: #8cc6ff; --radius: 14px; --warn: #ffb454; --bad: #d98f6c; --good: #8fe6a4;
+    /* No purple on this page, the pets included: the character's rim is a
+       var() ramp, re-tokened to the landing page's ice. */
+    --fx-paw-rim-a: #ffffff; --fx-paw-rim-b: #e6f1ff; --fx-paw-rim-c: #a9d1ff;
+    --fx-paw-rim-d: #8cc6ff; --fx-paw-rim-e: #cfe5ff;
+    --fx-paw-glow: rgba(140, 198, 255, .45); --fx-paw-halo: #6aa9e6; --fx-paw-eye: #f7fbff;
     --display: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
     --body: "Manrope", "Helvetica Neue", Arial, sans-serif;
     --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
@@ -61,18 +69,162 @@
   section + section { border-top: 1px solid var(--line); }
 
   /* --- offers + the card ---------------------------------------------------- */
-  .split { display: grid; grid-template-columns: 1.2fr .8fr; gap: clamp(2rem, 5vw, 4rem); align-items: start; }
-  @media (max-width: 820px) { .split { grid-template-columns: 1fr; } }
-  .offer { display: grid; grid-template-columns: 7.5rem 1fr; gap: 1rem; align-items: baseline;
-           padding: 1.15rem 0; border-top: 1px solid var(--line); }
-  .offer:first-child { border-top: 0; }
-  .offer .k { font: 500 13px/1 var(--mono); letter-spacing: .02em; }
-  .offer span:last-child { color: var(--dim); font-size: 14px; line-height: 1.6; }
+  .split { display: grid; grid-template-columns: 1.25fr .75fr; gap: clamp(2rem, 5vw, 4rem); align-items: start; }
+  /* On a phone the waitlist comes first: five tall demos is a long way to
+     scroll to find out what any of it costs. */
+  @media (max-width: 820px) { .split { grid-template-columns: 1fr; } .price-card { position: static; order: -1; } }
+  .intro { color: var(--dim); font-size: 13.5px; margin: -1rem 0 2.25rem; max-width: 72ch; }
+
+  /* --- the features: one block each, a live mock-up under every one ------- */
+  .feature { display: grid; gap: .5rem; padding: 2.5rem 0; border-top: 1px solid var(--line); }
+  .feature:first-child { border-top: 0; padding-top: 0; }
+  .feature .k { width: fit-content; font: 500 12px/1 var(--mono); color: var(--accent);
+                background: color-mix(in srgb, var(--accent) 10%, transparent); border-radius: 6px; padding: .3rem .45rem; }
+  .feature h2 { margin: .35rem 0 0; font: 600 clamp(1.3rem, 2.1vw, 1.6rem)/1.15 var(--display); letter-spacing: -.02em; }
+  .feature > p { margin: 0 0 1rem; color: var(--dim); font-size: 14.5px; line-height: 1.6; max-width: 54ch; }
+  .demo { position: relative; min-height: 260px; padding: 1.5rem; overflow: hidden;
+          display: grid; place-items: center; background: var(--well);
+          border: 1px solid var(--line); border-radius: var(--radius); --fx-paw-ground: none; }
+  .ico { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2;
+         stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  .brand { width: 13px; height: 13px; fill: currentColor; flex: none; }
+
+  /* hub: a row of sessions, each one a pet */
+  .hub { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; align-items: end; }
+  .seat { position: relative; display: grid; justify-items: center; gap: .45rem; cursor: pointer;
+          padding: .6rem .35rem .75rem; border-radius: 12px; transition: background .2s, box-shadow .2s; }
+  .seat .host { --fx-paw-size: clamp(70px, 11vw, 104px); }
+  .seat .tag { display: flex; align-items: center; gap: .4rem; font: 500 12.5px/1 var(--mono); }
+  .seat .tag .brand { color: var(--dim); }
+  .dot { display: inline-flex; align-items: center; gap: .4rem; font: 400 11.5px/1 var(--mono); color: var(--dim); white-space: nowrap; }
+  .dot::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--line-hi); flex: none; }
+  [data-state="working"] .dot::before, [data-state="thinking"] .dot::before,
+  [data-state="focused"] .dot::before { background: var(--accent); }
+  [data-state="listening"] .dot { color: var(--warn); }
+  [data-state="listening"] .dot::before { background: var(--warn); }
+  [data-state="wink"] .dot::before { background: var(--good); }
+  .seat:hover, .seat.focus { background: color-mix(in srgb, var(--panel) 80%, transparent); }
+  .seat.focus { box-shadow: inset 0 0 0 1px var(--line-hi); }
+  /* the peek floats above the pet, in the headroom the row leaves */
+  .peek { position: absolute; bottom: calc(100% - .2rem); left: 50%; z-index: 2; display: grid; gap: .3rem;
+          padding: .5rem .65rem; background: var(--panel); border: 1px solid var(--line-hi); border-radius: 9px;
+          box-shadow: 0 12px 24px -14px rgba(0, 0, 0, .6);
+          font: 400 11.5px/1.2 var(--mono); color: var(--dim); white-space: nowrap; text-align: center;
+          opacity: 0; translate: -50% 6px; pointer-events: none; transition: opacity .18s, translate .18s; }
+  .peek b { color: var(--ink); font-weight: 500; }
+  .seat:hover .peek, .seat.focus .peek { opacity: 1; translate: -50% 0; }
+
+  /* control: hover the pet, its actions slide out */
+  .control { grid-template-columns: 1fr auto 1fr; gap: 1.5rem; align-items: center; }
+  .control .who { grid-column: 2; display: grid; justify-items: center; gap: .6rem; cursor: pointer; }
+  .control .host { --fx-paw-size: clamp(116px, 18vw, 156px); }
+  .acts { grid-column: 3; justify-self: start; display: grid; gap: .5rem; }
+  .act { display: flex; align-items: center; gap: .55rem; cursor: pointer; white-space: nowrap;
+         font: 500 13px/1 var(--body); color: var(--ink); background: var(--panel);
+         border: 1px solid var(--line-hi); border-radius: 999px; padding: .6rem 1rem .6rem .75rem;
+         opacity: 0; translate: -12px 0; transition: opacity .22s, translate .22s, background .15s, border-color .15s; }
+  .act:nth-child(2) { transition-delay: .05s, .05s, 0s, 0s; }
+  .act:nth-child(3) { transition-delay: .1s, .1s, 0s, 0s; }
+  .control:hover .act, .control.on .act { opacity: 1; translate: 0 0; }
+  .act:hover, .act.hot { background: color-mix(in srgb, var(--accent) 16%, var(--panel));
+                         border-color: color-mix(in srgb, var(--accent) 60%, var(--line-hi)); }
+  .act.stop:hover, .act.stop.hot { background: color-mix(in srgb, var(--bad) 16%, var(--panel));
+                                   border-color: color-mix(in srgb, var(--bad) 60%, var(--line-hi)); }
+  @media (max-width: 560px) {
+    .control { grid-template-columns: 1fr; }
+    .control .who, .acts { grid-column: 1; justify-self: center; }
+    .acts { grid-auto-flow: column; }
+    .act { padding: .55rem .75rem; translate: 0 -8px; }
+  }
+
+  /* voice: talk, confirm, it starts */
+  .voice { grid-template-columns: 1fr auto; gap: 1.5rem; justify-items: stretch; }
+  .voice .host { --fx-paw-size: clamp(104px, 16vw, 140px); }
+  .talk { display: grid; gap: 1rem; justify-items: start; }
+  .mic { display: flex; align-items: center; gap: .9rem; }
+  .orb { position: relative; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+         color: var(--dim); background: var(--panel); border: 1px solid var(--line-hi);
+         transition: color .2s, background .2s, border-color .2s; }
+  .orb .ico { width: 18px; height: 18px; }
+  .voice[data-step="listen"] .orb { color: #1b1c17; background: var(--accent); border-color: var(--accent); }
+  .wave { display: flex; align-items: center; gap: 3px; height: 26px; }
+  .wave i { width: 3px; height: 4px; border-radius: 2px; background: var(--line-hi); transition: height .25s, background .25s; }
+  .voice[data-step="listen"] .wave i { background: var(--accent); }
+  .heard { min-height: 3em; max-width: 30ch; font: 400 14.5px/1.5 var(--mono); color: var(--ink); }
+  .heard:empty::before { content: "Talk, and a session starts."; color: var(--dim); }
+  .ask { display: flex; flex-wrap: wrap; align-items: center; gap: .55rem .7rem; font-size: 13px;
+         background: var(--panel); border: 1px solid var(--line-hi); border-radius: 12px; padding: .6rem .7rem;
+         opacity: 0; translate: 0 8px; transition: opacity .25s, translate .25s, border-color .25s; }
+  .ask .q b { font: 500 12.5px/1 var(--mono); }
+  .ask .yes, .ask .no { font: 600 12px/1 var(--display); border-radius: 999px; padding: .45rem .7rem; }
+  .ask .yes { color: #1b1c17; background: var(--accent); transition: box-shadow .2s; }
+  .ask .no { color: var(--dim); border: 1px solid var(--line-hi); }
+  .ask .ok { display: none; align-items: center; gap: .4rem; color: var(--good); font: 500 12.5px/1 var(--mono); }
+  .voice[data-step="confirm"] .ask, .voice[data-step="started"] .ask { opacity: 1; translate: 0 0; }
+  .voice[data-step="started"] .ask { border-color: color-mix(in srgb, var(--good) 45%, var(--line-hi)); }
+  .voice[data-step="started"] .ask .q, .voice[data-step="started"] .ask .yes,
+  .voice[data-step="started"] .ask .no { display: none; }
+  .voice[data-step="started"] .ask .ok { display: inline-flex; }
+  @media (max-width: 560px) { .voice { grid-template-columns: 1fr; } .voice .host { justify-self: center; order: -1; } }
+
+  /* packs: the friends, as a strip */
+  .packs { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .5rem; align-items: end; align-content: center; }
+  .head { display: grid; justify-items: center; gap: .5rem; cursor: pointer; }
+  .head img { width: 100%; max-width: 96px; height: auto;
+              transition: translate .3s cubic-bezier(.2, .8, .2, 1), rotate .3s cubic-bezier(.2, .8, .2, 1); }
+  .head b { font: 400 11.5px/1 var(--mono); color: var(--dim); opacity: 0; translate: 0 4px; transition: opacity .2s, translate .2s; }
+  .head:hover img, .head.hot img { translate: 0 -10px; rotate: -5deg; }
+  .head:hover b, .head.hot b { opacity: 1; translate: 0 0; }
+  .packs .more { grid-column: 1 / -1; justify-self: center; margin-top: .75rem; font: 400 12px/1 var(--mono); color: var(--dim); text-decoration: none; }
+  .packs .more:hover { color: var(--ink); }
+
+  /* signed: the warning today, gone in Pro */
+  .signed { grid-template-areas: "stage"; }
+  /* only the card and the pet share the cell; the chip is pinned to the
+     stage corner, and an absolute child with a grid-area would pin to the
+     cell instead */
+  .signed > .warn, .signed > .host { grid-area: stage; }
+  .build { position: absolute; top: 1rem; left: 1rem; font: 500 11.5px/1 var(--mono); color: var(--dim);
+           background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: .4rem .7rem; }
+  .build .pro { display: none; color: var(--good); }
+  .signed[data-build="pro"] .build .free { display: none; }
+  .signed[data-build="pro"] .build .pro { display: inline; }
+  .warn { width: min(300px, 100%); display: grid; gap: .5rem; justify-items: start;
+          background: var(--panel); border: 1px solid var(--line-hi); border-radius: 14px; padding: 1.1rem 1.15rem;
+          box-shadow: 0 24px 48px -24px rgba(0, 0, 0, .55);
+          transition: opacity .45s, scale .45s cubic-bezier(.2, .8, .2, 1), filter .45s; }
+  .warn .ico { width: 22px; height: 22px; color: var(--warn); }
+  .warn b { font: 600 15px/1.3 var(--display); }
+  .warn span { color: var(--dim); font-size: 12.5px; line-height: 1.5; }
+  .warn code { font: 400 11.5px/1.5 var(--mono); color: var(--dim); background: var(--bg); border-radius: 6px; padding: .3rem .45rem; }
+  .signed .host { --fx-paw-size: clamp(110px, 16vw, 140px); opacity: 0; scale: .85;
+                  transition: opacity .45s .15s, scale .55s .15s cubic-bezier(.2, .8, .2, 1); }
+  .signed[data-build="pro"] .warn { opacity: 0; scale: .92; filter: blur(6px); }
+  .signed[data-build="pro"] .host { opacity: 1; scale: 1; }
+
+  /* Everything that moves on its own sits out reduced motion. Hovering still
+     works; it just arrives without the travel. */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-state="listening"] .dot::before { animation: ping 1.3s ease-out infinite; }
+    .voice[data-step="listen"] .orb::after { content: ""; position: absolute; inset: -6px; border-radius: 50%;
+                                            border: 2px solid var(--accent); animation: ring 1.4s ease-out infinite; }
+    .voice[data-step="listen"] .wave i { animation: wave .8s ease-in-out infinite; animation-delay: calc(var(--i) * -.11s); }
+    .signed[data-build="free"] .warn { animation: nudge 3.2s ease-in-out infinite; }
+  }
+  @keyframes ping { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--warn) 60%, transparent); }
+                    100% { box-shadow: 0 0 0 7px transparent; } }
+  @keyframes ring { 0% { scale: .9; opacity: .7; } 100% { scale: 1.35; opacity: 0; } }
+  @keyframes wave { 0%, 100% { height: 4px; } 50% { height: 24px; } }
+  @keyframes nudge { 0%, 86%, 100% { translate: 0 0; } 89% { translate: -4px 0; } 92% { translate: 4px 0; } 95% { translate: -2px 0; } }
   .price-card { position: sticky; top: 96px; background: var(--well); border: 1px solid var(--line);
                 border-radius: var(--radius); padding: 1.75rem; display: grid; gap: .9rem; justify-items: start; }
+  .card-top { display: flex; align-items: center; gap: .9rem; }
+  .card-top .pet { --fx-paw-size: 76px; --fx-paw-ground: none; flex: none; }
   .amount { font: 600 44px/1 var(--display); letter-spacing: -.02em; }
-  .amount small { font: 500 13px/1 var(--mono); color: var(--dim); letter-spacing: .04em; margin-left: .5rem; }
-  .fine { color: var(--dim); font-size: 12.5px; line-height: 1.6; max-width: 26ch; }
+  #preorder, #friends-section { scroll-margin-top: 90px; }
+  .amount small { display: block; margin-top: .45rem; font: 500 11.5px/1 var(--mono); color: var(--dim); letter-spacing: .06em; }
+  .price-card .signup { justify-self: stretch; }
+  .fine { color: var(--dim); font-size: 12.5px; line-height: 1.6; max-width: 38ch; }
 
   /* --- the friends ---------------------------------------------------------- */
   .friends { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
@@ -120,6 +272,8 @@
   .say { margin: 0; font: 400 12.5px/1.5 var(--mono); color: var(--dim); min-height: 1.2em; }
   .say[data-bad] { color: #d98f6c; }
   .say[data-good] { color: var(--accent); }
+  /* joined: the form steps aside and the line underneath is the receipt */
+  .signup[data-done] input, .signup[data-done] .cta { display: none; }
   /* Reachable by a screen reader, invisible to everyone else -- the label and
      the honeypot both need to exist without being seen. */
   .sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
@@ -135,18 +289,124 @@
   <a class="cta" href="#preorder">Pre-order Pro</a>
 </header>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-anthropic" viewBox="0 0 24 24"><path d="M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.5409Zm-.3712 10.2232 2.2914-5.9456 2.2914 5.9456Z"/></symbol>
+  <symbol id="i-openai" viewBox="0 0 24 24"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z"/></symbol>
+  <symbol id="i-focus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.2"/></symbol>
+  <symbol id="i-restart" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="2"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3.5l9 16H3z"/><path d="M12 10v4"/><path d="M12 17.2v.3"/></symbol>
+</svg>
+
 <section>
   <div class="badge">pro</div>
+  <p class="intro">Mock-ups of what Pro will do, driven by the real pet. Pro ships later, macOS first.</p>
   <div class="split">
-    <div class="offers">
-      <div class="offer"><span class="k">hub</span><span>Every running session on your desk, one glance. The pet becomes a row of pets, one per session, each carrying its own state.</span></div>
-      <div class="offer"><span class="k">control</span><span>Start, stop and restart sessions from the pet. Click a friend, act on the session it watches.</span></div>
-      <div class="offer"><span class="k">voice</span><span>Say it, and a Claude Code or Codex session starts with what you said. Confirm before anything runs.</span></div>
-      <div class="offer"><span class="k">packs</span><span>New friends beyond the puppy, drawn in the same glass. Every one runs all twenty-eight states.</span></div>
-      <div class="offer"><span class="k">signed</span><span>A notarized build. No damaged-app dialog, ever.</span></div>
+    <div class="features">
+
+      <article class="feature">
+        <span class="k">hub</span>
+        <h2>Every session, one glance.</h2>
+        <p>The pet becomes a row of pets, one per running session, each carrying its own state. Hover one to see what it is doing, click to focus it.</p>
+        <div class="demo hub" aria-hidden="true">
+          <div class="seat" data-name="api" data-agent="Claude Code">
+            <div class="host"></div>
+            <div class="tag"><svg class="brand"><use href="#i-anthropic"/></svg>api</div>
+            <div class="dot"></div>
+            <div class="peek"></div>
+          </div>
+          <div class="seat" data-name="site" data-agent="Codex">
+            <div class="host"></div>
+            <div class="tag"><svg class="brand"><use href="#i-openai"/></svg>site</div>
+            <div class="dot"></div>
+            <div class="peek"></div>
+          </div>
+          <div class="seat" data-name="docs" data-agent="Claude Code">
+            <div class="host"></div>
+            <div class="tag"><svg class="brand"><use href="#i-anthropic"/></svg>docs</div>
+            <div class="dot"></div>
+            <div class="peek"></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="feature">
+        <span class="k">control</span>
+        <h2>Hover the pet, act on its session.</h2>
+        <p>Focus, restart or stop a session from the pet that watches it. The actions are right there when you point at it.</p>
+        <div class="demo control" aria-hidden="true" data-state="working">
+          <div class="who">
+            <div class="host"></div>
+            <div class="dot">api &middot; working</div>
+          </div>
+          <div class="acts">
+            <span class="act" data-act="focus"><svg class="ico"><use href="#i-focus"/></svg>Focus</span>
+            <span class="act" data-act="restart"><svg class="ico"><use href="#i-restart"/></svg>Restart</span>
+            <span class="act stop" data-act="stop"><svg class="ico"><use href="#i-stop"/></svg>Stop</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="feature">
+        <span class="k">voice</span>
+        <h2>Say it. Confirm. It starts.</h2>
+        <p>Say what you want and a Claude Code or Codex session starts with it. Nothing runs until you confirm.</p>
+        <div class="demo voice" aria-hidden="true" data-step="idle">
+          <div class="talk">
+            <div class="mic">
+              <span class="orb"><svg class="ico"><use href="#i-mic"/></svg></span>
+              <span class="wave"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i></span>
+            </div>
+            <div class="heard"></div>
+            <div class="ask">
+              <svg class="brand"><use href="#i-anthropic"/></svg>
+              <span class="q"></span>
+              <span class="yes">Start</span><span class="no">Cancel</span>
+              <span class="ok"><svg class="ico"><use href="#i-check"/></svg><span></span></span>
+            </div>
+          </div>
+          <div class="host"></div>
+        </div>
+      </article>
+
+      <article class="feature">
+        <span class="k">packs</span>
+        <h2>More friends, same glass.</h2>
+        <p>New friends beyond the puppy, drawn in the same glass. Every one runs all twenty-eight states.</p>
+        <div class="demo packs" aria-hidden="true">
+          <span class="head"><img src="/friends/cat.svg" alt=""><b>cat</b></span>
+          <span class="head"><img src="/friends/fox.svg" alt=""><b>fox</b></span>
+          <span class="head"><img src="/friends/panda.svg" alt=""><b>panda</b></span>
+          <span class="head"><img src="/friends/penguin.svg" alt=""><b>penguin</b></span>
+          <span class="head"><img src="/friends/dragon.svg" alt=""><b>dragon</b></span>
+          <a class="more" href="#friends-section">all nine &darr;</a>
+        </div>
+      </article>
+
+      <article class="feature">
+        <span class="k">signed</span>
+        <h2>Opens like any other app.</h2>
+        <p>A signed, notarized build. No blocked-app warning, no trip to Privacy &amp; Security.</p>
+        <div class="demo signed" aria-hidden="true" data-build="free">
+          <span class="build"><span class="free">free build &middot; today</span><span class="pro">Pro &middot; signed &amp; notarized</span></span>
+          <div class="warn">
+            <svg class="ico"><use href="#i-alert"/></svg>
+            <b>macOS won&rsquo;t open Paw</b>
+            <span>It can&rsquo;t check who made it, so it stops you here.</span>
+            <code>Settings &rarr; Privacy &amp; Security &rarr; Open Anyway</code>
+          </div>
+          <div class="host"></div>
+        </div>
+      </article>
+
     </div>
     <div class="price-card">
-      <div class="amount">$19<small>FOUNDER &middot; LIFETIME</small></div>
+      <div class="card-top">
+        <div class="pet" aria-hidden="true"></div>
+        <div class="amount">$19<small>FOUNDER &middot; LIFETIME</small></div>
+      </div>
       <form class="signup" id="preorder" novalidate>
         <label class="sr" for="email">Your email</label>
         <input id="email" name="email" type="email" inputmode="email" autocomplete="email"
@@ -161,7 +421,7 @@
   </div>
 </section>
 
-<section>
+<section id="friends-section">
   <div class="badge">the friends</div>
   <div class="friends" id="friends"></div>
 </section>
@@ -206,21 +466,58 @@ function socketEyes(el) {
   });
 }
 
-// The pre-order: an address, posted to our own endpoint, stored in our own
-// database. Nothing leaves for a third party and nothing is public.
+// --- small tools every demo shares ------------------------------------------
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const pet = (el, state, fps = 24) => mount(el, { state, fps });
+const poke = (p) => p.engine.react("poke", p.clock());
+
+// Plays `scene` on repeat while `stage` is on screen and nobody is pointing
+// at it. Every wait inside a scene goes through `pause`, which throws once a
+// newer run has started -- so a hover, or scrolling away, stops the scene
+// mid-step instead of letting two runs fight over the same pet.
+function autoplay(stage, scene, { hold = true, onHold } = {}) {
+  let seen = false, held = false, run = 0;
+  const go = async () => {
+    const mine = ++run;
+    const pause = async (ms) => { await sleep(ms); if (mine !== run) throw "superseded"; };
+    try { for (;;) { await scene(pause); await pause(400); } } catch { /* a newer run owns the stage */ }
+  };
+  if (!calm) {
+    new IntersectionObserver(([e]) => {
+      seen = e.isIntersecting;
+      if (seen && !held) go(); else run++;
+    }, { threshold: 0.35 }).observe(stage);
+  }
+  if (hold) {
+    stage.addEventListener("pointerenter", () => { held = true; run++; onHold?.(); });
+    stage.addEventListener("pointerleave", () => { held = false; if (seen && !calm) go(); });
+  }
+  return { kick: () => { if (!calm) go(); } };
+}
+
+// --- the waitlist ---------------------------------------------------------------
+// The card's pet watches the form: it listens while you type, thinks while
+// the address is on its way, and winks once you are in.
 const form = document.getElementById("preorder");
+const cardPet = pet(document.querySelector(".card-top .pet"), "idle");
 const say = form.querySelector(".say");
 const tell = (text, kind) => {
   say.textContent = text;
   say.removeAttribute("data-good"); say.removeAttribute("data-bad");
   if (kind) say.setAttribute(`data-${kind}`, "");
 };
+const flinch = (state) => { cardPet.update({ state }); cardPet.engine.react("startle", cardPet.clock(), 0.7); };
+form.email.addEventListener("focus", () => { if (!form.dataset.done) cardPet.update({ state: "listening" }); });
+form.email.addEventListener("blur", () => { if (!form.dataset.done && !form.email.value) cardPet.update({ state: "idle" }); });
+form.email.addEventListener("input", () => { if (say.hasAttribute("data-bad")) { tell(""); cardPet.update({ state: "listening" }); } });
 form.addEventListener("submit", async (ev) => {
   ev.preventDefault();
   const email = form.email.value.trim();
-  if (!email) return tell("An email address, and you are on the list.", "bad");
+  if (!email) { flinch("confused"); return tell("An email address, and you are on the list.", "bad"); }
   form.setAttribute("data-busy", "");
-  tell("Adding you\u2026");
+  cardPet.update({ state: "thinking" });
+  tell("Adding you…");
   try {
     const res = await fetch("/api/preorder", {
       method: "POST",
@@ -230,13 +527,165 @@ form.addEventListener("submit", async (ev) => {
     const out = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(out.error || "That did not go through. Try again in a moment.");
     form.reset();
-    tell("You are on the list. We will write when checkout opens \u2014 nothing else.", "good");
+    form.dataset.done = "";
+    cardPet.update({ state: "wink" });
+    poke(cardPet);
+    tell("You are on the list. We will write when checkout opens — nothing else.", "good");
   } catch (err) {
+    flinch("confused");
     tell(err.message, "bad");
   } finally {
     form.removeAttribute("data-busy");
   }
 });
+document.querySelector('header .cta').addEventListener("click", () => setTimeout(() => form.email.focus({ preventScroll: true }), 350));
+
+// --- hub: a row of sessions, each one a pet -----------------------------------
+// Each seat walks its own little script, a step every couple of seconds, so
+// the row reads as three sessions living their own lives.
+const LABEL = { listening: "needs you", wink: "done", idle: "waiting" };
+const HUB = [
+  ["working", "working", "wink", "idle"],
+  ["thinking", "working", "working", "thinking"],
+  ["listening", "listening", "working", "focused"],
+];
+const hub = document.querySelector(".demo.hub");
+const seats = [...hub.querySelectorAll(".seat")].map((el, i) => {
+  const p = pet(el.querySelector(".host"), HUB[i][0], 20);
+  const set = (state) => {
+    p.update({ state });
+    el.dataset.state = state;
+    el.querySelector(".dot").textContent = LABEL[state] ?? state;
+    el.querySelector(".peek").innerHTML = `<b>${el.dataset.name} &middot; ${el.dataset.agent}</b><span>click to focus</span>`;
+  };
+  set(HUB[i][0]);
+  el.addEventListener("click", () => {
+    for (const s of seatEls) s.classList.toggle("focus", s === el && !el.classList.contains("focus"));
+    poke(p);
+  });
+  return { el, set };
+});
+const seatEls = seats.map((s) => s.el);
+let hubStep = 0;
+autoplay(hub, async (pause) => {
+  await pause(2400);
+  hubStep++;
+  seats.forEach((s, i) => s.set(HUB[i][hubStep % HUB[i].length]));
+}, { hold: false });
+
+// --- control: hover the pet, its actions slide out ----------------------------
+const ctl = document.querySelector(".demo.control");
+const ctlPet = pet(ctl.querySelector(".host"), "working");
+const ctlLine = ctl.querySelector(".who .dot");
+let acting = 0;
+const show = (state, text) => { ctlPet.update({ state }); ctl.dataset.state = state; ctlLine.textContent = `api · ${text}`; };
+async function act(name) {
+  const mine = ++acting;
+  poke(ctlPet);
+  if (name === "focus") show("curious", "focused");
+  if (name === "stop") show("sleeping", "stopped");
+  if (name === "restart") {
+    show("listening", "restarting…");
+    await sleep(1100);
+    if (mine === acting) show("working", "working");
+  }
+}
+for (const b of ctl.querySelectorAll(".act")) b.addEventListener("click", (e) => { e.stopPropagation(); act(b.dataset.act); });
+// hover does not exist on a phone: a tap on the pet opens the actions
+ctl.querySelector(".who").addEventListener("click", () => ctl.classList.toggle("on"));
+const ORDER = ["focus", "restart", "stop"];
+let nextAct = 0;
+autoplay(ctl, async (pause) => {
+  if (ctl.dataset.state !== "working") { show("working", "working"); await pause(1200); }
+  const name = ORDER[nextAct++ % ORDER.length];
+  const btn = ctl.querySelector(`.act[data-act="${name}"]`);
+  await pause(900);
+  ctl.classList.add("on");
+  await pause(750);
+  btn.classList.add("hot");
+  await pause(550);
+  act(name);
+  await pause(1700);
+  btn.classList.remove("hot");
+  ctl.classList.remove("on");
+  await pause(1300);
+}, { onHold: () => { ctl.classList.remove("on"); for (const b of ctl.querySelectorAll(".act.hot")) b.classList.remove("hot"); } });
+ctl.addEventListener("pointerleave", () => setTimeout(() => {
+  if (!ctl.matches(":hover")) { ++acting; show("working", "working"); }
+}, 900));
+
+// --- voice: talk, confirm, it starts ---------------------------------------------
+const voice = document.querySelector(".demo.voice");
+const voicePet = pet(voice.querySelector(".host"), "idle");
+const heard = voice.querySelector(".heard");
+const ask = voice.querySelector(".ask");
+const ASKS = [
+  { agent: "Claude Code", icon: "#i-anthropic", said: "fix the flaky checkout test", dir: "~/api" },
+  { agent: "Codex", icon: "#i-openai", said: "draft the release notes for this week", dir: "~/site" },
+];
+let turn = 0;
+const player = autoplay(voice, async (pause) => {
+  const a = ASKS[turn++ % ASKS.length];
+  ask.querySelector("use").setAttribute("href", a.icon);
+  voice.dataset.step = "listen";
+  voicePet.update({ state: "listening" });
+  heard.textContent = "";
+  for (const word of a.said.split(" ")) {
+    heard.textContent += (heard.textContent ? " " : "") + word;
+    await pause(170 + ((word.length * 37) % 110));
+  }
+  await pause(600);
+  ask.querySelector(".q").innerHTML = `Start ${a.agent} in <b>${a.dir}</b>?`;
+  voice.dataset.step = "confirm";
+  voicePet.update({ state: "thinking" });
+  await pause(1500);
+  ask.querySelector(".ok span").textContent = `${a.agent} started in ${a.dir}`;
+  voice.dataset.step = "started";
+  voicePet.update({ state: "working" });
+  poke(voicePet);
+  await pause(2400);
+  voice.dataset.step = "idle";
+  voicePet.update({ state: "idle" });
+  heard.textContent = "";
+  await pause(1600);
+}, { hold: false });
+// pointing at an idle mic starts talking now, instead of waiting out the gap
+voice.addEventListener("pointerenter", () => { if (voice.dataset.step === "idle") player.kick(); });
+
+// --- packs: the friends, as a strip -----------------------------------------------
+const packs = document.querySelector(".demo.packs");
+const heads = [...packs.querySelectorAll(".head")];
+let lit = 0;
+autoplay(packs, async (pause) => {
+  heads.forEach((h, i) => h.classList.toggle("hot", i === lit));
+  await pause(1100);
+  lit = (lit + 1) % heads.length;
+}, { onHold: () => heads.forEach((h) => h.classList.remove("hot")) });
+
+// --- signed: the warning today, gone in Pro --------------------------------------
+const signed = document.querySelector(".demo.signed");
+const signedPet = pet(signed.querySelector(".host"), "happy");
+const build = (which) => {
+  if (signed.dataset.build === which) return;
+  signed.dataset.build = which;
+  if (which === "pro") poke(signedPet);
+};
+autoplay(signed, async (pause) => {
+  build("free");
+  await pause(2800);
+  build("pro");
+  await pause(3000);
+}, { onHold: () => build("pro") });
+signed.addEventListener("pointerleave", () => build("free"));
+
+// Reduced motion gets one honest still frame per demo instead of a loop.
+if (calm) {
+  ctl.classList.add("on");
+  ask.querySelector(".q").innerHTML = `Start ${ASKS[0].agent} in <b>${ASKS[0].dir}</b>?`;
+  heard.textContent = ASKS[0].said;
+  voice.dataset.step = "confirm";
+  build("pro");
+}
 
 // Inlined, so the drawings can live a little: an <img> is a sealed box, but
 // an inline SVG lets CSS reach the eye paths. Eyes are found by geometry at

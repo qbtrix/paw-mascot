@@ -26,6 +26,8 @@
   whole way down. The friends are the flat CC BY heads in site/friends/,
   wearing the MIT engine's eyes; the engine-mountable pack art stays private.
   The artist series promises nothing that does not exist: no names, no dates.
+  The demos are aria-hidden, so anything a keyboard can reach, like the
+  "all nine friends" link, lives outside them.
 -->
 <link rel="stylesheet" href="/_fx/effects/paw-avatar/style.css">
 <style>
@@ -175,8 +177,8 @@
   .head b { font: 400 11.5px/1 var(--mono); color: var(--dim); opacity: 0; translate: 0 4px; transition: opacity .2s, translate .2s; }
   .head:hover img, .head.hot img { translate: 0 -10px; rotate: -5deg; }
   .head:hover b, .head.hot b { opacity: 1; translate: 0 0; }
-  .packs .more { grid-column: 1 / -1; justify-self: center; margin-top: .75rem; font: 400 12px/1 var(--mono); color: var(--dim); text-decoration: none; }
-  .packs .more:hover { color: var(--ink); }
+  .feature .more { width: fit-content; margin-top: .35rem; font: 400 12.5px/1 var(--mono); color: var(--dim); text-decoration: none; }
+  .feature .more:hover { color: var(--ink); }
 
   /* signed: the warning today, gone in Pro */
   .signed { grid-template-areas: "stage"; }
@@ -381,8 +383,8 @@
           <span class="head"><img src="/friends/panda.svg" alt=""><b>panda</b></span>
           <span class="head"><img src="/friends/penguin.svg" alt=""><b>penguin</b></span>
           <span class="head"><img src="/friends/dragon.svg" alt=""><b>dragon</b></span>
-          <a class="more" href="#friends-section">all nine &darr;</a>
         </div>
+        <a class="more" href="#friends-section">See all nine friends &darr;</a>
       </article>
 
       <article class="feature">
@@ -527,7 +529,7 @@ form.addEventListener("submit", async (ev) => {
     const out = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(out.error || "That did not go through. Try again in a moment.");
     form.reset();
-    form.dataset.done = "";
+    form.dataset.done = "1";
     cardPet.update({ state: "wink" });
     poke(cardPet);
     tell("You are on the list. We will write when checkout opens — nothing else.", "good");

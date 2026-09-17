@@ -30,7 +30,7 @@ binding = "ASSETS"
 [[d1_databases]]
 binding = "DB"
 database_name = "paw-preorders"
-database_id = "PASTE_AFTER_d1_create"
+database_id = "b77e0255-fed2-450c-9127-8bd30dae57e7"
 
 # Five signups a minute per IP. Plenty for a person, useless for a bot.
 # namespace_id is any number unique within this Cloudflare account.

@@ -464,6 +464,7 @@
                       border-radius: inherit; background: var(--accent); transition: width .7s cubic-bezier(.3, .7, .2, 1); }
   .claimed span { font: 400 11px/1 var(--mono); color: var(--dim); }
   .claimed b { font-weight: 500; color: var(--ink); }
+  .next { font: 400 11px/1.4 var(--mono); color: var(--dim); }
   /* On a phone the waitlist comes first: five tall demos is a long way to
      scroll to find out what any of it costs. This must sit after the sticky
      rule above -- earlier in the sheet it loses, and a sticky card at the top
@@ -565,7 +566,7 @@
     <div>
       <span class="wip"><i></i>in the works</span>
       <h1>Pro is being built as a native Mac app.</h1>
-      <p>Written in Swift, macOS first. The free pet stays open source and runs today. Everything below is a mock-up of what Pro will do, driven by the real pet.</p>
+      <p>Swift, macOS first. The free pet runs today and stays open source. Everything below is a mock-up, driven by the real pet.</p>
     </div>
     <div class="mac" aria-hidden="true">
       <div class="mac-bar"><span class="lights"><i></i><i></i><i></i></span><span>Paw Pro</span><span></span></div>
@@ -579,7 +580,7 @@
       <article class="feature">
         <span class="k">hub</span>
         <h2>Every session, one pet.</h2>
-        <p>One pet, however many sessions you run. Hover it and every session is listed beside it: answer one with a quick chat right there, or jump into Claude Code or Codex. Click the pet itself and it shakes awake to listen.</p>
+        <p>Hover the pet and every session lines up beside it. Chat right there, or jump into the app. Click the pet and it wakes to listen.</p>
         <div class="demo hub" aria-hidden="true">
           <div class="who">
             <div class="host"></div>
@@ -598,7 +599,7 @@
       <article class="feature">
         <span class="k">control</span>
         <h2>Hover the pet, act on its session.</h2>
-        <p>Focus, restart or stop a session from the pet that watches it. The gear opens the pet's settings: switch to another pet, tune its personality, see what it remembers, and glance at your week. It all lives in a .soul file (Soul Protocol, an open format) on your Mac. Memory comes after Pro's first release.</p>
+        <p>Focus, restart or stop from the pet. The gear opens its settings: another pet, personality, memory, your week, all in a .soul file on your Mac (Soul Protocol, an open format).</p>
         <div class="demo control" aria-hidden="true" data-state="working">
           <div class="who">
             <div class="host"></div>
@@ -650,7 +651,7 @@
       <article class="feature">
         <span class="k">voice</span>
         <h2>Say it. Confirm. It starts.</h2>
-        <p>Say what you want and a Claude Code or Codex session starts with it. Nothing runs until you confirm.</p>
+        <p>A Claude Code or Codex session starts with whatever you said. Nothing runs until you confirm.</p>
         <div class="demo voice" aria-hidden="true" data-step="idle">
           <div class="talk">
             <div class="mic">
@@ -672,7 +673,7 @@
       <article class="feature">
         <span class="k">memory</span>
         <h2>It remembers what you do, and writes it down.</h2>
-        <p>Pro can watch what you let it: the notes you take, the pages you read, your terminal and your sessions. It files what matters into memory pages you can read, search, edit and delete, and takes a quick note whenever you give it one. It stays on your Mac by default. Planned for after Pro's first release.</p>
+        <p>It watches only what you let it: notes, pages, terminal, sessions. What matters lands in memory pages you can read, search, edit and delete; hand it a note any time. On your Mac by default. After the first release.</p>
         <div class="demo mm" aria-hidden="true">
           <div class="mm-feed">
             <div class="mm-head"><span>seen</span><span><svg class="ico"><use href="#i-lock"/></svg> on this Mac</span></div>
@@ -699,7 +700,7 @@
       <article class="feature">
         <span class="k">surfaces</span>
         <h2>A panel for the moment, then gone.</h2>
-        <p>Some answers aren't text: a change to approve, two designs to pick from, a number to watch. The pet draws a small panel for it, you act, and it's gone. Planned for after Pro's first release.</p>
+        <p>A change to approve, a design to pick, a number to watch. The pet draws a panel, you act, it's gone. After the first release.</p>
         <div class="demo surfaces" aria-hidden="true" data-step="idle">
           <div class="host"></div>
           <div class="surface"></div>
@@ -709,7 +710,7 @@
       <article class="feature">
         <span class="k">packs</span>
         <h2>More friends, same glass.</h2>
-        <p>New friends beyond the puppy, drawn in the same glass. Every one runs all twenty-eight states.</p>
+        <p>New friends in the same glass, each running all twenty-eight states.</p>
         <div class="demo packs" aria-hidden="true">
           <span class="head"><img src="/friends/cat.svg" alt=""><b>cat</b></span>
           <span class="head"><img src="/friends/fox.svg" alt=""><b>fox</b></span>
@@ -743,6 +744,7 @@
         <div class="amount"><span class="was">$39</span>$19<small>FIRST 250 FOUNDERS &middot; LIFETIME</small></div>
       </div>
       <div class="claimed"><i style="--k:0"></i><span><b>0</b> of 250 locked</span></div>
+      <div class="next">then $29 for the next 200 &middot; $39 at launch</div>
       <form class="signup" id="preorder" novalidate>
         <label class="sr" for="email">Your email</label>
         <input id="email" name="email" type="email" inputmode="email" autocomplete="email"
@@ -859,15 +861,28 @@ pet(document.querySelector(".mac .host"), "working");
 
 // --- the founder bar: the real count, or nothing --------------------------------
 const claimed = document.querySelector(".claimed");
+// Two batches: the first 250 lock $19, the next 200 lock $29, launch is $39.
+// The page flips to the second batch on its own the moment the count says so.
+// ponytail: past 450 it just shows the second bar full; a third state can wait.
 async function drawCount() {
   try {
     const r = await fetch("/api/preorder/count");
     if (!r.ok) return;
     const { count } = await r.json();
     if (typeof count !== "number") return;
-    const n = Math.min(count, 250);
-    claimed.querySelector("i").style.setProperty("--k", n / 250);
-    claimed.querySelector("span").innerHTML = `<b>${n}</b> of 250 locked`;
+    const second = count >= 250;
+    const cap = second ? 200 : 250;
+    const n = Math.min(second ? count - 250 : count, cap);
+    if (second && !form.dataset.batch2) {
+      form.dataset.batch2 = "1";
+      document.querySelector(".amount").innerHTML =
+        `<span class="was">$39</span>$29<small>NEXT 200 &middot; LIFETIME</small>`;
+      document.querySelector(".next").textContent = "$39 at launch";
+      form.querySelector(".cta").textContent = "Lock $29";
+      document.querySelector("header .cta").textContent = "Lock $29";
+    }
+    claimed.querySelector("i").style.setProperty("--k", n / cap);
+    claimed.querySelector("span").innerHTML = `<b>${n}</b> of ${cap} locked`;
     claimed.setAttribute("data-live", "");
   } catch {}
 }

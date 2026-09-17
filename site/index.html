@@ -55,11 +55,17 @@
 
   Created 2026-09-15. Assembled into dist/site by scripts/build-site.mjs.
   Smooth scrolling (2026-09-17) comes from the vendored /lenis.mjs, off for
-  reduced motion.
+  reduced motion. Later that day: the header lost its download button (the
+  footer has one) and Pro took the accent; on a phone the header wraps to two
+  rows. Fonts load from a <link> with preconnect instead of @import, the engine
+  is modulepreloaded, and the grid tiles pause while the page scrolls.
 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600&family=Instrument+Sans:wght@500;600&family=Manrope:wght@400;500&display=swap">
+<link rel="modulepreload" href="/_fx/effects/paw-avatar/index.js">
 <link rel="stylesheet" href="/_fx/effects/paw-avatar/style.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600&family=Instrument+Sans:wght@500;600&family=Manrope:wght@400;500&display=swap');
 
   :root {
     /* The ground is the captain's swatch: a warm olive charcoal, read off the
@@ -140,10 +146,10 @@
   }
   a { color: inherit; }
 
-  /* --- header: wordmark, filters, the one CTA, one line -------------------- */
+  /* --- header: wordmark, filters, themes, Pro; one line, two on a phone ---- */
   header {
     position: sticky; top: 0; z-index: 5; height: 72px;
-    display: grid; grid-template-columns: auto 1fr auto auto auto; align-items: center; gap: 1.5rem;
+    display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 1.5rem;
     padding: 0 clamp(1rem, 3vw, 2.5rem);
     background: color-mix(in srgb, var(--bg) 88%, transparent);
     backdrop-filter: blur(10px); border-bottom: 1px solid var(--line);
@@ -178,6 +184,19 @@
   }
   .cta:hover { filter: brightness(1.06); }
   .cta:active { transform: scale(.98); }
+  /* A phone gets two rows: name and Pro on top, filters and themes under. On
+     one row the swatches ran off the right edge and the page scrolled sideways. */
+  @media (max-width: 760px) {
+    header { height: auto; grid-template-columns: 1fr auto; row-gap: .6rem; column-gap: .75rem;
+             grid-template-areas: "mark pro" "pills themes"; padding-block: .7rem; }
+    .mark { grid-area: mark; }
+    header .cta { grid-area: pro; justify-self: end; }
+    .pills { grid-area: pills; justify-content: flex-start; gap: .3rem; }
+    .pills .pill { font-size: 12px; padding: .42rem .62rem; }
+    .themes { grid-area: themes; gap: .3rem; }
+    .swatch { width: 16px; height: 16px; box-shadow: inset 0 0 0 4px var(--sw-ground); }
+    .swatch[aria-pressed="true"] { box-shadow: inset 0 0 0 4px var(--sw-ground), 0 0 0 2px var(--ink); }
+  }
 
   /* --- the grid: twenty-eight live states ---------------------------------- */
   main { max-width: 1240px; margin: 0 auto; padding: clamp(2rem, 4vw, 3.5rem) clamp(1rem, 3vw, 2.5rem) 5rem; }
@@ -332,8 +351,7 @@
   <a class="mark" href="/"><span class="paw" data-state="idle" aria-hidden="true"></span>Paw</a>
   <nav class="pills" id="pills" aria-label="Filter states"></nav>
   <div class="themes" id="themes" aria-label="Theme"></div>
-  <a class="pill" href="/pro" style="text-decoration:none">Pro</a>
-  <a class="cta" href="https://github.com/qbtrix/paw-mascot/releases/latest">Download for macOS</a>
+  <a class="cta" href="/pro">Pro</a>
 </header>
 
 <main>
@@ -430,6 +448,20 @@ function replay(id) {
   const now = ctl.clock();
   ctl.engine.setState("idle", now);
   ctl.engine.setState(id, now);
+}
+
+// Scrolling and the tiles redrawing compete for the same frames, and the
+// smooth scroll moves the page from the main thread. So the tiles hold still
+// while the page moves and pick up again once it stops. Nothing is lost: the
+// pose is a function of time, so they resume on the right frame.
+{
+  let resume = null;
+  const setFps = (fps) => { for (const t of tiles.values()) t.update({ fps }); };
+  addEventListener("scroll", () => {
+    if (!resume) setFps(0.5);
+    clearTimeout(resume);
+    resume = setTimeout(() => { resume = null; setFps(24); }, 150);
+  }, { passive: true });
 }
 
 // And a slow wave across the grid, so the page is never a wall of statues:

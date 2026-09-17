@@ -33,7 +33,10 @@
   said as "in the works" and nothing more. The surfaces block is the
   ephemeral-UI plan, marked as after the first release; its internal name
   stays off the page. Every CTA says lock the price; the old ordering
-  wording is gone from the page.
+  wording is gone from the page. The control demo's gear opens the pet's own
+  settings: characters are the flat CC BY friends (never engine art),
+  personality and memory are a .soul file on the Mac, and the stats are mock
+  shapes, not anyone's real numbers.
 -->
 <link rel="stylesheet" href="/_fx/effects/paw-avatar/style.css">
 <style>
@@ -206,11 +209,67 @@
                          border-color: color-mix(in srgb, var(--accent) 60%, var(--line-hi)); }
   .act.stop:hover, .act.stop.hot { background: color-mix(in srgb, var(--bad) 16%, var(--panel));
                                    border-color: color-mix(in srgb, var(--bad) 60%, var(--line-hi)); }
+  .act:nth-child(4) { transition-delay: .15s, .15s, 0s, 0s; }
+
+  /* the gear: the pet's own settings take the actions' place. Characters are
+     the flat CC BY friends, never engine art; every number is a mock shape. */
+  .prefs { display: none; width: 100%; padding: .4rem; background: var(--panel); border: 1px solid var(--line-hi);
+           border-radius: 12px; box-shadow: 0 14px 28px -14px rgba(0, 0, 0, .6); }
+  .control[data-view="prefs"] { grid-template-columns: auto minmax(0, 300px); justify-content: center; }
+  .control[data-view="prefs"] .who { grid-column: 1; }
+  .control[data-view="prefs"] .acts { display: none; }
+  .control[data-view="prefs"] .prefs { display: grid; grid-column: 2; }
+  @media (prefers-reduced-motion: no-preference) { .control[data-view="prefs"] .prefs { animation: pop .25s ease-out; } }
+  .tabs { display: flex; gap: .15rem; padding-bottom: .4rem; margin-bottom: .45rem; border-bottom: 1px solid var(--line); }
+  .tabs span { padding: .35rem .5rem; border-radius: 6px; cursor: pointer; font: 400 11.5px/1 var(--mono); color: var(--dim); }
+  .tabs span:hover { color: var(--ink); }
+  .tabs span.sel { color: var(--ink); background: var(--well); }
+  .tabs .close { margin-left: auto; color: var(--accent); }
+  .pane { display: none; height: 168px; align-content: start; gap: .65rem; padding: .15rem .3rem .3rem; }
+  .pane.sel { display: grid; }
+  .chars { display: flex; gap: .35rem; }
+  .char { display: grid; place-items: center; width: 40px; height: 40px; cursor: pointer; border-radius: 9px;
+          background: var(--well); border: 1px solid var(--line); transition: border-color .15s, box-shadow .15s; }
+  .char img { width: 28px; height: 28px; object-fit: contain; }
+  .char:hover { border-color: var(--line-hi); }
+  .char.sel { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 22%, transparent); }
+  .soulname { font: 400 11.5px/1.3 var(--mono); color: var(--dim); }
+  .soulname b { font-weight: 500; color: var(--ink); }
+  .traits { display: grid; gap: .5rem; }
+  .trait { display: grid; grid-template-columns: 58px 1fr; align-items: center; gap: .6rem; font: 400 11px/1 var(--mono); color: var(--dim); }
+  .trait i { position: relative; height: 5px; overflow: hidden; border-radius: 3px; background: var(--line); }
+  .trait i::after { content: ""; position: absolute; inset: 0 auto 0 0; width: calc(var(--v) * 100%); border-radius: inherit;
+                    background: var(--accent); transition: width .45s cubic-bezier(.3, .7, .2, 1); }
+  .mems { display: grid; gap: .3rem; }
+  .mems span { display: flex; align-items: center; gap: .45rem; padding: .42rem .5rem; border-radius: 7px;
+               background: var(--well); font: 400 12px/1.2 var(--body); color: var(--ink); }
+  .mems span::before { content: ""; flex: none; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+  @media (prefers-reduced-motion: no-preference) { .mems span:first-child { animation: pop .3s ease-out; } }
+  .memfield { display: flex; align-items: center; gap: .45rem; padding: .45rem .55rem; cursor: text; border: 1px dashed var(--line-hi);
+              border-radius: 7px; font: 400 12px/1 var(--body); color: var(--dim); }
+  .memfield .ico { width: 12px; height: 12px; }
+  .memfield[data-typed] { border-style: solid; border-color: color-mix(in srgb, var(--accent) 55%, var(--line-hi)); color: var(--ink); }
+  .pane small { font: 400 10.5px/1.3 var(--mono); color: var(--dim); }
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: .35rem; }
+  .tiles div { display: grid; align-content: start; gap: .3rem; padding: .5rem; border-radius: 8px; background: var(--well); }
+  .tiles b { font: 600 20px/1 var(--display); letter-spacing: -.02em; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .tiles div:last-child b { color: var(--warn); }
+  .tiles span { font: 400 10px/1.2 var(--mono); color: var(--dim); }
+  .wk { display: grid; grid-template-columns: repeat(7, 1fr); align-items: end; gap: 5px; height: 58px; }
+  .wk i { height: 3px; border-radius: 3px 3px 1px 1px; background: var(--line-hi);
+          transition: height .5s cubic-bezier(.3, .7, .2, 1) var(--d); }
+  .wk.grow i { height: var(--h); }
+  .wk i.now { background: var(--accent); }
+  .wk-days { display: grid; grid-template-columns: repeat(7, 1fr); margin-top: -.35rem; text-align: center; font: 400 9.5px/1 var(--mono); color: var(--dim); }
+
   @media (max-width: 560px) {
     .control { grid-template-columns: 1fr; }
     .control .who, .acts { grid-column: 1; justify-self: center; }
-    .acts { grid-auto-flow: column; }
+    .acts { grid-template-columns: repeat(2, auto); }
     .act { padding: .55rem .75rem; translate: 0 -8px; }
+    .control[data-view="prefs"] { grid-template-columns: minmax(0, 300px); }
+    .control[data-view="prefs"] .who, .control[data-view="prefs"] .prefs { grid-column: 1; }
+    .control[data-view="prefs"] .who { justify-self: center; }
   }
 
   /* voice: talk, confirm, it starts */
@@ -414,6 +473,8 @@
   <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
   <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3.5l9 16H3z"/><path d="M12 10v4"/><path d="M12 17.2v.3"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></symbol>
   <symbol id="i-chat" viewBox="0 0 24 24"><path d="M20 11.5a7.5 7.5 0 0 1-11 6.6L4.5 19.5 6 15.3A7.5 7.5 0 1 1 20 11.5z"/></symbol>
   <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 19V5"/><path d="M6 11l6-6 6 6"/></symbol>
   <symbol id="i-open" viewBox="0 0 24 24"><path d="M9 6h9v9"/><path d="M18 6L6 18"/></symbol>
@@ -458,7 +519,7 @@
       <article class="feature">
         <span class="k">control</span>
         <h2>Hover the pet, act on its session.</h2>
-        <p>Focus, restart or stop a session from the pet that watches it. The actions are right there when you point at it.</p>
+        <p>Focus, restart or stop a session from the pet that watches it. The gear opens the pet itself: its character, its personality, what it remembers, and your week at a glance. It all lives in a .soul file (Soul Protocol, an open format) on your Mac. Memory comes after Pro's first release.</p>
         <div class="demo control" aria-hidden="true" data-state="working">
           <div class="who">
             <div class="host"></div>
@@ -468,6 +529,41 @@
             <span class="act" data-act="focus"><svg class="ico"><use href="#i-focus"/></svg>Focus</span>
             <span class="act" data-act="restart"><svg class="ico"><use href="#i-restart"/></svg>Restart</span>
             <span class="act stop" data-act="stop"><svg class="ico"><use href="#i-stop"/></svg>Stop</span>
+            <span class="act gear" data-act="settings"><svg class="ico"><use href="#i-gear"/></svg>Settings</span>
+          </div>
+          <div class="prefs">
+            <div class="tabs"><span data-tab="character">character</span><span data-tab="memory">memory</span><span data-tab="stats">stats</span><span class="close">done</span></div>
+            <div class="pane" data-pane="character">
+              <div class="chars">
+                <span class="char sel" data-name="paw"><img src="/favicon.png" alt=""></span>
+                <span class="char" data-name="cat"><img src="/friends/cat.svg" alt=""></span>
+                <span class="char" data-name="fox"><img src="/friends/fox.svg" alt=""></span>
+                <span class="char" data-name="panda"><img src="/friends/panda.svg" alt=""></span>
+                <span class="char" data-name="axolotl"><img src="/friends/axolotl.svg" alt=""></span>
+              </div>
+              <div class="soulname"><b>paw</b> &middot; <span>paw.soul</span></div>
+              <div class="traits">
+                <div class="trait">curious<i style="--v:.7"></i></div>
+                <div class="trait">chatty<i style="--v:.6"></i></div>
+                <div class="trait">calm<i style="--v:.5"></i></div>
+              </div>
+            </div>
+            <div class="pane" data-pane="memory">
+              <div class="mems"><span>api tests need Docker running</span><span>you like small PRs</span><span>no deploys on Fridays</span></div>
+              <div class="memfield"><svg class="ico"><use href="#i-plus"/></svg><span>Remember something&hellip;</span></div>
+              <small>Kept in <span class="soulfile">paw.soul</span>, on this Mac.</small>
+            </div>
+            <div class="pane" data-pane="stats">
+              <div class="tiles">
+                <div><b data-n="12">12</b><span>sessions</span></div>
+                <div><b data-n="9">9</b><span>finished</span></div>
+                <div><b data-n="20" data-u="m">20m</b><span>waited on you</span></div>
+              </div>
+              <div class="wk">
+                <i style="--h:45%;--d:0ms"></i><i style="--h:70%;--d:40ms"></i><i style="--h:55%;--d:80ms"></i><i style="--h:90%;--d:120ms"></i><i class="now" style="--h:65%;--d:160ms"></i><i style="--h:20%;--d:200ms"></i><i style="--h:30%;--d:240ms"></i>
+              </div>
+              <div class="wk-days"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+            </div>
           </div>
         </div>
       </article>
@@ -860,13 +956,92 @@ async function act(name) {
     await sleep(1100);
     if (mine === acting) show("working", "working");
   }
+  if (name === "settings") openPrefs();
 }
 for (const b of ctl.querySelectorAll(".act")) b.addEventListener("click", (e) => { e.stopPropagation(); act(b.dataset.act); });
 // hover does not exist on a phone: a tap on the pet opens the actions
 ctl.querySelector(".who").addEventListener("click", () => ctl.classList.toggle("on"));
-const ORDER = ["focus", "restart", "stop"];
+// the gear: the pet's own settings -- a character, its soul, its memory, a dashboard
+const prefs = ctl.querySelector(".prefs");
+const prefTabs = [...prefs.querySelectorAll("[data-tab]")];
+const panes = [...prefs.querySelectorAll(".pane")];
+const chars = [...prefs.querySelectorAll(".char")];
+const wk = prefs.querySelector(".wk");
+const SOULS = { paw: [.7, .6, .5], cat: [.85, .3, .65], fox: [.9, .75, .35], panda: [.4, .5, .9], axolotl: [.65, .9, .55] };
+const charName = () => prefs.querySelector(".char.sel").dataset.name;
+function tab(name) {
+  prefTabs.forEach((t) => t.classList.toggle("sel", t.dataset.tab === name));
+  panes.forEach((p) => p.classList.toggle("sel", p.dataset.pane === name));
+  wk.classList.remove("grow");
+  if (name !== "stats") return;
+  void wk.offsetWidth; // let the bars sit at zero for a frame, so they grow
+  wk.classList.add("grow");
+  for (const b of prefs.querySelectorAll(".tiles b")) {
+    const n = +b.dataset.n, unit = b.dataset.u ?? "", t0 = performance.now();
+    if (calm) { b.textContent = n + unit; continue; }
+    const step = (now) => {
+      const k = Math.min(1, (now - t0) / 700);
+      b.textContent = Math.round(n * (1 - (1 - k) ** 3)) + unit;
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+}
+function pickChar(i) {
+  chars.forEach((c, j) => c.classList.toggle("sel", j === i));
+  const name = charName();
+  prefs.querySelector(".soulname").innerHTML = `<b>${name}</b> &middot; <span>${name}.soul</span>`;
+  prefs.querySelector(".soulfile").textContent = `${name}.soul`;
+  prefs.querySelectorAll(".trait i").forEach((bar, k) => bar.style.setProperty("--v", SOULS[name][k]));
+  ctlLine.textContent = `${name} · settings`;
+  poke(ctlPet);
+}
+const MEMS = ["docs live in site/docs", "Codex handles the site repo", "you merge after lunch"];
+let memTok = 0, memNext = 0;
+async function remember() {
+  const mine = ++memTok, text = MEMS[memNext++ % MEMS.length];
+  const box = prefs.querySelector(".memfield"), field = box.querySelector("span");
+  box.setAttribute("data-typed", "");
+  field.textContent = "";
+  for (const word of text.split(" ")) {
+    await sleep(140);
+    if (mine !== memTok) return;
+    field.textContent += (field.textContent ? " " : "") + word;
+  }
+  await sleep(350);
+  if (mine !== memTok) return;
+  const mems = prefs.querySelector(".mems"), row = document.createElement("span");
+  row.textContent = text;
+  mems.prepend(row);
+  if (mems.children.length > 3) mems.lastElementChild.remove();
+  box.removeAttribute("data-typed");
+  field.textContent = "Remember something\u2026";
+  poke(ctlPet);
+}
+function openPrefs() {
+  ctl.dataset.view = "prefs";
+  ctl.classList.remove("on");
+  tab("character");
+  ctlLine.textContent = `${charName()} · settings`;
+}
+function closePrefs() {
+  delete ctl.dataset.view;
+  ++memTok;
+  show("working", "working");
+}
+prefs.addEventListener("click", (e) => {
+  e.stopPropagation();
+  const t = e.target.closest("[data-tab]"), c = e.target.closest(".char");
+  if (t) tab(t.dataset.tab);
+  else if (c) pickChar(chars.indexOf(c));
+  else if (e.target.closest(".memfield")) remember();
+  else if (e.target.closest(".close")) closePrefs();
+});
+const ORDER = ["focus", "restart", "stop", "settings"];
 let nextAct = 0;
 autoplay(ctl, async (pause) => {
+  // someone has the settings open (a tap on a phone, or a mouse still over them): wait
+  if (ctl.dataset.view === "prefs") { await pause(1500); return; }
   if (ctl.dataset.state !== "working") { show("working", "working"); await pause(1200); }
   const name = ORDER[nextAct++ % ORDER.length];
   const btn = ctl.querySelector(`.act[data-act="${name}"]`);
@@ -876,13 +1051,33 @@ autoplay(ctl, async (pause) => {
   btn.classList.add("hot");
   await pause(550);
   act(name);
+  if (name === "settings") {
+    // a short tour: another character, a new memory, the week
+    btn.classList.remove("hot");
+    await pause(1100);
+    pickChar((chars.indexOf(prefs.querySelector(".char.sel")) + 1) % chars.length);
+    await pause(1600);
+    tab("memory");
+    await pause(500);
+    await remember();
+    await pause(1300);
+    tab("stats");
+    await pause(2800);
+    closePrefs();
+    await pause(900);
+    return;
+  }
   await pause(1700);
   btn.classList.remove("hot");
   ctl.classList.remove("on");
   await pause(1300);
 }, { onHold: () => { ctl.classList.remove("on"); for (const b of ctl.querySelectorAll(".act.hot")) b.classList.remove("hot"); } });
-ctl.addEventListener("pointerleave", () => setTimeout(() => {
-  if (!ctl.matches(":hover")) { ++acting; show("working", "working"); }
+// a finger "leaves" the moment it lifts, so only a mouse leaving closes the settings
+ctl.addEventListener("pointerleave", (e) => setTimeout(() => {
+  if (ctl.matches(":hover")) return;
+  ++acting;
+  if (ctl.dataset.view !== "prefs") show("working", "working");
+  else if (e.pointerType === "mouse") closePrefs();
 }, 900));
 
 // --- voice: talk, confirm, it starts ---------------------------------------------

@@ -63,6 +63,7 @@
   the logo is the pet's eyes alone, and the default charcoal room gives the
   mascots a pale green rim to match its olive ground. The demo pet shares the
   grid's tokens, floor glow included, so no violet shows anywhere.
+  The mark's eyes are nudged down so they sit level with the wordmark.
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -168,8 +169,8 @@
           font: 600 21px/1 "Baloo 2", var(--display); letter-spacing: 0; }
   /* The mark is the pet's eyes alone, the same eyes-only cut the Pro page's
      friends wear: the engine still blinks them, the body is hidden. */
-  .mark .paw { --fx-paw-size: 96px; --fx-paw-ground: none; margin: -34px -32px -34px -36px; }
-  .mark .fx-paw-svg { filter: drop-shadow(0 0 3px var(--paw-glow, rgba(176, 226, 160, .5))); }
+  .mark .paw { --fx-paw-size: 96px; --fx-paw-ground: none; margin: -27px -32px -41px -36px; }
+  .mark .fx-paw-svg { filter: drop-shadow(0 0 3px var(--paw-glow, rgba(158, 200, 232, .5))); }
   .mark .fx-paw-ground, .mark .fx-paw-back, .mark .fx-paw-part,
   .mark .fx-paw-mouth, .mark .fx-paw-marks { display: none; }
   .pills { display: flex; gap: .4rem; justify-content: center; }
@@ -222,16 +223,15 @@
   main { max-width: 1240px; margin: 0 auto; padding: clamp(2rem, 4vw, 3.5rem) clamp(1rem, 3vw, 2.5rem) 5rem; }
   /* The grid and the demo pet share one material. */
   .grid, .demo-pet {
-    /* No purple on this page, the mascot included. The character's rim
-       is a var() ramp, so it is re-tokened here (a pale green by default,
-       picking up the olive ground; the theme's ramp when one is set) and
-       the app keeps its own. */
-    --fx-paw-rim-a: var(--paw-rim-a, #f7fff3); --fx-paw-rim-b: var(--paw-rim-b, #e2f5da);
-    --fx-paw-rim-c: var(--paw-rim-c, #c3e8b6); --fx-paw-rim-d: var(--paw-rim-d, #a9dc98);
-    --fx-paw-rim-e: var(--paw-rim-e, #d6efcb);
-    --fx-paw-glow: var(--paw-glow, rgba(176, 226, 160, .40));
-    --fx-paw-halo: var(--paw-halo, #8fc27f);
-    --fx-paw-eye: var(--paw-eye, #f8fff4);
+    /* The character's rim is a var() ramp, so it is re-tokened here: by
+       default mint through light blue to a touch of lilac, soft against the
+       olive ground; the theme's ramp when one is set. The app keeps its own. */
+    --fx-paw-rim-a: var(--paw-rim-a, #f7fbff); --fx-paw-rim-b: var(--paw-rim-b, #d6f4ea);
+    --fx-paw-rim-c: var(--paw-rim-c, #a8e4d2); --fx-paw-rim-d: var(--paw-rim-d, #a3bdf2);
+    --fx-paw-rim-e: var(--paw-rim-e, #cdbff4);
+    --fx-paw-glow: var(--paw-glow, rgba(158, 200, 232, .38));
+    --fx-paw-halo: var(--paw-halo, #8ea6dc);
+    --fx-paw-eye: var(--paw-eye, #f6fffd);
     --fx-paw-floor-a: var(--fx-paw-rim-c); --fx-paw-floor-b: var(--fx-paw-rim-d);
     --fx-paw-floor-c: var(--fx-paw-halo);
   }

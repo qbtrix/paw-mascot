@@ -11,8 +11,12 @@
 // confirm link; the seat counts once the link is opened. Before this, a bot
 // could post fake addresses, fill the public bar and flip the card to the $29
 // batch. A per-IP rate limit (SIGNUP_LIMIT) stops the endpoint being used to
-// spam inboxes. Seats go in confirmation order, not signup order. Mail goes
-// through Mailtrap's sending API, the same provider pocketpaw's /growth uses.
+// spam inboxes. Seats go in confirmation order, not signup order.
+//
+// 2026-09-17: mail moved from Mailtrap to Cloudflare Email Service, which the
+// Workers Paid plan already covers (3,000 a month). It sends from the
+// mail.pocketpaw.xyz subdomain so bounces and any spam complaints stay off
+// the main domain.
 //
 // Everything else on this site is a static asset. Cloudflare serves assets
 // first and only calls this Worker when nothing matches, so every page keeps
@@ -25,25 +29,23 @@ const json = (body, status = 200) =>
 // proof an address works is mail arriving at it (which is now the confirm).
 const looksLikeEmail = (s) => /^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(s) && s.length <= 254;
 
-// Sends the confirm link. Fails loud: without a key, and outside local dev,
-// it throws rather than pretending a mail went out.
+// Sends the confirm link through Cloudflare Email Service (the EMAIL binding).
+// Local dev sets MAIL_DEV and only logs the link, so testing never mails
+// anyone. Fails loud: without the binding it throws rather than pretending a
+// mail went out. Replies go to paw@pocketpaw.xyz, which Email Routing forwards.
 async function sendConfirm(env, email, link) {
-  if (!env.MAILTRAP_API_TOKEN) {
-    if (!env.MAIL_DEV) throw new Error("mail not configured");
+  if (env.MAIL_DEV) {
     console.log(`[MAIL_DEV] confirm link for ${email}: ${link}`);
     return;
   }
-  const res = await fetch("https://send.api.mailtrap.io/api/send", {
-    method: "POST",
-    headers: { "Api-Token": env.MAILTRAP_API_TOKEN, "content-type": "application/json" },
-    body: JSON.stringify({
-      from: { email: env.MAIL_FROM || "paw@pet.pocketpaw.xyz", name: "Paw" },
-      to: [{ email }],
-      subject: "Confirm your Paw Pro founder spot",
-      text: `Tap to lock your founder price:\n\n${link}\n\nIf you didn't ask for this, ignore it.\n`
-    })
+  if (!env.EMAIL) throw new Error("mail not configured");
+  await env.EMAIL.send({
+    from: { email: env.MAIL_FROM || "paw@mail.pocketpaw.xyz", name: "Paw" },
+    replyTo: "paw@pocketpaw.xyz",
+    to: email,
+    subject: "Confirm your Paw Pro founder spot",
+    text: `Tap to lock your founder price:\n\n${link}\n\nIf you didn't ask for this, ignore it.\n`
   });
-  if (!res.ok) throw new Error(`mailtrap ${res.status}`);
 }
 
 async function signup(request, env, origin) {
@@ -79,7 +81,10 @@ async function signup(request, env, origin) {
 
   try {
     await sendConfirm(env, email, `${origin}/confirm?t=${row.token}`);
-  } catch {
+  } catch (err) {
+    // Email Service throws with a code (E_SENDER_NOT_VERIFIED, E_RATE_LIMIT_EXCEEDED,
+    // ...). Logged so `wrangler tail` says why; the address is left out.
+    console.error("confirm mail failed:", err.code || "", err.message);
     return json({ error: "Could not send the confirm email. Try again in a moment." }, 500);
   }
   return json({ ok: true, state: "sent" });

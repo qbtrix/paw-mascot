@@ -3,9 +3,9 @@
 #
 # 2026-09-17: added the SIGNUP_LIMIT rate limiter. Every signup POST now sends
 # a confirm email, so an unthrottled endpoint could be used to spam inboxes.
-# Mail goes out through Mailtrap's sending API: set the token with
-#   wrangler secret put MAILTRAP_API_TOKEN
-# Locally, .dev.vars sets MAIL_DEV=1 and the confirm link is logged instead.
+# Mail goes out through Cloudflare Email Service (the EMAIL binding below),
+# from mail.pocketpaw.xyz, onboarded in the dashboard under Email Sending.
+# No API key. Locally, .dev.vars sets MAIL_DEV=1 and the link is only logged.
 #
 # Created 2026-09-15 as assets-only, the same shape paw-fx uses for its
 # registry site. It grew exactly one endpoint the same day (see `main`).
@@ -38,3 +38,8 @@ database_id = "b77e0255-fed2-450c-9127-8bd30dae57e7"
 name = "SIGNUP_LIMIT"
 namespace_id = "1701"
 simple = { limit = 5, period = 60 }
+
+# Confirm emails. The sender domain must be onboarded for Email Sending on
+# this account. Local dev never reaches it: MAIL_DEV logs the link instead.
+[[send_email]]
+name = "EMAIL"

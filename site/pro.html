@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Paw Pro - the hub, the voice, and more friends</title>
-<meta name="description" content="Paw Pro turns the desktop pet into a control surface: every session at a glance, start and stop from the pet, launch by voice, and a pack of new friends. Founder pre-order, lifetime.">
+<meta name="description" content="Paw Pro turns the desktop pet into a control surface: every session at a glance, quick chat, voice, and a pack of new friends. A native Mac app in the works. Lock the founder price.">
 <link rel="canonical" href="https://pet.pocketpaw.xyz/pro">
 <meta name="theme-color" content="#252621">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Paw Pro - the hub, the voice, and more friends">
-<meta property="og:description" content="Every session at a glance, control from the pet, voice launch, and new friends. Founder pre-order, lifetime.">
+<meta property="og:description" content="Every session at a glance, quick chat, voice, and new friends. A native Mac app in the works. Lock the founder price.">
 <meta property="og:url" content="https://pet.pocketpaw.xyz/pro">
 <meta property="og:image" content="https://pet.pocketpaw.xyz/og.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -28,7 +28,12 @@
   The artist series promises nothing that does not exist: no names, no dates.
   The demos are aria-hidden, so anything a keyboard can reach, like the
   "all nine friends" link, lives outside them. The hub is one pet with a
-  scrolling session list beside it, never a row of pets.
+  scrolling session list beside it, never a row of pets; rows answer by
+  quick chat or open in their app. Up top, Pro is a native Mac app in Swift,
+  said as "in the works" and nothing more. The surfaces block is the
+  ephemeral-UI plan, marked as after the first release; its internal name
+  stays off the page. Every CTA says lock the price; the old ordering
+  wording is gone from the page.
 -->
 <link rel="stylesheet" href="/_fx/effects/paw-avatar/style.css">
 <style>
@@ -74,7 +79,30 @@
   /* --- offers + the card ---------------------------------------------------- */
   .split { display: grid; grid-template-columns: 1.25fr .75fr; gap: clamp(2rem, 5vw, 4rem); align-items: start; }
   @media (max-width: 820px) { .split { grid-template-columns: 1fr; } }
-  .intro { color: var(--dim); font-size: 13.5px; margin: -1rem 0 2.25rem; max-width: 72ch; }
+  /* --- top: Pro is a native Mac app, in the works. Only what is true: Swift,
+     macOS first, being built. No speed claims, no date. -------------------- */
+  .native { display: grid; grid-template-columns: 1.25fr .75fr; gap: clamp(2rem, 5vw, 4rem); align-items: center;
+            padding-bottom: clamp(2.5rem, 5vw, 3.5rem); margin-bottom: clamp(2.5rem, 5vw, 3.5rem); border-bottom: 1px solid var(--line); }
+  .native h1 { margin: .9rem 0 .7rem; font: 600 clamp(1.9rem, 3.6vw, 2.75rem)/1.06 var(--display); letter-spacing: -.03em; max-width: 17ch; }
+  .native p { margin: 0; color: var(--dim); max-width: 58ch; }
+  .wip { display: inline-flex; align-items: center; gap: .5rem; font: 500 12px/1 var(--mono); color: var(--warn); }
+  .wip i { width: 7px; height: 7px; border-radius: 50%; background: var(--warn); }
+  .mac { background: var(--well); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; --fx-paw-ground: none; }
+  .mac-bar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: .6rem .75rem;
+             border-bottom: 1px solid var(--line); font: 500 11.5px/1 var(--display); color: var(--dim); }
+  .mac-bar .lights { display: flex; gap: 6px; }
+  .mac-bar .lights i { width: 10px; height: 10px; border-radius: 50%; background: var(--line-hi); }
+  .mac .host { display: grid; justify-items: center; padding: 1.4rem 0 .6rem; --fx-paw-size: clamp(96px, 12vw, 124px); }
+  .mac-build { display: grid; gap: .5rem; padding: 0 1rem 1.1rem; font: 400 11px/1 var(--mono); color: var(--dim); }
+  .mac-build b { position: relative; height: 3px; overflow: hidden; border-radius: 2px; background: var(--line); }
+  .mac-build b::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 34%; border-radius: inherit; background: var(--accent); }
+  @media (prefers-reduced-motion: no-preference) {
+    .wip i { animation: wip 1.6s ease-in-out infinite; }
+    .mac-build b::after { animation: build 2.2s cubic-bezier(.45, 0, .2, 1) infinite; }
+  }
+  @keyframes wip { 50% { opacity: .3; } }
+  @keyframes build { from { translate: -100% 0; } to { translate: 300% 0; } }
+  @media (max-width: 820px) { .native { grid-template-columns: 1fr; } .mac { max-width: 360px; } }
 
   /* --- the features: one block each, a live mock-up under every one ------- */
   .feature { display: grid; gap: .5rem; padding: 2.5rem 0; border-top: 1px solid var(--line); }
@@ -123,17 +151,38 @@
   .row { display: flex; align-items: center; gap: .5rem; padding: .45rem .5rem; border-radius: 7px; cursor: pointer;
          font: 500 12px/1 var(--mono); color: var(--ink); transition: background .15s; }
   .row .brand { color: var(--dim); }
-  .row .st, .row .go { margin-left: auto; padding-left: .75rem; font-weight: 400; font-size: 11.5px; white-space: nowrap; }
-  .row .st { color: var(--dim); }
+  .row .st { margin-left: auto; padding-left: .75rem; font-weight: 400; font-size: 11.5px; white-space: nowrap; color: var(--dim); }
   .row[data-tone="warn"] .st { color: var(--warn); }
   .row[data-tone="good"] .st { color: var(--good); }
-  .row .go { display: none; align-items: center; gap: .3rem; color: var(--accent); }
-  .row .go .ico { width: 12px; height: 12px; }
-  .row:hover { background: color-mix(in srgb, var(--accent) 12%, var(--well)); }
+  /* on hover the state gives way to two actions: quick chat, or open the app */
+  .row .ra { display: none; margin-left: auto; gap: .2rem; }
+  .row .ra span { display: inline-flex; align-items: center; gap: .25rem; padding: .25rem .4rem; margin-block: -.3rem; border-radius: 5px;
+                  font: 400 11px/1 var(--mono); color: var(--dim); }
+  .row .ra span:hover { color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, transparent); }
+  .row .ra .ico { width: 11px; height: 11px; }
+  .row:hover { background: color-mix(in srgb, var(--accent) 10%, var(--well)); }
   .row:hover .st { display: none; }
-  .row:hover .go { display: inline-flex; }
+  .row:hover .ra { display: inline-flex; }
   .row.opening .st { display: inline; color: var(--accent); }
-  .row.opening .go { display: none; }
+  .row.opening .ra { display: none; }
+  /* quick chat: the list steps aside for a short thread, same height, so nothing jumps */
+  .thread { display: none; height: 158px; align-content: end; gap: .4rem; padding: 0 .2rem .2rem; overflow: hidden; }
+  .panel[data-view="chat"] .list { display: none; }
+  .panel[data-view="chat"] .thread { display: grid; }
+  .sum span { display: flex; align-items: center; gap: .4rem; }
+  .thread p { justify-self: start; max-width: 88%; margin: 0; padding: .45rem .6rem; border-radius: 10px 10px 10px 3px;
+              background: var(--well); font: 400 12px/1.4 var(--body); color: var(--ink); }
+  .thread p.me { justify-self: end; border-radius: 10px 10px 3px 10px; background: color-mix(in srgb, var(--accent) 20%, var(--well)); }
+  .qc { display: flex; align-items: center; gap: .5rem; margin-top: .35rem; padding: .5rem .6rem; cursor: text;
+        background: var(--well); border: 1px solid var(--line-hi); border-radius: 8px;
+        font: 400 12px/1 var(--body); color: var(--dim); transition: border-color .15s; }
+  .qc:hover, .qc[data-typed] { border-color: color-mix(in srgb, var(--accent) 55%, var(--line-hi)); }
+  .qc-text { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .qc[data-typed] .qc-text { color: var(--ink); }
+  .qc .ico { width: 13px; height: 13px; }
+  .qc[data-typed] .qc-send { color: var(--accent); }
+  @media (prefers-reduced-motion: no-preference) { .thread p { animation: pop .25s ease-out; } }
+  @keyframes pop { from { opacity: 0; translate: 0 6px; } }
   /* too narrow for side by side: stack, and keep the list out -- a phone has no hover */
   @container (max-width: 600px) {
     .hub { grid-template-columns: 1fr; }
@@ -193,6 +242,41 @@
   .voice[data-step="started"] .ask .no { display: none; }
   .voice[data-step="started"] .ask .ok { display: inline-flex; }
   @media (max-width: 560px) { .voice { grid-template-columns: 1fr; } .voice .host { justify-self: center; order: -1; } }
+
+  /* surfaces: the pet draws a panel for the moment, you use it, it dissolves */
+  .surfaces { grid-template-columns: auto minmax(0, 290px); justify-content: center; gap: 2rem; }
+  .surfaces .host { --fx-paw-size: clamp(104px, 16vw, 140px); }
+  .surface { width: 100%; display: grid; gap: .7rem; padding: .85rem;
+             background: var(--panel); border: 1px solid var(--line-hi); border-radius: 12px;
+             box-shadow: 0 14px 28px -14px rgba(0, 0, 0, .6);
+             opacity: 0; scale: .96; filter: blur(6px); transition: opacity .35s, scale .35s, filter .35s; }
+  .surfaces[data-step="shown"] .surface { opacity: 1; scale: 1; filter: none; }
+  .surfaces[data-step="done"] .surface { opacity: 0; scale: 1.04; filter: blur(8px); }
+  .sf-top { display: flex; align-items: center; gap: .45rem; font: 400 12px/1.2 var(--mono); color: var(--dim); }
+  .sf-top b { font-weight: 500; color: var(--ink); }
+  .sf-diff { display: grid; gap: 2px; font: 400 11.5px/1.5 var(--mono); }
+  .sf-diff span { padding: .15rem .45rem; border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sf-diff .del { color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, transparent); }
+  .sf-diff .ins { color: var(--good); background: color-mix(in srgb, var(--good) 12%, transparent); }
+  .sf-acts { display: flex; gap: .45rem; }
+  .sf-acts span { cursor: pointer; padding: .45rem .75rem; border-radius: 999px; border: 1px solid var(--line-hi);
+                  font: 600 12px/1 var(--display); color: var(--dim); transition: box-shadow .2s; }
+  .sf-acts .sf-go { color: #1b1c17; background: var(--accent); border-color: var(--accent); }
+  .sf-acts span.hot { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+  .sf-pick { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+  .sf-pick span { cursor: pointer; display: grid; gap: .4rem; justify-items: center; padding: .5rem;
+                  border: 1px solid var(--line-hi); border-radius: 9px; font: 500 11.5px/1 var(--mono); color: var(--dim);
+                  transition: border-color .2s, background .2s, color .2s; }
+  .sf-pick span:hover, .sf-pick span.hot { border-color: var(--accent); color: var(--ink); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+  .sf-pick i { position: relative; width: 100%; height: 44px; border-radius: 5px; background: var(--well); }
+  .sf-pick i::before, .sf-pick i::after { content: ""; position: absolute; border-radius: 2px; background: var(--line-hi); }
+  .sf-pick i.a::before { left: 12%; top: 24%; width: 44%; height: 12%; }
+  .sf-pick i.a::after { right: 12%; top: 22%; width: 26%; height: 56%; background: color-mix(in srgb, var(--accent) 45%, var(--line-hi)); }
+  .sf-pick i.b::before { left: 22%; top: 26%; width: 56%; height: 12%; }
+  .sf-pick i.b::after { left: 37%; top: 54%; width: 26%; height: 16%; border-radius: 99px; background: color-mix(in srgb, var(--accent) 45%, var(--line-hi)); }
+  .sf-bars { display: flex; align-items: end; gap: 4px; height: 56px; }
+  .sf-bars i { flex: 1; height: var(--h); border-radius: 2px 2px 0 0; background: color-mix(in srgb, var(--accent) 55%, var(--line-hi)); }
+  @media (max-width: 560px) { .surfaces { grid-template-columns: minmax(0, 290px); } .surfaces .host { justify-self: center; } }
 
   /* packs: the friends, as a strip */
   .packs { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .5rem; align-items: end; align-content: center; }
@@ -289,7 +373,7 @@
   .friend b { font: 500 13.5px/1.4 var(--mono); }
   .friend i { font-style: normal; color: var(--dim); font-size: 12px; }
   .note { color: var(--dim); font-size: 13.5px; line-height: 1.7; max-width: 58ch; }
-  /* The pre-order form. It used to be a link that opened a GitHub issue --
+  /* The lock-the-price form. It used to be a link that opened a GitHub issue --
      which asked a buyer for a GitHub account and then published their
      interest where anyone could read it. */
   .signup { display: grid; gap: .55rem; }
@@ -318,7 +402,7 @@
 <header>
   <a class="mark" href="/"><span class="paw" aria-hidden="true"></span>Paw</a>
   <a class="back" href="/">&larr; the free pet</a>
-  <a class="cta" href="#preorder">Pre-order Pro</a>
+  <a class="cta" href="#preorder">Lock $19</a>
 </header>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -330,19 +414,32 @@
   <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
   <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3.5l9 16H3z"/><path d="M12 10v4"/><path d="M12 17.2v.3"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M20 11.5a7.5 7.5 0 0 1-11 6.6L4.5 19.5 6 15.3A7.5 7.5 0 1 1 20 11.5z"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 19V5"/><path d="M6 11l6-6 6 6"/></symbol>
   <symbol id="i-open" viewBox="0 0 24 24"><path d="M9 6h9v9"/><path d="M18 6L6 18"/></symbol>
 </svg>
 
 <section>
   <div class="badge">pro</div>
-  <p class="intro">Mock-ups of what Pro will do, driven by the real pet. Pro ships later, macOS first.</p>
+  <div class="native">
+    <div>
+      <span class="wip"><i></i>in the works</span>
+      <h1>Pro is being built as a native Mac app.</h1>
+      <p>Written in Swift, macOS first. The free pet stays open source and runs today. Everything below is a mock-up of what Pro will do, driven by the real pet.</p>
+    </div>
+    <div class="mac" aria-hidden="true">
+      <div class="mac-bar"><span class="lights"><i></i><i></i><i></i></span><span>Paw Pro</span><span></span></div>
+      <div class="host"></div>
+      <div class="mac-build"><span>swift build</span><b></b></div>
+    </div>
+  </div>
   <div class="split">
     <div class="features">
 
       <article class="feature">
         <span class="k">hub</span>
         <h2>Every session, one pet.</h2>
-        <p>One pet, however many sessions you run. Hover it and every session is listed beside it; click one to jump into Claude Code or Codex. Click the pet itself and it shakes awake to listen.</p>
+        <p>One pet, however many sessions you run. Hover it and every session is listed beside it: answer one with a quick chat right there, or jump into Claude Code or Codex. Click the pet itself and it shakes awake to listen.</p>
         <div class="demo hub" aria-hidden="true">
           <div class="who">
             <div class="host"></div>
@@ -352,6 +449,8 @@
           <div class="panel">
             <div class="sum"><span></span><b></b></div>
             <div class="list"></div>
+            <div class="thread"></div>
+            <div class="qc"><svg class="ico"><use href="#i-chat"/></svg><span class="qc-text"></span><svg class="ico qc-send"><use href="#i-send"/></svg></div>
           </div>
         </div>
       </article>
@@ -392,6 +491,16 @@
             </div>
           </div>
           <div class="host"></div>
+        </div>
+      </article>
+
+      <article class="feature">
+        <span class="k">surfaces</span>
+        <h2>A panel for the moment, then gone.</h2>
+        <p>Some answers aren't text: a change to approve, two designs to pick from, a number to watch. The pet draws a small panel for it, you act, and it's gone. Planned for after Pro's first release.</p>
+        <div class="demo surfaces" aria-hidden="true" data-step="idle">
+          <div class="host"></div>
+          <div class="surface"></div>
         </div>
       </article>
 
@@ -437,7 +546,7 @@
                placeholder="you@example.com" required>
         <!-- Not for you. Bots fill it; humans never see it. -->
         <input class="sr" tabindex="-1" aria-hidden="true" autocomplete="off" name="website">
-        <button class="cta" type="submit">Pre-order Pro</button>
+        <button class="cta" type="submit">Lock the price</button>
         <p class="say" role="status" aria-live="polite"></p>
       </form>
       <div class="fine">Price locks now; Pro ships later, macOS first. The free pet is yours today and stays MIT forever. Your address is only ever used to tell you when Pro opens.</div>
@@ -455,7 +564,7 @@
   <p class="note"><b>Later, guest artists.</b> The engine takes any drawing that keeps its
   contract, so a friend can be drawn by anyone. After Pro ships we want limited
   friends drawn by artists we admire, and commissions of your own pet. Nothing
-  here is signed yet; pre-ordering is what makes it real.</p>
+  here is signed yet; locking the price is what makes it real.</p>
 </section>
 
 <script type="module">
@@ -520,6 +629,9 @@ function autoplay(stage, scene, { hold = true, onHold } = {}) {
   return { kick: () => { if (!calm) go(); } };
 }
 
+// --- top: the pet in its native window, busy being built -------------------------
+pet(document.querySelector(".mac .host"), "working");
+
 // --- the waitlist ---------------------------------------------------------------
 // The card's pet watches the form: it listens while you type, thinks while
 // the address is on its way, and winks once you are in.
@@ -538,7 +650,7 @@ form.email.addEventListener("input", () => { if (say.hasAttribute("data-bad")) {
 form.addEventListener("submit", async (ev) => {
   ev.preventDefault();
   const email = form.email.value.trim();
-  if (!email) { flinch("confused"); return tell("An email address, and you are on the list.", "bad"); }
+  if (!email) { flinch("confused"); return tell("An email address, and the price is locked.", "bad"); }
   form.setAttribute("data-busy", "");
   cardPet.update({ state: "thinking" });
   tell("Adding you…");
@@ -554,7 +666,7 @@ form.addEventListener("submit", async (ev) => {
     form.dataset.done = "1";
     cardPet.update({ state: "wink" });
     poke(cardPet);
-    tell("You are on the list. We will write when checkout opens — nothing else.", "good");
+    tell("Price locked. We will write when checkout opens — nothing else.", "good");
   } catch (err) {
     flinch("confused");
     tell(err.message, "bad");
@@ -572,14 +684,22 @@ const TONE = { listening: "warn", wink: "good", working: "accent", thinking: "ac
 const RANK = ["listening", "working", "thinking", "focused", "wink", "idle"];
 const CC = { app: "Claude Code", icon: "#i-anthropic" }, CX = { app: "Codex", icon: "#i-openai" };
 const SESSIONS = [
-  { name: "api", ...CC, walk: ["working", "working", "wink", "idle"] },
-  { name: "site", ...CX, walk: ["thinking", "working", "working", "thinking"] },
-  { name: "docs", ...CC, walk: ["listening", "listening", "working", "focused"] },
-  { name: "billing", ...CC, walk: ["working", "thinking", "working", "working"] },
-  { name: "mobile", ...CX, walk: ["idle", "idle", "working", "wink"] },
-  { name: "infra", ...CC, walk: ["thinking", "thinking", "listening", "working"] },
-  { name: "search", ...CX, walk: ["working", "wink", "idle", "idle"] },
-  { name: "tests", ...CC, walk: ["working", "working", "working", "thinking"] },
+  { name: "api", ...CC, walk: ["working", "working", "wink", "idle"],
+    said: "The migration is ready. Run it on staging first?", you: "yes, staging first" },
+  { name: "site", ...CX, walk: ["thinking", "working", "working", "thinking"],
+    said: "Two hero drafts are ready. Want to compare them?", you: "show me both" },
+  { name: "docs", ...CC, walk: ["listening", "listening", "working", "focused"],
+    said: "The API guide has broken links. Fix them, or rewrite the page?", you: "just fix the links" },
+  { name: "billing", ...CC, walk: ["working", "thinking", "working", "working"],
+    said: "Refactoring invoices. Keep the old CSV export?", you: "keep it for now" },
+  { name: "mobile", ...CX, walk: ["idle", "idle", "working", "wink"],
+    said: "The login screen is done. What next?", you: "the settings screen" },
+  { name: "infra", ...CC, walk: ["thinking", "thinking", "listening", "working"],
+    said: "This plan replaces the load balancer. Apply it?", you: "hold off until Monday" },
+  { name: "search", ...CX, walk: ["working", "wink", "idle", "idle"],
+    said: "The index is rebuilt and the tests pass.", you: "nice, open a PR" },
+  { name: "tests", ...CC, walk: ["working", "working", "working", "thinking"],
+    said: "A few tests are flaky. Quarantine them?", you: "yes, and file an issue" },
 ];
 const hub = document.querySelector(".demo.hub");
 const who = hub.querySelector(".who");
@@ -590,15 +710,23 @@ const list = hub.querySelector(".list");
 const rows = SESSIONS.map((s, i) => {
   const row = document.createElement("div");
   row.className = "row";
-  row.innerHTML = `<svg class="brand"><use href="${s.icon}"/></svg>${s.name}<span class="st"></span>` +
-    `<span class="go">${s.app}<svg class="ico"><use href="#i-open"/></svg></span>`;
-  row.addEventListener("click", (e) => { e.stopPropagation(); openSession(i); });
+  row.innerHTML = `<svg class="brand"><use href="${s.icon}"/></svg>${s.name}<span class="st"></span><span class="ra">` +
+    `<span data-do="chat"><svg class="ico"><use href="#i-chat"/></svg>chat</span>` +
+    `<span data-do="open">open<svg class="ico"><use href="#i-open"/></svg></span></span>`;
+  row.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (e.target.closest('[data-do="chat"]')) quickChat(i); else openSession(i);
+  });
   list.append(row);
   return row;
 });
-let hubStep = 0, token = 0, busy = false, opening = -1;
+const panel = hub.querySelector(".panel");
+const thread = hub.querySelector(".thread");
+const qc = hub.querySelector(".qc");
+const qcText = qc.querySelector(".qc-text");
+let hubStep = 0, token = 0, busy = false, opening = -1, leadIdx = 0, answered = -1, chatting = 0;
 function paintHub() {
-  const states = SESSIONS.map((s) => s.walk[hubStep % s.walk.length]);
+  const states = SESSIONS.map((s, i) => (i === answered ? "working" : s.walk[hubStep % s.walk.length]));
   states.forEach((st, i) => {
     rows[i].dataset.tone = TONE[st] === "accent" ? "" : (TONE[st] ?? "");
     if (i !== opening) rows[i].querySelector(".st").textContent = LABEL[st] ?? st;
@@ -607,8 +735,12 @@ function paintHub() {
   pips.innerHTML = order.slice(0, 5).map((i) => `<i data-on="${TONE[states[i]] ?? ""}"></i>`).join("") +
     (order.length > 5 ? `<em>+${order.length - 5}</em>` : "");
   const need = states.filter((st) => st === "listening").length;
-  hub.querySelector(".sum span").textContent = `${SESSIONS.length} sessions`;
-  hub.querySelector(".sum b").textContent = need ? `${need} need${need > 1 ? "" : "s"} you` : "";
+  if (panel.dataset.view !== "chat") {
+    hub.querySelector(".sum span").textContent = `${SESSIONS.length} sessions`;
+    hub.querySelector(".sum b").textContent = need ? `${need} need${need > 1 ? "" : "s"} you` : "";
+  }
+  leadIdx = order[0];
+  if (panel.dataset.view !== "chat") qcText.textContent = `Message ${SESSIONS[leadIdx].name}\u2026`;
   if (busy) return; // mid-shake or mid-open: do not talk over the pet
   const lead = states[order[0]];
   hubPet.update({ state: lead });
@@ -638,6 +770,47 @@ function openSession(i) {
   rows[i].querySelector(".st").textContent = "opening\u2026";
   moment("curious", `opening ${SESSIONS[i].name}\u2026`, 1300, () => poke(hubPet));
 }
+// quick chat: answer a session from the list, without opening its app
+const bubble = (text, me) => {
+  const b = document.createElement("p");
+  if (me) b.className = "me";
+  b.textContent = text;
+  thread.append(b);
+};
+async function quickChat(i) {
+  const mine = ++chatting, s = SESSIONS[i];
+  const wait = async (ms) => { await sleep(ms); if (mine !== chatting) throw "superseded"; };
+  hub.classList.add("on");
+  panel.dataset.view = "chat";
+  thread.innerHTML = "";
+  hub.querySelector(".sum span").innerHTML = `<svg class="brand"><use href="${s.icon}"/></svg>${s.name} &middot; ${s.app}`;
+  hub.querySelector(".sum b").textContent = "";
+  bubble(s.said);
+  qc.removeAttribute("data-typed");
+  qcText.textContent = `Reply to ${s.name}\u2026`;
+  try {
+    await wait(900);
+    qc.setAttribute("data-typed", "");
+    qcText.textContent = "";
+    for (const word of s.you.split(" ")) {
+      qcText.textContent += (qcText.textContent ? " " : "") + word;
+      await wait(150);
+    }
+    await wait(400);
+    bubble(s.you, true);
+    qc.removeAttribute("data-typed");
+    qcText.textContent = `Reply to ${s.name}\u2026`;
+    moment("thinking", `${s.name} is reading\u2026`, 1000, () => {});
+    await wait(1000);
+    bubble("On it.");
+    answered = i;
+    moment("working", `${s.name} is on it`, 1600, () => poke(hubPet));
+    await wait(1900);
+    panel.dataset.view = "";
+    paintHub();
+  } catch {}
+}
+qc.addEventListener("click", (e) => { e.stopPropagation(); quickChat(leadIdx); });
 // click and shake: the pet startles awake and listens for a command
 who.addEventListener("click", () => {
   hub.classList.add("on");
@@ -648,9 +821,17 @@ autoplay(hub, async (pause) => {
   if (!hub.matches(":hover")) hub.classList.remove("on");
   await pause(2400);
   hubStep++;
+  answered = -1;
   paintHub();
-  // now and then the list opens by itself and scrolls, so it reads without a mouse
-  if (hubStep % 3 === 2) {
+  // now and then the list opens by itself -- once to scroll, once to answer
+  // the session that needs you -- so it reads without a mouse
+  if (hubStep % 6 === 5) {
+    hub.classList.add("on");
+    await pause(700);
+    await quickChat(leadIdx);
+    await pause(300);
+    hub.classList.remove("on");
+  } else if (hubStep % 3 === 2) {
     hub.classList.add("on");
     await pause(900);
     list.scrollTo({ top: list.scrollHeight, behavior: "smooth" });
@@ -742,6 +923,54 @@ const player = autoplay(voice, async (pause) => {
 // pointing at an idle mic starts talking now, instead of waiting out the gap
 voice.addEventListener("pointerenter", () => { if (voice.dataset.step === "idle") player.kick(); });
 
+// --- surfaces: a panel for the moment, then gone -----------------------------------
+// Three throwaway panels the pet might draw. Each has one obvious answer; the
+// loop "presses" it, and a click on any answer does the same.
+const surf = document.querySelector(".demo.surfaces");
+const surfPet = pet(surf.querySelector(".host"), "idle");
+const card = surf.querySelector(".surface");
+const SURFACES = [
+  `<div class="sf-top"><svg class="brand"><use href="#i-anthropic"/></svg><span>api wants to edit <b>routes.ts</b></span></div>
+   <div class="sf-diff"><span class="del">- app.get("/orders", list)</span><span class="ins">+ app.get("/orders", auth, list)</span></div>
+   <div class="sf-acts"><span class="sf-go">Approve</span><span>Skip</span></div>`,
+  `<div class="sf-top"><svg class="brand"><use href="#i-openai"/></svg><span>site: <b>which hero?</b></span></div>
+   <div class="sf-pick"><span class="sf-go"><i class="a"></i>A</span><span><i class="b"></i>B</span></div>`,
+  `<div class="sf-top"><svg class="ico"><use href="#i-alert"/></svg><span><b>checkout errors</b>, today</span></div>
+   <div class="sf-bars">${[30, 22, 26, 18, 64, 34, 20, 16, 14, 12].map((h) => `<i style="--h:${h}%"></i>`).join("")}</div>
+   <div class="sf-acts"><span class="sf-go">Looks fine</span><span>Open logs</span></div>`,
+];
+let shown = 0, surfTok = 0;
+function draw() {
+  card.innerHTML = SURFACES[shown % SURFACES.length];
+  surf.dataset.step = "shown";
+  surfPet.update({ state: "curious" });
+}
+async function dismiss(pick) {
+  const mine = ++surfTok;
+  (pick ?? card.querySelector(".sf-go"))?.classList.add("hot");
+  await sleep(350);
+  if (mine !== surfTok) return;
+  surf.dataset.step = "done";
+  surfPet.update({ state: "happy" });
+  poke(surfPet);
+  shown++;
+}
+card.addEventListener("click", async (e) => {
+  const pick = e.target.closest(".sf-acts span, .sf-pick span");
+  if (!pick || surf.dataset.step !== "shown") return;
+  await dismiss(pick);
+  await sleep(800);
+  if (surf.dataset.step === "done") draw();
+});
+autoplay(surf, async (pause) => {
+  surfPet.update({ state: "thinking" });
+  await pause(900);
+  draw();
+  await pause(2400);
+  await dismiss();
+  await pause(1100);
+}, { onHold: () => { if (surf.dataset.step !== "shown") draw(); } });
+
 // --- packs: the friends, as a strip -----------------------------------------------
 const packs = document.querySelector(".demo.packs");
 const heads = [...packs.querySelectorAll(".head")];
@@ -770,6 +999,7 @@ signed.addEventListener("pointerleave", () => build("free"));
 
 // Reduced motion gets one honest still frame per demo instead of a loop.
 if (calm) {
+  draw();
   hub.classList.add("on");
   ctl.classList.add("on");
   ask.querySelector(".q").innerHTML = `Start ${ASKS[0].agent} in <b>${ASKS[0].dir}</b>?`;

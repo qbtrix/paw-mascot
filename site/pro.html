@@ -137,113 +137,87 @@
          stroke-linecap: round; stroke-linejoin: round; flex: none; }
   .brand { width: 13px; height: 13px; fill: currentColor; flex: none; }
 
-  /* away: the headline. Agents take minutes, so the pet floats over whatever
-     you're doing -- here, a long read in a browser -- with a small live panel.
-     Only what the hooks can really see: the tool and file it's on, time
-     elapsed, done, or waiting on you. No invented progress percentages. */
+  /* away: the headline. Agents take minutes, so people go do something else.
+     The background is only a placeholder for that (skeletons of a video, a
+     chat, a long read, rotating). The pet floats over it and shows the gist
+     on its own; hovering the pet opens the same session panel the hub uses.
+     Only what the hooks can really see: the tool and file, done, or waiting
+     on you. No invented progress percentages. */
   .aw { min-height: 380px; padding: 0; place-items: stretch; }
   .aw-win { position: absolute; inset: 1rem; display: grid; grid-template-rows: auto 1fr; overflow: hidden;
             background: #1c1d19; border: 1px solid var(--line); border-radius: 10px; }
   .aw-bar { display: flex; align-items: center; gap: .75rem; padding: .5rem .7rem; border-bottom: 1px solid var(--line); }
   .aw-lights { display: flex; gap: 5px; }
   .aw-lights i { width: 9px; height: 9px; border-radius: 50%; background: var(--line-hi); }
-  .aw-url { display: inline-flex; align-items: center; gap: .35rem; min-width: 0; margin: 0 auto; padding: .3rem .7rem; border-radius: 6px;
-            background: var(--well); font: 400 11px/1 var(--mono); color: var(--dim); white-space: nowrap; overflow: hidden; }
+  .aw-url { display: flex; align-items: center; gap: .4rem; width: min(220px, 55%); margin: 0 auto; padding: .38rem .7rem;
+            border-radius: 6px; background: var(--well); color: var(--dim); }
   .aw-url .ico { width: 10px; height: 10px; flex: none; }
-  /* behind the panel, what people actually do while agents work: a video, a
-     chat with friends, a long read. It rotates; the panel floats over all of
-     it. The focus of each scene sits left, clear of the panel. */
+  .aw-url .sk-line { transition: width .4s; }
   .aw-page { position: relative; overflow: hidden; }
   .aw-scene { position: absolute; inset: 0; opacity: 0; transition: opacity .6s; }
   .aw-scene.on { opacity: 1; }
+  .sk { border-radius: 6px; background: var(--line); }
+  .sk-line { display: block; width: var(--w, 100%); height: 7px; border-radius: 4px; background: var(--line); }
+  .sk-line.thin { height: 5px; background: color-mix(in srgb, var(--line) 70%, transparent); }
+  .sk-line.bold { height: 12px; background: var(--line-hi); }
   .aw-video { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); align-content: start; gap: .9rem; padding: .9rem; }
-  .av-player { position: relative; overflow: hidden; aspect-ratio: 16 / 9; border-radius: 8px;
-               background: radial-gradient(circle at 72% 36%, #ffe3a6 0 7%, #ffb454 8% 11%, transparent 12%),
-                           linear-gradient(180deg, #2c4f73 0%, #6d8fb3 42%, #eaa56a 70%, #3a3226 71%, #1f1b14 100%); }
-  .av-player::before, .av-player::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; }
-  .av-player::before { height: 44%; background: #2b3d2e; clip-path: polygon(0 52%, 17% 28%, 35% 50%, 54% 16%, 73% 44%, 100% 22%, 100% 100%, 0 100%); }
-  .av-player::after { height: 30%; background: #1b281e; clip-path: polygon(0 42%, 24% 66%, 47% 34%, 69% 60%, 100% 36%, 100% 100%, 0 100%); }
-  .av-time { position: absolute; right: .5rem; bottom: .55rem; z-index: 1; padding: .15rem .35rem; border-radius: 4px;
-             background: rgba(0, 0, 0, .55); font: 500 10px/1 var(--mono); color: #fff; }
-  .av-bar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; height: 3px; background: rgba(255, 255, 255, .22); }
-  .av-bar i { display: block; width: 33%; height: 100%; background: var(--warn); }
-  .av-meta { display: grid; gap: .3rem; margin-top: .6rem; }
-  .av-meta b { font: 600 13px/1.25 var(--display); color: var(--ink); }
-  .av-meta small, .av-next small, .ac-list small { font: 400 10.5px/1.2 var(--body); color: var(--dim); }
-  .av-next { display: grid; align-content: start; gap: .55rem; }
-  .av-next > div { display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: start; gap: .5rem; }
-  .av-next i { aspect-ratio: 16 / 9; border-radius: 5px; background: var(--g); }
-  .av-next span { display: grid; gap: .2rem; }
-  .av-next b { font: 500 11px/1.25 var(--body); color: var(--ink); }
-  .aw-chat { display: grid; grid-template-columns: 132px minmax(0, 1fr); }
-  .ac-list { display: grid; align-content: start; gap: .2rem; padding: .55rem .4rem; border-right: 1px solid var(--line); }
-  .ac-list > div { display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: center; gap: .5rem; padding: .4rem; border-radius: 8px; }
-  .ac-list > div.on { background: color-mix(in srgb, var(--accent) 10%, transparent); }
-  .ac-list img, .ac-head img { width: 28px; height: 28px; object-fit: contain; }
-  .ac-list span { display: grid; gap: .15rem; min-width: 0; }
-  .ac-list b { font: 500 12px/1.2 var(--body); color: var(--ink); }
-  .ac-list small { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-  .ac-main { display: grid; grid-template-rows: auto 1fr; min-width: 0; }
-  .ac-head { display: flex; align-items: center; gap: .5rem; padding: .5rem .8rem; border-bottom: 1px solid var(--line); font: 600 12.5px/1 var(--body); }
-  .ac-head img { width: 22px; height: 22px; }
-  /* narrow on purpose: your replies sit right-aligned, and must stay clear of the panel */
-  .ac-thread { display: grid; align-content: start; gap: .45rem; max-width: 226px; padding: .8rem; }
-  .ac-thread p { justify-self: start; max-width: 80%; margin: 0; padding: .5rem .7rem; border-radius: 14px 14px 14px 4px;
-                 background: var(--panel); font: 400 12.5px/1.35 var(--body); color: var(--ink); }
-  .ac-thread p.me { justify-self: end; border-radius: 14px 14px 4px 14px; background: color-mix(in srgb, var(--good) 26%, var(--panel)); }
-  .ac-thread p.typing { display: flex; gap: 3px; padding: .6rem .7rem; }
-  .ac-thread p.typing i { width: 5px; height: 5px; border-radius: 50%; background: var(--dim); }
-  .ar-body { display: grid; gap: .6rem; width: min(100%, 350px); padding: 1.1rem 1.4rem; }
-  .ar-body small { font: 500 10px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
-  .ar-body h4 { margin: 0; font: 600 18px/1.2 var(--display); letter-spacing: -.01em; color: var(--ink); }
-  .ar-hero { height: 88px; border-radius: 8px;
-             background: radial-gradient(circle at 30% 60%, #ffe3a6 0 10%, transparent 11%), linear-gradient(160deg, #3d5f58, #c98b5c); }
-  .ar-body p { margin: 0; font: 400 12.5px/1.6 var(--body); color: color-mix(in srgb, var(--ink) 80%, var(--dim)); }
+  .sk-player { position: relative; overflow: hidden; aspect-ratio: 16 / 9; border-radius: 8px; background: color-mix(in srgb, var(--line) 75%, var(--well)); }
+  .sk-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--line-hi); }
+  .sk-bar i { display: block; width: 33%; height: 100%; background: var(--dim); }
+  .sk-meta { display: grid; gap: .45rem; margin-top: .7rem; }
+  .sk-next { display: grid; align-content: start; gap: .6rem; }
+  .sk-next > div { display: grid; grid-template-columns: 60px minmax(0, 1fr); align-items: start; gap: .5rem; }
+  .sk-thumb { aspect-ratio: 16 / 9; }
+  .sk-next span, .sk-contacts span { display: grid; gap: .35rem; padding-top: .15rem; }
+  .aw-chat { display: grid; grid-template-columns: 124px minmax(0, 1fr); }
+  .sk-contacts { display: grid; align-content: start; gap: .3rem; padding: .6rem .45rem; border-right: 1px solid var(--line); }
+  .sk-contacts > div { display: grid; grid-template-columns: 26px minmax(0, 1fr); align-items: center; gap: .5rem; padding: .4rem; border-radius: 8px; }
+  .sk-contacts > div.on { background: color-mix(in srgb, var(--line) 45%, transparent); }
+  .sk-dot { width: 26px; height: 26px; border-radius: 50%; background: var(--line-hi); }
+  .sk-dot.small { width: 20px; height: 20px; }
+  .sk-convo { display: grid; grid-template-rows: auto 1fr; min-width: 0; }
+  .sk-head { display: flex; align-items: center; gap: .55rem; padding: .55rem .8rem; border-bottom: 1px solid var(--line); }
+  /* narrow on purpose: your side of the chat sits right-aligned and must stay clear of the pet */
+  .sk-thread { display: grid; align-content: start; gap: .5rem; max-width: 230px; padding: .8rem; }
+  .sk-bubble { display: block; justify-self: start; width: var(--w, 44px); height: 26px; border-radius: 13px 13px 13px 4px;
+               background: var(--line); transition: width .25s; }
+  .sk-bubble.me { justify-self: end; border-radius: 13px 13px 4px 13px; background: var(--line-hi); }
+  .sk-bubble.typing { display: flex; align-items: center; justify-content: center; gap: 3px; width: 44px; }
+  .sk-bubble.typing b { width: 5px; height: 5px; border-radius: 50%; background: var(--dim); }
+  .sk-article { display: grid; gap: .55rem; width: min(100%, 340px); padding: 1.1rem 1.4rem; }
+  .sk-hero { height: 86px; margin: .35rem 0 .45rem; border-radius: 8px; }
+  .sk-article .gap { height: .35rem; }
   @media (prefers-reduced-motion: no-preference) {
-    .av-bar i { animation: play 45s linear infinite; }
-    .ac-thread p { animation: pop .3s ease-out; }
-    .ac-thread p.typing i { animation: wip 1s ease-in-out infinite; }
-    .ac-thread p.typing i:nth-child(2) { animation-delay: .15s; }
-    .ac-thread p.typing i:nth-child(3) { animation-delay: .3s; }
-    .aw-article.on .ar-body { animation: read 16s ease-in-out infinite alternate; }
+    .sk-bar i { animation: play 45s linear infinite; }
+    .sk-bubble.typing b { animation: wip 1s ease-in-out infinite; }
+    .sk-bubble.typing b:nth-child(2) { animation-delay: .15s; }
+    .sk-bubble.typing b:nth-child(3) { animation-delay: .3s; }
+    .aw-article.on .sk-article { animation: read 16s ease-in-out infinite alternate; }
   }
   @keyframes play { from { width: 18%; } to { width: 94%; } }
   @keyframes read { to { translate: 0 -30%; } }
-  .aw-panel { position: absolute; right: 1.75rem; bottom: 1.75rem; width: min(292px, calc(100% - 3.5rem)); display: grid; gap: .1rem;
-              padding: .45rem; background: color-mix(in srgb, var(--panel) 90%, transparent); backdrop-filter: blur(10px);
-              border: 1px solid var(--line-hi); border-radius: 12px; box-shadow: 0 18px 40px -16px rgba(0, 0, 0, .75); }
-  .aw-panel > .host { position: absolute; top: -60px; right: .4rem; --fx-paw-size: 78px; }
-  .aw-top { display: flex; justify-content: space-between; gap: .5rem; padding: .35rem .5rem .55rem; margin-bottom: .15rem;
-            border-bottom: 1px solid var(--line); font: 400 11px/1 var(--mono); color: var(--dim); }
-  .aw-top b { font-weight: 400; color: var(--accent); }
-  .aw-top b[data-tone="warn"] { color: var(--warn); }
-  .aw-top b[data-tone="good"] { color: var(--good); }
-  .aw-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "icon name time" ". do do" ". ask ask";
-            align-items: center; gap: .25rem .5rem; padding: .45rem .5rem; border-radius: 8px; transition: background .3s; }
-  .aw-row .brand { grid-area: icon; color: var(--dim); }
-  .aw-row b { grid-area: name; font: 500 12px/1 var(--mono); }
-  .aw-row time { grid-area: time; font: 400 10.5px/1 var(--mono); color: var(--dim); font-variant-numeric: tabular-nums; }
-  .aw-do { grid-area: do; display: flex; align-items: center; gap: .45rem; min-width: 0; font: 400 11.5px/1.2 var(--mono); color: var(--dim); }
-  .aw-do span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-  .aw-do::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
-  .aw-row[data-s="done"] .aw-do { color: var(--good); }
-  .aw-row[data-s="done"] .aw-do::before { background: var(--good); }
-  .aw-row[data-s="need"] { background: color-mix(in srgb, var(--warn) 10%, transparent); }
-  .aw-row[data-s="need"] .aw-do { color: var(--warn); }
-  .aw-row[data-s="need"] .aw-do::before { background: var(--warn); }
-  .aw-ask { grid-area: ask; display: none; gap: .35rem; margin-top: .2rem; }
-  .aw-row[data-s="need"] .aw-ask { display: flex; }
-  .aw-ask span { cursor: pointer; padding: .32rem .65rem; border-radius: 999px; border: 1px solid var(--line-hi);
-                 font: 600 11px/1 var(--display); color: var(--dim); transition: box-shadow .2s; }
-  .aw-ask .aw-ok { color: #1b1c17; background: var(--accent); border-color: var(--accent); }
-  .aw-ask span.hot { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
-  @media (prefers-reduced-motion: no-preference) {
-    .aw-row[data-s="run"] .aw-do::before { animation: wip 1.4s ease-in-out infinite; }
-  }
+  /* the pet, alone by default; hovering it (only it) opens the hub's session panel */
+  .aw-float { position: absolute; right: 1.6rem; bottom: 1.4rem; display: flex; flex-direction: row-reverse; align-items: flex-end;
+              gap: .6rem; pointer-events: none; }
+  .aw-who { display: grid; justify-items: center; gap: .35rem; cursor: pointer; pointer-events: auto; }
+  .aw-who .host { --fx-paw-size: 78px; }
+  .aw-who .dot { padding: .25rem .5rem; border-radius: 999px; background: color-mix(in srgb, var(--panel) 88%, transparent); font-size: 10.5px; }
+  .aw-float .panel { flex: none; width: 250px; max-width: none; margin-bottom: .3rem; translate: 12px 0; }
+  .aw-float:hover .panel, .aw-float.on .panel { opacity: 1; translate: 0 0; pointer-events: auto; }
+  /* the hub's rows, minus its hover actions; a row waiting on you grows Allow / Deny */
+  .aw-float .row { flex-wrap: wrap; cursor: default; }
+  .aw-float .row:hover .st { display: inline; }
+  .aw-float .row .ra, .aw-float .row:hover .ra { display: none; }
+  .aw-float .row.asking .ra { display: flex; flex-basis: 100%; gap: .3rem; margin: .45rem 0 0 1.3rem; }
+  .aw-float .row .ra span { margin-block: 0; cursor: pointer; }
+  .aw-float .ra [data-do="ok"] { color: #1b1c17; background: var(--accent); }
+  .aw-float .ra span.hot { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
   @media (max-width: 560px) {
-    .aw { min-height: 400px; }
+    .aw { min-height: 420px; }
     .aw-video, .aw-chat { grid-template-columns: minmax(0, 1fr); }
-    .av-next, .ac-list { display: none; }
+    .sk-next, .sk-contacts { display: none; }
+    .aw-float { flex-direction: column-reverse; align-items: flex-end; }
+    .aw-float .panel { width: min(250px, calc(100vw - 6rem)); margin: 0; translate: 0 8px; }
   }
 
   /* hub: one pet, every session in a list beside it -- the control menu's
@@ -739,52 +713,47 @@
       <article class="feature">
         <span class="k">away</span>
         <h2>Agents take a while. Go do something else.</h2>
-        <p>While Claude Code or Codex work, you're off reading or in another app. The pet floats over it with a small live panel: what each agent is on, how long it's been, when it's done, when it needs you. Answer there and keep going. No more watching a terminal.</p>
+        <p>While Claude Code or Codex work, you're off watching, chatting, reading. The pet floats over it and shows how things stand; hover it for every session: what each one is on, what's done, what needs you. Answer there and keep going. No more watching a terminal.</p>
         <div class="demo aw" aria-hidden="true">
           <div class="aw-win">
-            <div class="aw-bar"><span class="aw-lights"><i></i><i></i><i></i></span><span class="aw-url"><svg class="ico"><use href="#i-lock"/></svg><span>video.example/watch</span></span></div>
+            <div class="aw-bar"><span class="aw-lights"><i></i><i></i><i></i></span><span class="aw-url"><svg class="ico"><use href="#i-lock"/></svg><i class="sk-line thin" style="--w:62%"></i></span></div>
             <div class="aw-page">
-              <div class="aw-scene aw-video on" data-url="video.example/watch">
+              <div class="aw-scene aw-video on" data-url="62">
                 <div>
-                  <div class="av-player"><span class="av-time">6:12 / 18:40</span><div class="av-bar"><i></i></div></div>
-                  <div class="av-meta"><b>Building a tiny synth from scratch</b><small>maker's corner &middot; 18 min</small></div>
+                  <div class="sk-player"><div class="sk-bar"><i></i></div></div>
+                  <div class="sk-meta"><i class="sk-line bold" style="--w:72%"></i><i class="sk-line thin" style="--w:38%"></i></div>
                 </div>
-                <div class="av-next">
-                  <div><i style="--g: linear-gradient(135deg, #2f5d50, #8fe6a4)"></i><span><b>Soldering, the gentle way</b><small>12 min</small></span></div>
-                  <div><i style="--g: linear-gradient(135deg, #7a4a2a, #ffb454)"></i><span><b>Why old radios hum</b><small>9 min</small></span></div>
-                  <div><i style="--g: linear-gradient(135deg, #24466b, #8cc6ff)"></i><span><b>A synth in a matchbox</b><small>21 min</small></span></div>
-                </div>
-              </div>
-              <div class="aw-scene aw-chat" data-url="chat.example/friends">
-                <div class="ac-list">
-                  <div class="on"><img src="/friends/bunny.svg" alt=""><span><b>bunny</b><small>typing&hellip;</small></span></div>
-                  <div><img src="/friends/bear.svg" alt=""><span><b>bear</b><small>see you saturday</small></span></div>
-                  <div><img src="/friends/capybara.svg" alt=""><span><b>capybara</b><small>haha same</small></span></div>
-                </div>
-                <div class="ac-main">
-                  <div class="ac-head"><img src="/friends/bunny.svg" alt="">bunny</div>
-                  <div class="ac-thread"></div>
+                <div class="sk-next">
+                  <div><i class="sk sk-thumb"></i><span><i class="sk-line" style="--w:92%"></i><i class="sk-line thin" style="--w:40%"></i></span></div>
+                  <div><i class="sk sk-thumb"></i><span><i class="sk-line" style="--w:78%"></i><i class="sk-line thin" style="--w:34%"></i></span></div>
+                  <div><i class="sk sk-thumb"></i><span><i class="sk-line" style="--w:86%"></i><i class="sk-line thin" style="--w:46%"></i></span></div>
+                  <div><i class="sk sk-thumb"></i><span><i class="sk-line" style="--w:70%"></i><i class="sk-line thin" style="--w:30%"></i></span></div>
                 </div>
               </div>
-              <div class="aw-scene aw-article" data-url="blog.example/slow-mornings">
-                <div class="ar-body">
-                  <small>Essay &middot; 6 min read</small>
-                  <h4>Slow mornings are underrated</h4>
-                  <div class="ar-hero"></div>
-                  <p>There is a quiet that only exists before the first message arrives. Coffee, a window, nothing that needs an answer yet.</p>
-                  <p>Most of us give that hour away without noticing. The inbox gets it, or the news, or a tab we meant to close yesterday.</p>
-                  <p>Keeping it is easier than it sounds. Pick one thing that can wait until nine, and let it wait.</p>
-                  <p>The work still gets done. It just starts from a calmer place.</p>
+              <div class="aw-scene aw-chat" data-url="44">
+                <div class="sk-contacts">
+                  <div class="on"><i class="sk-dot"></i><span><i class="sk-line" style="--w:62%"></i><i class="sk-line thin" style="--w:88%"></i></span></div>
+                  <div><i class="sk-dot"></i><span><i class="sk-line" style="--w:48%"></i><i class="sk-line thin" style="--w:76%"></i></span></div>
+                  <div><i class="sk-dot"></i><span><i class="sk-line" style="--w:70%"></i><i class="sk-line thin" style="--w:58%"></i></span></div>
+                  <div><i class="sk-dot"></i><span><i class="sk-line" style="--w:54%"></i><i class="sk-line thin" style="--w:82%"></i></span></div>
                 </div>
+                <div class="sk-convo">
+                  <div class="sk-head"><i class="sk-dot small"></i><i class="sk-line" style="--w:70px"></i></div>
+                  <div class="sk-thread"></div>
+                </div>
+              </div>
+              <div class="aw-scene aw-article" data-url="78">
+                <div class="sk-article"><i class="sk-line bold" style="--w:80%"></i><i class="sk sk-hero"></i><i class="sk-line thin" style="--w:30%"></i><i class="sk-line thin" style="--w:75%"></i><i class="gap"></i><i class="sk-line thin" style="--w:96%"></i><i class="sk-line thin" style="--w:92%"></i><i class="sk-line thin" style="--w:98%"></i><i class="sk-line thin" style="--w:70%"></i><i class="gap"></i><i class="sk-line thin" style="--w:94%"></i><i class="sk-line thin" style="--w:97%"></i><i class="sk-line thin" style="--w:88%"></i><i class="sk-line thin" style="--w:60%"></i><i class="gap"></i><i class="sk-line thin" style="--w:95%"></i><i class="sk-line thin" style="--w:91%"></i><i class="sk-line thin" style="--w:83%"></i></div>
               </div>
             </div>
           </div>
-          <div class="aw-panel">
-            <div class="host"></div>
-            <div class="aw-top"><span>while you're away</span><b></b></div>
-            <div class="aw-row" data-name="api"><svg class="brand"><use href="#i-anthropic"/></svg><b>api</b><time></time><span class="aw-do"><span></span></span><span class="aw-ask"><span class="aw-ok">Allow</span><span class="aw-no">Deny</span></span></div>
-            <div class="aw-row" data-name="site"><svg class="brand"><use href="#i-openai"/></svg><b>site</b><time></time><span class="aw-do"><span></span></span><span class="aw-ask"><span class="aw-ok">Allow</span><span class="aw-no">Deny</span></span></div>
-            <div class="aw-row" data-name="docs"><svg class="brand"><use href="#i-anthropic"/></svg><b>docs</b><time></time><span class="aw-do"><span></span></span><span class="aw-ask"><span class="aw-ok">Allow</span><span class="aw-no">Deny</span></span></div>
+          <div class="aw-float">
+            <div class="aw-who"><div class="host"></div><div class="pips"></div><div class="dot"></div></div>
+            <div class="panel">
+              <div class="sum"><span></span><b></b></div>
+              <div class="list"></div>
+              <div class="qc"><svg class="ico"><use href="#i-chat"/></svg><span class="qc-text"></span><svg class="ico qc-send"><use href="#i-send"/></svg></div>
+            </div>
           </div>
         </div>
       </article>
@@ -1189,46 +1158,61 @@ form.addEventListener("submit", async (ev) => {
 document.querySelector('header .cta').addEventListener("click", () => setTimeout(() => form.email.focus({ preventScroll: true }), 350));
 
 // --- away: the pet floats over whatever you're doing ------------------------------
-// Three agents working while you read. Each beat moves them on: a new tool and
-// file, time passing; one finishes, one asks before overwriting a file, the
-// loop presses Allow, and it goes back to work. You never open a terminal.
+// Agents keep working while you're elsewhere (the background is a placeholder
+// of that: a video, a chat, a long read). The pet gives the gist by itself --
+// pips and one line -- and hovering it opens the hub's session panel, with
+// Allow and Deny on whatever is waiting on you.
 const aw = document.querySelector(".demo.aw");
-const awPet = pet(aw.querySelector(".aw-panel > .host"), "working");
-const awTop = aw.querySelector(".aw-top b");
-const awRows = Object.fromEntries([...aw.querySelectorAll(".aw-row")].map((r) => [r.dataset.name, r]));
+const awFloat = aw.querySelector(".aw-float");
+const awWho = aw.querySelector(".aw-who");
+const awPet = pet(awWho.querySelector(".host"), "working");
+const awPips = awWho.querySelector(".pips"), awLine = awWho.querySelector(".dot");
+const awSum = awFloat.querySelector(".sum"), awList = awFloat.querySelector(".list");
+const awQc = awFloat.querySelector(".qc-text");
 const AW_STEPS = {
   api: ["Read · 12 files", "Edit · routes.ts", "Bash · npm test", "Edit · auth.ts", "Bash · npm test"],
-  site: ["Read · pricing.html", "Edit · pricing.html", "Edit · styles.css", "Bash · npm run build"],
+  site: ["Read · pricing.html", "Edit · pricing.html", "Edit · styles.css", "Bash · build"],
   docs: ["Grep · broken links", "Read · README.md", "Edit · guide.md"],
 };
-const AW_START = { api: 134, site: 251, docs: 48 };
+const AW_ICON = { api: "#i-anthropic", site: "#i-openai", docs: "#i-anthropic" };
 const awState = {};
-const awTime = (t) => `${Math.floor(t / 60)}m ${String(t % 60).padStart(2, "0")}s`;
+const awRows = Object.fromEntries(Object.keys(AW_STEPS).map((name) => {
+  const row = document.createElement("div");
+  row.className = "row";
+  row.innerHTML = `<svg class="brand"><use href="${AW_ICON[name]}"/></svg>${name}<span class="st"></span>` +
+    `<span class="ra"><span data-do="ok">allow</span><span data-do="no">deny</span></span>`;
+  row.addEventListener("click", (e) => {
+    const choice = e.target.closest("[data-do]")?.dataset.do;
+    if (choice) awAnswer(name, choice === "ok");
+  });
+  awList.append(row);
+  return [name, row];
+}));
 function awPaint() {
-  let need = 0, done = 0, run = 0;
+  let need = 0, done = 0, run = 0, asker = "";
+  awPips.innerHTML = "";
   for (const [name, st] of Object.entries(awState)) {
-    const row = awRows[name];
-    row.dataset.s = st.s;
-    row.querySelector("time").textContent = awTime(st.t);
-    row.querySelector(".aw-do span").textContent =
+    const row = awRows[name], tone = st.s === "need" ? "warn" : st.s === "done" ? "good" : "";
+    row.classList.toggle("asking", st.s === "need"); // not "ask": the voice demo owns .ask
+    row.dataset.tone = tone;
+    row.querySelector(".st").textContent =
       st.s === "run" ? AW_STEPS[name][st.i % AW_STEPS[name].length] : st.s === "done" ? st.note : st.ask;
-    if (st.s === "need") need++; else if (st.s === "done") done++; else run++;
+    awPips.insertAdjacentHTML("beforeend", `<i data-on="${tone || "accent"}"></i>`);
+    if (st.s === "need") { need++; asker ||= name; } else if (st.s === "done") done++; else run++;
   }
-  awTop.textContent = need ? `${need} needs you` : done ? `${done} done, ${run} working` : `${run} working`;
-  awTop.dataset.tone = need ? "warn" : done ? "good" : "";
+  awSum.querySelector("span").textContent = `${need + done + run} sessions`;
+  awSum.querySelector("b").textContent = need ? `${need} needs you` : "";
+  awLine.textContent = need ? `${asker} needs you` : done ? `${done} done, ${run} working` : `${run} working`;
+  awWho.dataset.state = need ? "listening" : done ? "wink" : "working";
+  awQc.textContent = `Message ${asker || "api"}\u2026`;
   if (!need) awPet.update({ state: "working" });
 }
 function awReset() {
-  for (const name of Object.keys(AW_STEPS)) awState[name] = { s: "run", t: AW_START[name], i: 0 };
+  for (const name of Object.keys(AW_STEPS)) awState[name] = { s: "run", i: 0 };
   awPaint();
 }
 function awStep(names) {
-  for (const name of names) {
-    const st = awState[name];
-    if (st.s !== "run") continue;
-    st.i++;
-    st.t += 9 + ((st.t * 7) % 13);
-  }
+  for (const name of names) if (awState[name].s === "run") awState[name].i++;
   awPaint();
 }
 function awDone(name, note) {
@@ -1246,62 +1230,66 @@ function awNeed(name, ask) {
 function awAnswer(name, ok) {
   const st = awState[name];
   if (st.s !== "need") return;
-  for (const b of awRows[name].querySelectorAll(".aw-ask span")) b.classList.remove("hot");
-  Object.assign(st, ok ? { s: "run", i: st.i + 1 } : { s: "done", note: "Skipped · you said no" });
+  for (const b of awRows[name].querySelectorAll(".ra span")) b.classList.remove("hot");
+  Object.assign(st, ok ? { s: "run", i: st.i + 1 } : { s: "done", note: "skipped" });
   awPaint();
   awPet.update({ state: "happy" });
   poke(awPet);
 }
-for (const [name, row] of Object.entries(awRows)) {
-  row.querySelector(".aw-ok").addEventListener("click", () => awAnswer(name, true));
-  row.querySelector(".aw-no").addEventListener("click", () => awAnswer(name, false));
-}
+awWho.addEventListener("click", () => poke(awPet));
+// no hover on a phone: a tap on the pet opens and closes the panel
+awWho.addEventListener("pointerup", (e) => { if (e.pointerType !== "mouse") awFloat.classList.toggle("on"); });
 const AW_BEATS = [
   async () => awStep(["api", "site", "docs"]),
   async () => awStep(["api", "site", "docs"]),
-  async () => awDone("site", "Done · 4 files changed"),
+  async () => awDone("site", "done · 4 files"),
   async () => awStep(["api", "docs"]),
-  async () => awNeed("docs", "Overwrite README.md?"),
+  async () => awNeed("docs", "replace README.md?"),
   async (wait) => {
     await wait(1600);
-    awRows.docs.querySelector(".aw-ok").classList.add("hot");
+    // someone hovering the panel gets to answer it themselves
+    for (let k = 0; k < 25 && awState.docs.s === "need" && awFloat.matches(":hover"); k++) await wait(400);
+    if (awState.docs.s !== "need") return;
+    awRows.docs.querySelector('[data-do="ok"]').classList.add("hot");
     await wait(450);
     awAnswer("docs", true);
   },
   async () => awStep(["api", "docs"]),
-  async () => awDone("api", "Done · tests pass"),
+  async () => awDone("api", "done · tests pass"),
   async () => awStep(["docs"]),
-  async () => awDone("docs", "Done · 9 links fixed"),
+  async () => awDone("docs", "done · links fixed"),
   async (wait) => { await wait(1200); awReset(); },
 ];
-// what you're doing meanwhile: a video, a chat with friends, a long read
+// what you're doing meanwhile, as skeletons: a video, a chat, a long read
 const awScenes = [...aw.querySelectorAll(".aw-scene")];
-const awUrl = aw.querySelector(".aw-url span");
-const awThread = aw.querySelector(".ac-thread");
-const AW_CHAT = [["them", "dinner tonight?"], ["me", "yes! ramen at 8?"], ["them", "perfect, booking it now"], ["me", "see you there"]];
+const awUrl = aw.querySelector(".aw-url .sk-line");
+const awThread = aw.querySelector(".sk-thread");
+const AW_BUBBLES = [["them", 58], ["me", 44], ["them", 74], ["me", 36], ["them", 50]];
 let awSceneN = 0, awChatTok = 0;
 async function awChatPlay() {
   const mine = ++awChatTok;
   awThread.innerHTML = "";
-  for (const [who, text] of AW_CHAT) {
-    const msg = document.createElement("p");
-    if (who === "them") {
-      msg.className = "typing";
-      msg.innerHTML = "<i></i><i></i><i></i>";
-      awThread.append(msg);
-      await sleep(calm ? 0 : 900);
+  for (const [who, width] of AW_BUBBLES) {
+    const bubble = document.createElement("i");
+    bubble.className = `sk-bubble ${who}`;
+    awThread.append(bubble);
+    if (who === "them" && !calm) {
+      bubble.classList.add("typing");
+      bubble.innerHTML = "<b></b><b></b><b></b>";
+      await sleep(900);
       if (mine !== awChatTok) return;
-    } else awThread.append(msg);
-    msg.className = who === "me" ? "me" : "";
-    msg.textContent = text;
-    await sleep(calm ? 0 : 1100);
+      bubble.classList.remove("typing");
+      bubble.innerHTML = "";
+    }
+    bubble.style.setProperty("--w", `${width}%`);
+    await sleep(calm ? 0 : 1000);
     if (mine !== awChatTok) return;
   }
 }
 function awScene(n) {
   awSceneN = n % awScenes.length;
   awScenes.forEach((sc, i) => sc.classList.toggle("on", i === awSceneN));
-  awUrl.textContent = awScenes[awSceneN].dataset.url;
+  awUrl.style.setProperty("--w", `${awScenes[awSceneN].dataset.url}%`);
   if (awScenes[awSceneN].classList.contains("aw-chat")) awChatPlay();
 }
 let awBeat = 0;
@@ -1311,7 +1299,7 @@ autoplay(aw, async (pause) => {
   if (awBeat % 4 === 3) awScene(awSceneN + 1);
   await AW_BEATS[awBeat++ % AW_BEATS.length](pause);
   await pause(1300);
-}, { onHold: () => { for (const b of aw.querySelectorAll(".aw-ask .hot")) b.classList.remove("hot"); } });
+}, { hold: false });
 
 // --- hub: one pet, every session beside it -------------------------------------
 // Eight sessions walk their own little scripts. The pet carries the loudest,
@@ -1998,8 +1986,8 @@ signed.addEventListener("pointerleave", () => build("free"));
 
 // Reduced motion gets one honest still frame per demo instead of a loop.
 if (calm) {
-  awDone("site", "Done · 4 files changed");
-  awNeed("docs", "Overwrite README.md?");
+  awDone("site", "done · 4 files");
+  awNeed("docs", "replace README.md?");
   draw();
   hub.classList.add("on");
   ctl.classList.add("on");

@@ -336,7 +336,7 @@
   .mm-head { display: flex; justify-content: space-between; gap: .5rem; font: 400 11px/1 var(--mono); color: var(--dim); }
   .mm-head span { display: inline-flex; align-items: center; gap: .3rem; }
   .mm-srcs { display: flex; flex-wrap: wrap; gap: .3rem; }
-  .mm-srcs span { display: inline-flex; align-items: center; gap: .3rem; padding: .3rem .5rem; cursor: pointer; border-radius: 999px;
+  .mm-srcs span { display: inline-flex; align-items: center; gap: .3rem; padding: .28rem .45rem; cursor: pointer; border-radius: 999px;
                   border: 1px solid var(--line-hi); font: 400 10.5px/1 var(--mono); color: var(--ink); transition: color .15s, border-color .15s; }
   .mm-srcs span .ico { color: var(--accent); }
   .mm-srcs span.off { color: var(--dim); border-style: dashed; text-decoration: line-through; }
@@ -369,6 +369,36 @@
   .mm-field { flex: 1; padding: .65rem .75rem; font: 400 13px/1 var(--body); }
   .mm-field .ico { width: 14px; height: 14px; }
   @media (max-width: 560px) { .mm { grid-template-columns: minmax(0, 1fr); grid-template-areas: "qn" "feed" "doc"; } }
+
+  /* together, an idea: each teammate's own pet in a shared space, and the
+     team's memory between them. Teammates are roles and friends' heads, not
+     invented people. */
+  .tg { place-items: stretch; gap: 1rem; }
+  .tg-team { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; }
+  .tg-mate { display: grid; justify-items: center; gap: .35rem; padding: .5rem .25rem .65rem; cursor: pointer;
+             border-radius: 12px; transition: background .25s; }
+  .tg-mate.hot { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+  .tg-mate b { font: 500 12.5px/1 var(--mono); }
+  .tg-mate .dot { font-size: 11px; }
+  .tg-pet { display: grid; place-items: center; width: 84px; aspect-ratio: 1; --fx-paw-size: 84px; }
+  .tg-pet .art { width: 76%; }
+  .tg-pet .art svg { display: block; width: 100%; height: auto; }
+  .tg-space { display: grid; gap: .65rem; padding: .7rem; background: var(--panel); border: 1px solid var(--line-hi); border-radius: 12px; }
+  .tg-head { display: flex; justify-content: space-between; gap: .5rem; font: 400 11px/1 var(--mono); color: var(--dim); }
+  .tg-head span { display: inline-flex; align-items: center; gap: .3rem; }
+  .tg-head b { font: 600 14px/1 var(--display); color: var(--ink); }
+  .tg-head .ico { width: 11px; height: 11px; }
+  .tg-lines { display: grid; align-content: start; gap: .5rem; height: 128px; overflow: hidden; }
+  .tg-lines p { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: .15rem .55rem; margin: 0;
+                font: 400 12.5px/1.3 var(--body); color: var(--ink); }
+  .tg-lines p img { grid-row: span 2; width: 22px; height: 22px; object-fit: contain; }
+  .tg-lines p small { grid-column: 2; font: 400 10px/1 var(--mono); color: var(--dim); }
+  .tg-lines .take { grid-row: span 2; padding: .35rem .6rem; border-radius: 999px; font: 600 11px/1 var(--display);
+                    color: #1b1c17; background: var(--accent); transition: box-shadow .2s, opacity .2s; }
+  .tg-lines .take.hot { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+  .tg-lines .take.done { opacity: 0; }
+  @media (prefers-reduced-motion: no-preference) { .tg-lines p:first-child { animation: pop .3s ease-out; } }
+  @media (max-width: 560px) { .tg-pet { width: 64px; --fx-paw-size: 64px; } .tg-mate .dot { font-size: 10px; } }
 
   /* surfaces: the pet draws a panel for the moment, you use it, it dissolves */
   .surfaces { grid-template-columns: auto minmax(0, 290px); justify-content: center; gap: 2rem; }
@@ -569,6 +599,9 @@
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></symbol>
+  <symbol id="i-meet" viewBox="0 0 24 24"><rect x="3" y="6" width="12" height="12" rx="2"/><path d="M15 10l6-3v10l-6-3"/></symbol>
+  <symbol id="i-apps" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3v5M12 16v5M3 12h5M16 12h5"/><path d="M6 6l3 3M15 15l3 3M6 18l3-3M15 9l3-3"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4.5 7.5 12 13l7.5-5.5"/></symbol>
   <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></symbol>
@@ -689,16 +722,20 @@
 
       <article class="feature">
         <span class="k">memory</span>
-        <h2>It remembers what you do, and writes it down.</h2>
-        <p>It watches only what you let it: notes, pages, terminal, sessions. What matters lands in memory pages you can read, search, edit and delete; hand it a note any time. On your Mac by default. After the first release.</p>
+        <h2>It remembers everything you do, and writes it down.</h2>
+        <p>Meetings, mail, chat, the apps you work in, pages, notes, terminal, sessions: it watches whatever you allow. What matters lands in memory pages you can read, search, edit and delete; hand it a note any time. Switch any source off. On your Mac by default. After the first release.</p>
         <div class="demo mm" aria-hidden="true">
           <div class="mm-feed">
             <div class="mm-head"><span>seen</span><span><svg class="ico"><use href="#i-lock"/></svg> on this Mac</span></div>
             <div class="mm-srcs">
-              <span data-src="note"><svg class="ico"><use href="#i-note"/></svg>notes</span>
+              <span data-src="meet"><svg class="ico"><use href="#i-meet"/></svg>meetings</span>
+              <span data-src="mail"><svg class="ico"><use href="#i-mail"/></svg>mail</span>
+              <span data-src="chat"><svg class="ico"><use href="#i-chat"/></svg>chat</span>
+              <span data-src="app"><svg class="ico"><use href="#i-apps"/></svg>apps</span>
               <span data-src="web"><svg class="ico"><use href="#i-globe"/></svg>browser</span>
+              <span data-src="note"><svg class="ico"><use href="#i-note"/></svg>notes</span>
               <span data-src="term"><svg class="ico"><use href="#i-term"/></svg>terminal</span>
-              <span data-src="session"><svg class="ico"><use href="#i-chat"/></svg>sessions</span>
+              <span data-src="session"><svg class="ico"><use href="#i-spark"/></svg>sessions</span>
             </div>
             <div class="mm-list"></div>
           </div>
@@ -710,6 +747,24 @@
           <div class="mm-qn">
             <div class="host"></div>
             <div class="mm-field"><svg class="ico"><use href="#i-note"/></svg><span>Quick note&hellip;</span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="feature">
+        <span class="k">together</span>
+        <h2>Your pets, working as a team.</h2>
+        <p>An idea we're exploring. Teammates keep their own pets and share a space when they choose: see who's on what, hand a session over, ask the team's memory. It would need opt-in sync, since memory stays on your Mac by default.</p>
+        <div class="demo tg" aria-hidden="true">
+          <div class="tg-team">
+            <div class="tg-mate" data-mate="you" data-state="working"><div class="tg-pet"><div class="host"></div></div><b>you</b><span class="dot">on api</span></div>
+            <div class="tg-mate" data-mate="fox" data-state="listening"><div class="tg-pet"></div><b>backend</b><span class="dot">in a meeting</span></div>
+            <div class="tg-mate" data-mate="cat" data-state="working"><div class="tg-pet"></div><b>design</b><span class="dot">on site</span></div>
+          </div>
+          <div class="tg-space">
+            <div class="tg-head"><span>team space / <b>launch</b></span><span><svg class="ico"><use href="#i-lock"/></svg> opt-in sync</span></div>
+            <div class="tg-lines"></div>
+            <div class="mm-search tg-ask"><svg class="ico"><use href="#i-search"/></svg><span>Ask the team's memory&hellip;</span></div>
           </div>
         </div>
       </article>
@@ -1358,7 +1413,10 @@ const mmCrumb = mm.querySelector(".mm-crumb b");
 const mmLines = mm.querySelector(".mm-lines");
 const mmSearch = mm.querySelector(".mm-search"), mmQuery = mmSearch.querySelector("span");
 const mmField = mm.querySelector(".mm-field"), mmNote = mmField.querySelector("span");
-const MM_SRC = { note: ["#i-note", "notes"], web: ["#i-globe", "browser"], term: ["#i-term", "terminal"], session: ["#i-chat", "sessions"] };
+const MM_SRC = {
+  meet: ["#i-meet", "a meeting"], mail: ["#i-mail", "mail"], chat: ["#i-chat", "chat"], app: ["#i-apps", "an app"],
+  web: ["#i-globe", "browser"], note: ["#i-note", "notes"], term: ["#i-term", "terminal"], session: ["#i-spark", "sessions"],
+};
 const MM_PAGES = {
   api: [["Deploys go through staging first", "session"]],
   site: [["Hero copy lives in site/copy.md", "note"]],
@@ -1367,11 +1425,14 @@ const MM_PAGES = {
   "to do": [],
 };
 const MM_SEEN = [
-  { src: "web", said: "Read: exponential backoff for webhooks", page: "api", line: "Webhook retries should back off exponentially" },
+  { src: "meet", said: "Design review, 30 min", page: "site", line: "Decided: the dark theme ships first" },
   { src: "term", said: "npm test failed: Docker isn't running", page: "api", line: "Tests need Docker running" },
-  { src: "note", said: "Standup: pricing page ships Friday", page: "site", line: "Pricing page ships Friday" },
+  { src: "mail", said: "Invoices are due on the 30th", page: "to do", line: "Pay the invoices by the 30th" },
+  { src: "app", said: "Design app: edited the pricing mock-up", page: "site", line: "The pricing mock-up has a new layout" },
+  { src: "chat", said: "Backend asked for the deploy checklist", page: "to do", line: "Send backend the deploy checklist" },
+  { src: "web", said: "Read: exponential backoff for webhooks", page: "api", line: "Webhook retries should back off exponentially" },
   { src: "session", said: "docs fixed the broken links", page: "docs", line: "Broken links in the API guide are fixed" },
-  { src: "web", said: "Read: Swift actors, a primer", page: "you", line: "Learning Swift concurrency" },
+  { src: "note", said: "Standup: pricing page ships Friday", page: "site", line: "Pricing page ships Friday" },
 ];
 const MM_NOTES = ["renew the domain before Friday", "try the new icon in the dock"];
 const MM_QUERIES = ["docker", "friday"];
@@ -1480,6 +1541,99 @@ autoplay(mm, async (pause) => {
   }
   await pause(1500); // every source is off: nothing to see
 }, { onHold: () => { mmReset(); mmOpen(mmPage); } });
+
+// --- together, an idea: teammates' pets in one space --------------------------------
+// You are the engine pet; teammates are friends' heads wearing engine eyes, the
+// same way the grid does it. A loop of four beats: a meeting ends, a teammate
+// shares work, a session is handed to you, someone asks the team's memory.
+const tg = document.querySelector(".demo.tg");
+const tgMates = Object.fromEntries([...tg.querySelectorAll(".tg-mate")].map((m) => [m.dataset.mate, { el: m, pet: null }]));
+tgMates.you.pet = pet(tgMates.you.el.querySelector(".host"), "working");
+const tgLines = tg.querySelector(".tg-lines");
+const tgAsk = tg.querySelector(".tg-ask"), tgQuery = tgAsk.querySelector("span");
+const TG_FACE = { you: "/favicon.png", fox: "/friends/fox.svg", cat: "/friends/cat.svg" };
+const TG_START = { you: ["working", "on api"], fox: ["listening", "in a meeting"], cat: ["working", "on site"] };
+let tgBeat = 0, tgTok = 0;
+for (const name of ["fox", "cat"]) {
+  if (!headSvg.has(name)) headSvg.set(name, fetch(`/friends/${name}.svg`).then((r) => r.text()));
+  headSvg.get(name).then((svg) => {
+    const holder = tgMates[name].el.querySelector(".tg-pet");
+    holder.innerHTML = `<div class="art">${svg}</div>`;
+    tagEyes(holder.querySelector("svg"));
+    tgMates[name].pet = socketEyes(holder);
+    tgMates[name].pet?.update({ state: tgMates[name].el.dataset.state });
+  });
+}
+function tgStatus(name, state, text) {
+  const m = tgMates[name];
+  m.el.dataset.state = state;
+  m.el.querySelector(".dot").textContent = text;
+  m.pet?.update({ state });
+}
+function tgNudge(name) {
+  const m = tgMates[name];
+  m.el.classList.add("hot");
+  setTimeout(() => m.el.classList.remove("hot"), 900);
+  if (m.pet) poke(m.pet);
+}
+function tgSay(name, text, from, take) {
+  const line = document.createElement("p");
+  line.innerHTML = `<img src="${TG_FACE[name]}" alt=""><span></span><small></small>${take ? `<span class="take">Take it</span>` : ""}`;
+  line.querySelector("span").textContent = text;
+  line.querySelector("small").textContent = from;
+  tgLines.prepend(line);
+  while (tgLines.children.length > 3) tgLines.lastElementChild.remove();
+  return line;
+}
+async function tgAskScene(wait) {
+  tgNudge("you");
+  await mmType(tgAsk, tgQuery, "how do we deploy?", wait);
+  await wait(400);
+  tgAsk.removeAttribute("data-typed");
+  tgQuery.textContent = "Ask the team's memory\u2026";
+  tgSay("fox", "Staging first, then production after the smoke test", "backend's memory · from a session");
+  tgNudge("fox");
+  await wait(2200);
+}
+const TG_BEATS = [
+  async (wait) => {
+    for (const [name, [state, text]] of Object.entries(TG_START)) tgStatus(name, state, text);
+    await wait(1400);
+    tgStatus("fox", "wink", "out of the meeting");
+    tgSay("fox", "Decided: billing moves to the new API next week", "backend · from a meeting");
+    tgNudge("fox");
+    await wait(2400);
+  },
+  async (wait) => {
+    tgSay("cat", "The pricing mock-up is ready for review", "design · from the design app");
+    tgNudge("cat");
+    await wait(2400);
+  },
+  async (wait) => {
+    const take = tgSay("fox", "Handing you api: the migration", "backend → you", true).querySelector(".take");
+    tgNudge("fox");
+    await wait(1300);
+    take.classList.add("hot");
+    await wait(450);
+    take.classList.add("done");
+    setTimeout(() => take.remove(), 220); // faded out; give the line its height back
+    tgStatus("fox", "idle", "free");
+    tgStatus("you", "focused", "on api · migration");
+    tgNudge("you");
+    await wait(2200);
+  },
+  tgAskScene,
+];
+for (const name of Object.keys(tgMates)) tgMates[name].el.addEventListener("click", () => tgNudge(name));
+tgAsk.addEventListener("click", async () => {
+  const mine = ++tgTok;
+  try { await tgAskScene(async (ms) => { await sleep(ms); if (mine !== tgTok) throw "superseded"; }); } catch {}
+});
+tgSay("cat", "Dock icons are exported", "design · from the design app");
+tgSay("you", "Launch checklist is up to date", "you · from notes");
+autoplay(tg, (pause) => TG_BEATS[tgBeat++ % TG_BEATS.length](pause), {
+  onHold: () => { tgAsk.removeAttribute("data-typed"); tgQuery.textContent = "Ask the team's memory\u2026"; },
+});
 
 // --- surfaces: a panel for the moment, then gone -----------------------------------
 // Three throwaway panels the pet might draw. Each has one obvious answer; the

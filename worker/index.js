@@ -1,5 +1,6 @@
 // worker/index.js — the only server-side code the site has: one endpoint that
-// writes a pre-order email into D1.
+// writes a founder email into D1, and a count so the card's progress bar can
+// show a real number instead of an invented one.
 //
 // Created 2026-09-15, replacing a "file a GitHub issue" pre-order link. That
 // link asked a buyer for a GitHub account and then published their interest
@@ -20,6 +21,17 @@ const looksLikeEmail = (s) => /^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(s) && s.length 
 export default {
   async fetch(request, env) {
     const { pathname } = new URL(request.url);
+    // The card's bar reads this. It is the real row count, never a made-up
+    // number: if this endpoint is missing or down, the page hides the bar.
+    if (pathname === "/api/preorder/count") {
+      if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });
+      try {
+        const row = await env.DB.prepare("SELECT COUNT(*) AS c FROM preorders").first();
+        return json({ count: row.c });
+      } catch {
+        return json({ error: "No counter yet." }, 500);
+      }
+    }
     if (pathname !== "/api/preorder") return new Response("Not found", { status: 404 });
     if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
 

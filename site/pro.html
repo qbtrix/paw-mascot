@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Paw Pro - the hub, the voice, and more friends</title>
-<meta name="description" content="Paw Pro turns the desktop pet into a control surface: every session at a glance, quick chat, voice, and a pack of new friends. A native Mac app in the works. Lock the founder price.">
+<meta name="description" content="A native Mac app in the works: every session at a glance, quick chat and voice from the pet, and new friends. The first 250 founders lock $19.">
 <link rel="canonical" href="https://pet.pocketpaw.xyz/pro">
 <meta name="theme-color" content="#252621">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Paw Pro - the hub, the voice, and more friends">
-<meta property="og:description" content="Every session at a glance, quick chat, voice, and new friends. A native Mac app in the works. Lock the founder price.">
+<meta property="og:description" content="Every session at a glance, quick chat and voice from the pet, new friends. The first 250 founders lock $19.">
 <meta property="og:url" content="https://pet.pocketpaw.xyz/pro">
 <meta property="og:image" content="https://pet.pocketpaw.xyz/og.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -33,7 +33,8 @@
   said as "in the works" and nothing more. The surfaces block is the
   ephemeral-UI plan, marked as after the first release; its internal name
   stays off the page. Every CTA says lock the price; the old ordering
-  wording is gone from the page. The control demo's gear opens the pet's own
+  wording is gone from the page. The founder bar under the amount fetches
+  /api/preorder/count and stays hidden unless a real number comes back. The control demo's gear opens the pet's own
   settings: picking a pet swaps the one beside it for a flat CC BY friend
   wearing the engine's eyes, exactly as the grid below does (never
   engine-mountable art),
@@ -452,6 +453,15 @@
   #preorder, #friends-section { scroll-margin-top: 90px; }
   .amount small { display: block; margin-top: .45rem; font: 500 11.5px/1 var(--mono); color: var(--dim); letter-spacing: .06em; }
   .price-card .signup { justify-self: stretch; }
+  /* the founder bar. It only appears once /api/preorder/count answers, so the
+     number is always the real row count -- never a prop. */
+  .claimed { display: none; width: 100%; gap: .4rem; }
+  .claimed[data-live] { display: grid; }
+  .claimed i { position: relative; height: 6px; overflow: hidden; border-radius: 3px; background: var(--line); }
+  .claimed i::after { content: ""; position: absolute; inset: 0 auto 0 0; width: max(calc(var(--k) * 100%), 6px);
+                      border-radius: inherit; background: var(--accent); transition: width .7s cubic-bezier(.3, .7, .2, 1); }
+  .claimed span { font: 400 11px/1 var(--mono); color: var(--dim); }
+  .claimed b { font-weight: 500; color: var(--ink); }
   /* On a phone the waitlist comes first: five tall demos is a long way to
      scroll to find out what any of it costs. This must sit after the sticky
      rule above -- earlier in the sheet it loses, and a sticky card at the top
@@ -726,6 +736,7 @@
         <div class="pet" aria-hidden="true"></div>
         <div class="amount"><span class="was">$39</span>$19<small>FIRST 250 FOUNDERS &middot; LIFETIME</small></div>
       </div>
+      <div class="claimed"><i style="--k:0"></i><span><b>0</b> of 250 locked</span></div>
       <form class="signup" id="preorder" novalidate>
         <label class="sr" for="email">Your email</label>
         <input id="email" name="email" type="email" inputmode="email" autocomplete="email"
@@ -735,7 +746,7 @@
         <button class="cta" type="submit">Lock the price</button>
         <p class="say" role="status" aria-live="polite"></p>
       </form>
-      <div class="fine">Pro launches at $39; the first 250 founders lock $19 for life. Pro ships later, macOS first. The free pet is yours today and stays MIT forever. Your address is only ever used to tell you when Pro opens.</div>
+      <div class="fine">Pro launches at $39. The first 250 founders lock $19 for life. It ships later, macOS first. The free pet is yours today and stays MIT forever. We use your address once: to tell you when Pro opens.</div>
     </div>
   </div>
 </section>
@@ -836,6 +847,22 @@ function autoplay(stage, scene, { hold = true, onHold } = {}) {
 // --- top: the pet in its native window, busy being built -------------------------
 pet(document.querySelector(".mac .host"), "working");
 
+// --- the founder bar: the real count, or nothing --------------------------------
+const claimed = document.querySelector(".claimed");
+async function drawCount() {
+  try {
+    const r = await fetch("/api/preorder/count");
+    if (!r.ok) return;
+    const { count } = await r.json();
+    if (typeof count !== "number") return;
+    const n = Math.min(count, 250);
+    claimed.querySelector("i").style.setProperty("--k", n / 250);
+    claimed.querySelector("span").innerHTML = `<b>${n}</b> of 250 locked`;
+    claimed.setAttribute("data-live", "");
+  } catch {}
+}
+drawCount();
+
 // --- the waitlist ---------------------------------------------------------------
 // The card's pet watches the form: it listens while you type, thinks while
 // the address is on its way, and winks once you are in.
@@ -854,7 +881,7 @@ form.email.addEventListener("input", () => { if (say.hasAttribute("data-bad")) {
 form.addEventListener("submit", async (ev) => {
   ev.preventDefault();
   const email = form.email.value.trim();
-  if (!email) { flinch("confused"); return tell("An email address, and the price is locked.", "bad"); }
+  if (!email) { flinch("confused"); return tell("We need an email to lock it.", "bad"); }
   form.setAttribute("data-busy", "");
   cardPet.update({ state: "thinking" });
   tell("Adding you…");
@@ -868,9 +895,10 @@ form.addEventListener("submit", async (ev) => {
     if (!res.ok) throw new Error(out.error || "That did not go through. Try again in a moment.");
     form.reset();
     form.dataset.done = "1";
+    drawCount();
     cardPet.update({ state: "wink" });
     poke(cardPet);
-    tell("Price locked. We will write when checkout opens — nothing else.", "good");
+    tell("Price locked. One email when checkout opens, nothing more.", "good");
   } catch (err) {
     flinch("confused");
     tell(err.message, "bad");

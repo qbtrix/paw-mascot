@@ -137,6 +137,60 @@
          stroke-linecap: round; stroke-linejoin: round; flex: none; }
   .brand { width: 13px; height: 13px; fill: currentColor; flex: none; }
 
+  /* away: the headline. Agents take minutes, so the pet floats over whatever
+     you're doing -- here, a long read in a browser -- with a small live panel.
+     Only what the hooks can really see: the tool and file it's on, time
+     elapsed, done, or waiting on you. No invented progress percentages. */
+  .aw { min-height: 380px; padding: 0; place-items: stretch; }
+  .aw-win { position: absolute; inset: 1rem; display: grid; grid-template-rows: auto 1fr; overflow: hidden;
+            background: #1c1d19; border: 1px solid var(--line); border-radius: 10px; }
+  .aw-bar { display: flex; align-items: center; gap: .75rem; padding: .5rem .7rem; border-bottom: 1px solid var(--line); }
+  .aw-lights { display: flex; gap: 5px; }
+  .aw-lights i { width: 9px; height: 9px; border-radius: 50%; background: var(--line-hi); }
+  .aw-url { display: inline-flex; align-items: center; gap: .35rem; min-width: 0; margin: 0 auto; padding: .3rem .7rem; border-radius: 6px;
+            background: var(--well); font: 400 11px/1 var(--mono); color: var(--dim); white-space: nowrap; overflow: hidden; }
+  .aw-url .ico { width: 10px; height: 10px; flex: none; }
+  .aw-page { position: relative; overflow: hidden; padding: 1.3rem 1.5rem; }
+  .aw-read { display: grid; gap: .55rem; width: min(100%, 360px); }
+  .aw-read i { display: block; height: 6px; width: var(--w, 100%); border-radius: 4px; background: var(--line); }
+  .aw-read i.h { width: 58%; height: 13px; margin-bottom: .5rem; background: var(--line-hi); }
+  .aw-read i.gap { height: 2px; background: none; }
+  .aw-read i.img { height: 80px; border-radius: 8px; background: color-mix(in srgb, var(--line) 65%, transparent); }
+  @media (prefers-reduced-motion: no-preference) { .aw-read { animation: read 22s ease-in-out infinite alternate; } }
+  @keyframes read { to { translate: 0 -38%; } }
+  .aw-panel { position: absolute; right: 1.75rem; bottom: 1.75rem; width: min(292px, calc(100% - 3.5rem)); display: grid; gap: .1rem;
+              padding: .45rem; background: color-mix(in srgb, var(--panel) 90%, transparent); backdrop-filter: blur(10px);
+              border: 1px solid var(--line-hi); border-radius: 12px; box-shadow: 0 18px 40px -16px rgba(0, 0, 0, .75); }
+  .aw-panel > .host { position: absolute; top: -60px; right: .4rem; --fx-paw-size: 78px; }
+  .aw-top { display: flex; justify-content: space-between; gap: .5rem; padding: .35rem .5rem .55rem; margin-bottom: .15rem;
+            border-bottom: 1px solid var(--line); font: 400 11px/1 var(--mono); color: var(--dim); }
+  .aw-top b { font-weight: 400; color: var(--accent); }
+  .aw-top b[data-tone="warn"] { color: var(--warn); }
+  .aw-top b[data-tone="good"] { color: var(--good); }
+  .aw-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "icon name time" ". do do" ". ask ask";
+            align-items: center; gap: .25rem .5rem; padding: .45rem .5rem; border-radius: 8px; transition: background .3s; }
+  .aw-row .brand { grid-area: icon; color: var(--dim); }
+  .aw-row b { grid-area: name; font: 500 12px/1 var(--mono); }
+  .aw-row time { grid-area: time; font: 400 10.5px/1 var(--mono); color: var(--dim); font-variant-numeric: tabular-nums; }
+  .aw-do { grid-area: do; display: flex; align-items: center; gap: .45rem; min-width: 0; font: 400 11.5px/1.2 var(--mono); color: var(--dim); }
+  .aw-do span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .aw-do::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .aw-row[data-s="done"] .aw-do { color: var(--good); }
+  .aw-row[data-s="done"] .aw-do::before { background: var(--good); }
+  .aw-row[data-s="need"] { background: color-mix(in srgb, var(--warn) 10%, transparent); }
+  .aw-row[data-s="need"] .aw-do { color: var(--warn); }
+  .aw-row[data-s="need"] .aw-do::before { background: var(--warn); }
+  .aw-ask { grid-area: ask; display: none; gap: .35rem; margin-top: .2rem; }
+  .aw-row[data-s="need"] .aw-ask { display: flex; }
+  .aw-ask span { cursor: pointer; padding: .32rem .65rem; border-radius: 999px; border: 1px solid var(--line-hi);
+                 font: 600 11px/1 var(--display); color: var(--dim); transition: box-shadow .2s; }
+  .aw-ask .aw-ok { color: #1b1c17; background: var(--accent); border-color: var(--accent); }
+  .aw-ask span.hot { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+  @media (prefers-reduced-motion: no-preference) {
+    .aw-row[data-s="run"] .aw-do::before { animation: wip 1.4s ease-in-out infinite; }
+  }
+  @media (max-width: 560px) { .aw { min-height: 400px; } .aw-read { width: 100%; } }
+
   /* hub: one pet, every session in a list beside it -- the control menu's
      move, but a list, and it scrolls because people run a lot of sessions */
   .feature:has(> .hub) { container-type: inline-size; }
@@ -628,6 +682,25 @@
     <div class="features">
 
       <article class="feature">
+        <span class="k">away</span>
+        <h2>Agents take a while. Go do something else.</h2>
+        <p>While Claude Code or Codex work, you're off reading or in another app. The pet floats over it with a small live panel: what each agent is on, how long it's been, when it's done, when it needs you. Answer there and keep going. No more watching a terminal.</p>
+        <div class="demo aw" aria-hidden="true">
+          <div class="aw-win">
+            <div class="aw-bar"><span class="aw-lights"><i></i><i></i><i></i></span><span class="aw-url"><svg class="ico"><use href="#i-lock"/></svg>docs.example.dev/guides/long-read</span></div>
+            <div class="aw-page"><div class="aw-read"><i class="h"></i><i style="--w:92%"></i><i style="--w:97%"></i><i style="--w:88%"></i><i style="--w:95%"></i><i style="--w:60%"></i><i class="gap"></i><i style="--w:96%"></i><i style="--w:90%"></i><i style="--w:94%"></i><i style="--w:72%"></i><i class="gap"></i><i style="--w:93%"></i><i style="--w:98%"></i><i style="--w:85%"></i><i style="--w:91%"></i><i style="--w:55%"></i><i class="gap"></i><i style="--w:95%"></i><i style="--w:89%"></i><i style="--w:97%"></i><i style="--w:80%"></i><i class="gap"></i><i style="--w:94%"></i><i style="--w:92%"></i><i style="--w:66%"></i><i class="img"></i></div></div>
+          </div>
+          <div class="aw-panel">
+            <div class="host"></div>
+            <div class="aw-top"><span>while you're away</span><b></b></div>
+            <div class="aw-row" data-name="api"><svg class="brand"><use href="#i-anthropic"/></svg><b>api</b><time></time><span class="aw-do"><span></span></span><span class="aw-ask"><span class="aw-ok">Allow</span><span class="aw-no">Deny</span></span></div>
+            <div class="aw-row" data-name="site"><svg class="brand"><use href="#i-openai"/></svg><b>site</b><time></time><span class="aw-do"><span></span></span><span class="aw-ask"><span class="aw-ok">Allow</span><span class="aw-no">Deny</span></span></div>
+            <div class="aw-row" data-name="docs"><svg class="brand"><use href="#i-anthropic"/></svg><b>docs</b><time></time><span class="aw-do"><span></span></span><span class="aw-ask"><span class="aw-ok">Allow</span><span class="aw-no">Deny</span></span></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="feature">
         <span class="k">hub</span>
         <h2>Every session, one pet.</h2>
         <p>Hover the pet and every session lines up beside it. Chat right there, or jump into the app. Click the pet and it wakes to listen.</p>
@@ -1025,6 +1098,99 @@ form.addEventListener("submit", async (ev) => {
   }
 }
 document.querySelector('header .cta').addEventListener("click", () => setTimeout(() => form.email.focus({ preventScroll: true }), 350));
+
+// --- away: the pet floats over whatever you're doing ------------------------------
+// Three agents working while you read. Each beat moves them on: a new tool and
+// file, time passing; one finishes, one asks before overwriting a file, the
+// loop presses Allow, and it goes back to work. You never open a terminal.
+const aw = document.querySelector(".demo.aw");
+const awPet = pet(aw.querySelector(".aw-panel > .host"), "working");
+const awTop = aw.querySelector(".aw-top b");
+const awRows = Object.fromEntries([...aw.querySelectorAll(".aw-row")].map((r) => [r.dataset.name, r]));
+const AW_STEPS = {
+  api: ["Read · 12 files", "Edit · routes.ts", "Bash · npm test", "Edit · auth.ts", "Bash · npm test"],
+  site: ["Read · pricing.html", "Edit · pricing.html", "Edit · styles.css", "Bash · npm run build"],
+  docs: ["Grep · broken links", "Read · README.md", "Edit · guide.md"],
+};
+const AW_START = { api: 134, site: 251, docs: 48 };
+const awState = {};
+const awTime = (t) => `${Math.floor(t / 60)}m ${String(t % 60).padStart(2, "0")}s`;
+function awPaint() {
+  let need = 0, done = 0, run = 0;
+  for (const [name, st] of Object.entries(awState)) {
+    const row = awRows[name];
+    row.dataset.s = st.s;
+    row.querySelector("time").textContent = awTime(st.t);
+    row.querySelector(".aw-do span").textContent =
+      st.s === "run" ? AW_STEPS[name][st.i % AW_STEPS[name].length] : st.s === "done" ? st.note : st.ask;
+    if (st.s === "need") need++; else if (st.s === "done") done++; else run++;
+  }
+  awTop.textContent = need ? `${need} needs you` : done ? `${done} done, ${run} working` : `${run} working`;
+  awTop.dataset.tone = need ? "warn" : done ? "good" : "";
+  if (!need) awPet.update({ state: "working" });
+}
+function awReset() {
+  for (const name of Object.keys(AW_STEPS)) awState[name] = { s: "run", t: AW_START[name], i: 0 };
+  awPaint();
+}
+function awStep(names) {
+  for (const name of names) {
+    const st = awState[name];
+    if (st.s !== "run") continue;
+    st.i++;
+    st.t += 9 + ((st.t * 7) % 13);
+  }
+  awPaint();
+}
+function awDone(name, note) {
+  Object.assign(awState[name], { s: "done", note });
+  awPaint();
+  awPet.update({ state: "wink" });
+  poke(awPet);
+}
+function awNeed(name, ask) {
+  Object.assign(awState[name], { s: "need", ask });
+  awPaint();
+  awPet.update({ state: "listening" });
+  awPet.engine.react("startle", awPet.clock(), 0.7);
+}
+function awAnswer(name, ok) {
+  const st = awState[name];
+  if (st.s !== "need") return;
+  for (const b of awRows[name].querySelectorAll(".aw-ask span")) b.classList.remove("hot");
+  Object.assign(st, ok ? { s: "run", i: st.i + 1 } : { s: "done", note: "Skipped · you said no" });
+  awPaint();
+  awPet.update({ state: "happy" });
+  poke(awPet);
+}
+for (const [name, row] of Object.entries(awRows)) {
+  row.querySelector(".aw-ok").addEventListener("click", () => awAnswer(name, true));
+  row.querySelector(".aw-no").addEventListener("click", () => awAnswer(name, false));
+}
+const AW_BEATS = [
+  async () => awStep(["api", "site", "docs"]),
+  async () => awStep(["api", "site", "docs"]),
+  async () => awDone("site", "Done · 4 files changed"),
+  async () => awStep(["api", "docs"]),
+  async () => awNeed("docs", "Overwrite README.md?"),
+  async (wait) => {
+    await wait(1600);
+    awRows.docs.querySelector(".aw-ok").classList.add("hot");
+    await wait(450);
+    awAnswer("docs", true);
+  },
+  async () => awStep(["api", "docs"]),
+  async () => awDone("api", "Done · tests pass"),
+  async () => awStep(["docs"]),
+  async () => awDone("docs", "Done · 9 links fixed"),
+  async (wait) => { await wait(1200); awReset(); },
+];
+let awBeat = 0;
+awReset();
+autoplay(aw, async (pause) => {
+  await AW_BEATS[awBeat++ % AW_BEATS.length](pause);
+  await pause(1300);
+}, { onHold: () => { for (const b of aw.querySelectorAll(".aw-ask .hot")) b.classList.remove("hot"); } });
 
 // --- hub: one pet, every session beside it -------------------------------------
 // Eight sessions walk their own little scripts. The pet carries the loudest,
@@ -1711,6 +1877,8 @@ signed.addEventListener("pointerleave", () => build("free"));
 
 // Reduced motion gets one honest still frame per demo instead of a loop.
 if (calm) {
+  awDone("site", "Done · 4 files changed");
+  awNeed("docs", "Overwrite README.md?");
   draw();
   hub.classList.add("on");
   ctl.classList.add("on");

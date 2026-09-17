@@ -40,7 +40,8 @@
   link comes back here as ?confirmed=<founder number> (or =bad).
   Smooth scrolling comes from the vendored /lenis.mjs, off for reduced motion.
   Every feature description is held to about twenty words; the long ones
-  added with the away, memory and team blocks were cut down to that. The card's fine print is
+  added with the away, memory and team blocks were cut down to that.
+  The header mark is the pet's eyes alone, same cut as the home page. The card's fine print is
   three icon one-liners; macOS-first and ships-later live in the top band
   only, said once. The control demo's gear opens the pet's own
   settings: picking a pet swaps the one beside it for a flat CC BY friend
@@ -85,7 +86,12 @@
   }
   .mark { display: flex; align-items: center; gap: .6rem; text-decoration: none;
           font: 600 21px/1 "Baloo 2", var(--display); }
-  .mark .paw { --fx-paw-size: 28px; --fx-paw-ground: none; }
+  /* The mark is the pet's eyes alone, the same eyes-only cut the Pro page's
+     friends wear: the engine still blinks them, the body is hidden. */
+  .mark .paw { --fx-paw-size: 96px; --fx-paw-ground: none; margin: -34px -32px -34px -36px; }
+  .mark .fx-paw-svg { filter: drop-shadow(0 0 3px var(--fx-paw-glow, rgba(140, 198, 255, .5))); }
+  .mark .fx-paw-ground, .mark .fx-paw-back, .mark .fx-paw-part,
+  .mark .fx-paw-mouth, .mark .fx-paw-marks { display: none; }
   .back { justify-self: start; color: var(--dim); text-decoration: none; font-size: 13.5px; }
   .back:hover { color: var(--ink); }
   .cta { font: 600 13.5px/1 var(--display); color: #1b1c17; background: var(--accent);

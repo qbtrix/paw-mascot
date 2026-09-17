@@ -59,6 +59,10 @@
   footer has one) and Pro took the accent; on a phone the header wraps to two
   rows. Fonts load from a <link> with preconnect instead of @import, the engine
   is modulepreloaded, and the grid tiles pause while the page scrolls.
+  Then: the header has a ghost download icon that glides to the footer (#get),
+  the logo is the pet's eyes alone, and the default charcoal room gives the
+  mascots a pale green rim to match its olive ground. The demo pet shares the
+  grid's tokens, floor glow included, so no violet shows anywhere.
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -92,6 +96,9 @@
   :root[data-theme="ink"] {
     --bg: #141a27; --panel: #1a2131; --well: #10151f;
     --line: #252d40; --line-hi: #364259; --ink: #e9edf7; --dim: #8a94ab;
+    --paw-rim-a: #ffffff; --paw-rim-b: #e6f1ff; --paw-rim-c: #a9d1ff;
+    --paw-rim-d: #8cc6ff; --paw-rim-e: #cfe5ff;
+    --paw-glow: rgba(140, 198, 255, .45); --paw-halo: #6aa9e6; --paw-eye: #f7fbff;
   }
   :root[data-theme="ember"] {
     --bg: #241f1a; --panel: #2a241e; --well: #1c1815;
@@ -149,7 +156,7 @@
   /* --- header: wordmark, filters, themes, Pro; one line, two on a phone ---- */
   header {
     position: sticky; top: 0; z-index: 5; height: 72px;
-    display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 1.5rem;
+    display: grid; grid-template-columns: auto 1fr auto auto auto; align-items: center; gap: 1.5rem;
     padding: 0 clamp(1rem, 3vw, 2.5rem);
     background: color-mix(in srgb, var(--bg) 88%, transparent);
     backdrop-filter: blur(10px); border-bottom: 1px solid var(--line);
@@ -159,7 +166,12 @@
      stays in the working faces. */
   .mark { display: flex; align-items: center; gap: .6rem; text-decoration: none;
           font: 600 21px/1 "Baloo 2", var(--display); letter-spacing: 0; }
-  .mark .paw { --fx-paw-size: 28px; --fx-paw-ground: none; }
+  /* The mark is the pet's eyes alone, the same eyes-only cut the Pro page's
+     friends wear: the engine still blinks them, the body is hidden. */
+  .mark .paw { --fx-paw-size: 96px; --fx-paw-ground: none; margin: -34px -32px -34px -36px; }
+  .mark .fx-paw-svg { filter: drop-shadow(0 0 3px var(--paw-glow, rgba(176, 226, 160, .5))); }
+  .mark .fx-paw-ground, .mark .fx-paw-back, .mark .fx-paw-part,
+  .mark .fx-paw-mouth, .mark .fx-paw-marks { display: none; }
   .pills { display: flex; gap: .4rem; justify-content: center; }
   .pill {
     font: 500 13px/1 var(--body); color: var(--dim); background: transparent;
@@ -184,13 +196,21 @@
   }
   .cta:hover { filter: brightness(1.06); }
   .cta:active { transform: scale(.98); }
+  /* Download lives in the footer; the header only points at it. */
+  .ghost { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+           color: var(--dim); border: 1px solid var(--line); transition: color .18s, border-color .18s; }
+  .ghost:hover { color: var(--ink); border-color: var(--line-hi); }
+  .ghost svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8;
+               stroke-linecap: round; stroke-linejoin: round; }
   /* A phone gets two rows: name and Pro on top, filters and themes under. On
      one row the swatches ran off the right edge and the page scrolled sideways. */
   @media (max-width: 760px) {
-    header { height: auto; grid-template-columns: 1fr auto; row-gap: .6rem; column-gap: .75rem;
-             grid-template-areas: "mark pro" "pills themes"; padding-block: .7rem; }
+    header { height: auto; grid-template-columns: 1fr auto auto; row-gap: .6rem; column-gap: .75rem;
+             grid-template-areas: "mark dl pro" "pills themes themes"; padding-block: .7rem; }
     .mark { grid-area: mark; }
     header .cta { grid-area: pro; justify-self: end; }
+    header .ghost { grid-area: dl; justify-self: end; }
+    .themes { justify-self: end; }
     .pills { grid-area: pills; justify-content: flex-start; gap: .3rem; }
     .pills .pill { font-size: 12px; padding: .42rem .62rem; }
     .themes { grid-area: themes; gap: .3rem; }
@@ -200,17 +220,23 @@
 
   /* --- the grid: twenty-eight live states ---------------------------------- */
   main { max-width: 1240px; margin: 0 auto; padding: clamp(2rem, 4vw, 3.5rem) clamp(1rem, 3vw, 2.5rem) 5rem; }
+  /* The grid and the demo pet share one material. */
+  .grid, .demo-pet {
+    /* No purple on this page, the mascot included. The character's rim
+       is a var() ramp, so it is re-tokened here (a pale green by default,
+       picking up the olive ground; the theme's ramp when one is set) and
+       the app keeps its own. */
+    --fx-paw-rim-a: var(--paw-rim-a, #f7fff3); --fx-paw-rim-b: var(--paw-rim-b, #e2f5da);
+    --fx-paw-rim-c: var(--paw-rim-c, #c3e8b6); --fx-paw-rim-d: var(--paw-rim-d, #a9dc98);
+    --fx-paw-rim-e: var(--paw-rim-e, #d6efcb);
+    --fx-paw-glow: var(--paw-glow, rgba(176, 226, 160, .40));
+    --fx-paw-halo: var(--paw-halo, #8fc27f);
+    --fx-paw-eye: var(--paw-eye, #f8fff4);
+    --fx-paw-floor-a: var(--fx-paw-rim-c); --fx-paw-floor-b: var(--fx-paw-rim-d);
+    --fx-paw-floor-c: var(--fx-paw-halo);
+  }
   .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
           column-gap: clamp(1.5rem, 4vw, 3.5rem); row-gap: clamp(2rem, 4vw, 3.25rem);
-          /* No purple on this page, the mascot included. The character's rim
-             is a var() ramp, so it is re-tokened here (ice by default, the
-             theme's ramp when one is set) and the app keeps its own. */
-          --fx-paw-rim-a: var(--paw-rim-a, #ffffff); --fx-paw-rim-b: var(--paw-rim-b, #e6f1ff);
-          --fx-paw-rim-c: var(--paw-rim-c, #a9d1ff); --fx-paw-rim-d: var(--paw-rim-d, #8cc6ff);
-          --fx-paw-rim-e: var(--paw-rim-e, #cfe5ff);
-          --fx-paw-glow: var(--paw-glow, rgba(140, 198, 255, .45));
-          --fx-paw-halo: var(--paw-halo, #6aa9e6);
-          --fx-paw-eye: var(--paw-eye, #f7fbff);
           --fx-paw-ground: none; }
   @media (max-width: 1000px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   @media (max-width: 680px)  { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 1.25rem; row-gap: 2rem; } }
@@ -351,6 +377,7 @@
   <a class="mark" href="/"><span class="paw" data-state="idle" aria-hidden="true"></span>Paw</a>
   <nav class="pills" id="pills" aria-label="Filter states"></nav>
   <div class="themes" id="themes" aria-label="Theme"></div>
+  <a class="ghost" href="#get" aria-label="Download" title="Download"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14"/></svg></a>
   <a class="cta" href="/pro">Pro</a>
 </header>
 
@@ -378,7 +405,7 @@
   </div>
 </section>
 
-<footer>
+<footer id="get">
   <div class="band">
     <div class="badge" style="grid-column: 1 / -1">install</div>
 

@@ -37,7 +37,8 @@
   /api/preorder/count and stays hidden unless a real number comes back.
   2026-09-17: signing up mails a confirm link, and only confirmed signups
   count toward the bar, so a bot posting fake addresses cannot fill it. The
-  link comes back here as ?confirmed=<founder number> (or =bad). The card's fine print is
+  link comes back here as ?confirmed=<founder number> (or =bad).
+  Smooth scrolling comes from the vendored /lenis.mjs, off for reduced motion. The card's fine print is
   three icon one-liners; macOS-first and ships-later live in the top band
   only, said once. The control demo's gear opens the pet's own
   settings: picking a pet swaps the one beside it for a flat CC BY friend
@@ -66,6 +67,11 @@
   }
   * { box-sizing: border-box; }
   html { color-scheme: dark; }
+  /* Lenis smooth scroll (see the script at the end). Its own required rules. */
+  html.lenis, html.lenis body { height: auto; }
+  .lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
+  .lenis [data-lenis-prevent] { overscroll-behavior: contain; }
+  .lenis.lenis-smooth iframe { pointer-events: none; }
   body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.6 var(--body); -webkit-font-smoothing: antialiased; }
   a { color: inherit; }
   header {
@@ -600,7 +606,7 @@
           </div>
           <div class="panel">
             <div class="sum"><span></span><b></b></div>
-            <div class="list"></div>
+            <div class="list" data-lenis-prevent></div>
             <div class="thread"></div>
             <div class="qc"><svg class="ico"><use href="#i-chat"/></svg><span class="qc-text"></span><svg class="ico qc-send"><use href="#i-send"/></svg></div>
           </div>
@@ -1581,6 +1587,25 @@ await Promise.all(FRIENDS.map(async ([name, tag], i) => {
   tagEyes(el.querySelector("svg"));
   socketEyes(el);
 }));
+</script>
+<script type="module">
+// Smooth wheel scrolling, and smooth jumps for in-page links. Its own script,
+// so if it fails to load the page script above is untouched. Skipped for
+// reduced motion. Anything that scrolls inside the page carries
+// data-lenis-prevent so the wheel still scrolls it.
+if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  const { default: Lenis } = await import("/lenis.mjs");
+  const lenis = new Lenis({ autoRaf: true });
+  // Lenis's own anchors option lets the browser jump first and then glides,
+  // which flashes the target for a frame. Cancel the jump, glide only.
+  document.addEventListener("click", (ev) => {
+    const a = ev.target.closest('a[href^="#"]');
+    const to = a && a.hash.length > 1 && document.querySelector(a.hash);
+    if (!to) return;
+    ev.preventDefault();
+    lenis.scrollTo(to);
+  });
+}
 </script>
 </body>
 </html>

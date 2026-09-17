@@ -40,7 +40,6 @@ namespace_id = "1701"
 simple = { limit = 5, period = 60 }
 
 # Confirm emails. The sender domain must be onboarded for Email Sending on
-# this account; remote = true because there is no local mail simulator.
+# this account. Local dev never reaches it: MAIL_DEV logs the link instead.
 [[send_email]]
 name = "EMAIL"
-remote = true

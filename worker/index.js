@@ -81,7 +81,10 @@ async function signup(request, env, origin) {
 
   try {
     await sendConfirm(env, email, `${origin}/confirm?t=${row.token}`);
-  } catch {
+  } catch (err) {
+    // Email Service throws with a code (E_SENDER_NOT_VERIFIED, E_RATE_LIMIT_EXCEEDED,
+    // ...). Logged so `wrangler tail` says why; the address is left out.
+    console.error("confirm mail failed:", err.code || "", err.message);
     return json({ error: "Could not send the confirm email. Try again in a moment." }, 500);
   }
   return json({ ok: true, state: "sent" });

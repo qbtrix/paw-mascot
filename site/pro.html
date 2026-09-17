@@ -402,6 +402,8 @@
   .card-top { display: flex; align-items: center; gap: .9rem; }
   .card-top .pet { --fx-paw-size: 76px; --fx-paw-ground: none; flex: none; }
   .amount { font: 600 44px/1 var(--display); letter-spacing: -.02em; }
+  /* the anchor: what Pro will cost at launch, struck through next to the lock */
+  .amount .was { margin-right: .35rem; font-size: 26px; font-weight: 500; color: var(--dim); text-decoration: line-through; text-decoration-thickness: 2px; }
   #preorder, #friends-section { scroll-margin-top: 90px; }
   .amount small { display: block; margin-top: .45rem; font: 500 11.5px/1 var(--mono); color: var(--dim); letter-spacing: .06em; }
   .price-card .signup { justify-self: stretch; }
@@ -645,7 +647,7 @@
     <div class="price-card">
       <div class="card-top">
         <div class="pet" aria-hidden="true"></div>
-        <div class="amount">$19<small>FOUNDER &middot; LIFETIME</small></div>
+        <div class="amount"><span class="was">$39</span>$19<small>FOUNDER &middot; LIFETIME</small></div>
       </div>
       <form class="signup" id="preorder" novalidate>
         <label class="sr" for="email">Your email</label>
@@ -656,7 +658,7 @@
         <button class="cta" type="submit">Lock the price</button>
         <p class="say" role="status" aria-live="polite"></p>
       </form>
-      <div class="fine">Price locks now; Pro ships later, macOS first. The free pet is yours today and stays MIT forever. Your address is only ever used to tell you when Pro opens.</div>
+      <div class="fine">Pro launches at $39; founders lock $19 for life. Pro ships later, macOS first. The free pet is yours today and stays MIT forever. Your address is only ever used to tell you when Pro opens.</div>
     </div>
   </div>
 </section>

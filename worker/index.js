@@ -11,7 +11,8 @@
 // confirm link; the seat counts once the link is opened. Before this, a bot
 // could post fake addresses, fill the public bar and flip the card to the $29
 // batch. A per-IP rate limit (SIGNUP_LIMIT) stops the endpoint being used to
-// spam inboxes. Seats go in confirmation order, not signup order.
+// spam inboxes. Seats go in confirmation order, not signup order. Mail goes
+// through Mailtrap's sending API, the same provider pocketpaw's /growth uses.
 //
 // Everything else on this site is a static asset. Cloudflare serves assets
 // first and only calls this Worker when nothing matches, so every page keeps
@@ -27,22 +28,22 @@ const looksLikeEmail = (s) => /^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(s) && s.length 
 // Sends the confirm link. Fails loud: without a key, and outside local dev,
 // it throws rather than pretending a mail went out.
 async function sendConfirm(env, email, link) {
-  if (!env.RESEND_API_KEY) {
+  if (!env.MAILTRAP_API_TOKEN) {
     if (!env.MAIL_DEV) throw new Error("mail not configured");
     console.log(`[MAIL_DEV] confirm link for ${email}: ${link}`);
     return;
   }
-  const res = await fetch("https://api.resend.com/emails", {
+  const res = await fetch("https://send.api.mailtrap.io/api/send", {
     method: "POST",
-    headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, "content-type": "application/json" },
+    headers: { "Api-Token": env.MAILTRAP_API_TOKEN, "content-type": "application/json" },
     body: JSON.stringify({
-      from: env.MAIL_FROM || "Paw <paw@pet.pocketpaw.xyz>",
-      to: email,
+      from: { email: env.MAIL_FROM || "paw@pet.pocketpaw.xyz", name: "Paw" },
+      to: [{ email }],
       subject: "Confirm your Paw Pro founder spot",
       text: `Tap to lock your founder price:\n\n${link}\n\nIf you didn't ask for this, ignore it.\n`
     })
   });
-  if (!res.ok) throw new Error(`resend ${res.status}`);
+  if (!res.ok) throw new Error(`mailtrap ${res.status}`);
 }
 
 async function signup(request, env, origin) {

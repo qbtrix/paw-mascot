@@ -3,8 +3,8 @@
 #
 # 2026-09-17: added the SIGNUP_LIMIT rate limiter. Every signup POST now sends
 # a confirm email, so an unthrottled endpoint could be used to spam inboxes.
-# Mail goes out through Resend: set the key with
-#   wrangler secret put RESEND_API_KEY
+# Mail goes out through Mailtrap's sending API: set the token with
+#   wrangler secret put MAILTRAP_API_TOKEN
 # Locally, .dev.vars sets MAIL_DEV=1 and the confirm link is logged instead.
 #
 # Created 2026-09-15 as assets-only, the same shape paw-fx uses for its

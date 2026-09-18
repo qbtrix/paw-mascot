@@ -67,6 +67,7 @@
   The mark's eyes are nudged down so they sit level with the wordmark.
   The paste-into-your-agent prompt builds the app from source (app bundle
   only, tested from a fresh clone) instead of pointing at the release download.
+  The header carries two ghost icons, GitHub and download, beside Pro.
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -159,7 +160,7 @@
   /* --- header: wordmark, filters, themes, Pro; one line, two on a phone ---- */
   header {
     position: sticky; top: 0; z-index: 5; height: 72px;
-    display: grid; grid-template-columns: auto 1fr auto auto auto; align-items: center; gap: 1.5rem;
+    display: grid; grid-template-columns: auto 1fr auto auto auto auto; align-items: center; gap: 1.5rem;
     padding: 0 clamp(1rem, 3vw, 2.5rem);
     background: color-mix(in srgb, var(--bg) 88%, transparent);
     backdrop-filter: blur(10px); border-bottom: 1px solid var(--line);
@@ -205,14 +206,17 @@
   .ghost:hover { color: var(--ink); border-color: var(--line-hi); }
   .ghost svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8;
                stroke-linecap: round; stroke-linejoin: round; }
+  /* The GitHub mark is a solid shape, not a drawn line. */
+  .ghost.fill svg { width: 15px; height: 15px; fill: currentColor; stroke: none; }
   /* A phone gets two rows: name and Pro on top, filters and themes under. On
      one row the swatches ran off the right edge and the page scrolled sideways. */
   @media (max-width: 760px) {
-    header { height: auto; grid-template-columns: 1fr auto auto; row-gap: .6rem; column-gap: .75rem;
-             grid-template-areas: "mark dl pro" "pills themes themes"; padding-block: .7rem; }
+    header { height: auto; grid-template-columns: 1fr auto auto auto; row-gap: .6rem; column-gap: .75rem;
+             grid-template-areas: "mark gh dl pro" "pills themes themes themes"; padding-block: .7rem; }
     .mark { grid-area: mark; }
     header .cta { grid-area: pro; justify-self: end; }
     header .ghost { grid-area: dl; justify-self: end; }
+    header .ghost.fill { grid-area: gh; }
     .themes { justify-self: end; }
     .pills { grid-area: pills; justify-content: flex-start; gap: .3rem; }
     .pills .pill { font-size: 12px; padding: .42rem .62rem; }
@@ -379,6 +383,7 @@
   <a class="mark" href="/"><span class="paw" data-state="idle" aria-hidden="true"></span>Paw</a>
   <nav class="pills" id="pills" aria-label="Filter states"></nav>
   <div class="themes" id="themes" aria-label="Theme"></div>
+  <a class="ghost fill" href="https://github.com/qbtrix/paw-mascot" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5C5.7.5.6 5.6.6 11.9c0 5 3.3 9.3 7.8 10.8.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 1.8 2.7 1.3 3.4 1 .1-.7.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .4.2.7.8.6a11.4 11.4 0 0 0 7.8-10.8C23.4 5.6 18.3.5 12 .5Z"/></svg></a>
   <a class="ghost" href="#get" aria-label="Download" title="Download"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14"/></svg></a>
   <a class="cta" href="/pro">Pro</a>
 </header>

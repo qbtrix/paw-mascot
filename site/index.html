@@ -54,11 +54,12 @@
   the app serves it. Nothing on this page is a screenshot.
 
   Created 2026-09-15. Assembled into dist/site by scripts/build-site.mjs.
-  Smooth scrolling (2026-09-17) comes from the vendored /lenis.mjs, off for
-  reduced motion. Later that day: the header lost its download button (the
+  Scrolling is the browser's own: CSS glides to #get, and nothing hijacks
+  the wheel, so the tiles never have to stop drawing to keep it smooth.
+  2026-09-17: the header lost its download button (the
   footer has one) and Pro took the accent; on a phone the header wraps to two
   rows. Fonts load from a <link> with preconnect instead of @import, the engine
-  is modulepreloaded, and the grid tiles pause while the page scrolls.
+  is modulepreloaded,.
   Then: the header has a ghost download icon that glides to the footer (#get),
   the logo is the pet's eyes alone, and the default charcoal room gives the
   mascots a pale green rim to match its olive ground. The demo pet shares the
@@ -145,11 +146,10 @@
   }
   * { box-sizing: border-box; }
   html { color-scheme: dark; }
-  /* Lenis smooth scroll (see the last script). Its own required rules. */
-  html.lenis, html.lenis body { height: auto; }
-  .lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
-  .lenis [data-lenis-prevent] { overscroll-behavior: contain; }
-  .lenis.lenis-smooth iframe { pointer-events: none; }
+  /* The browser glides to #get by itself. A smooth-scroll library would
+     drive the page from the main thread, where it fights twenty-eight
+     animated tiles for every frame; the native one runs off it. */
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
   body {
     margin: 0; background: var(--bg); color: var(--ink);
     font: 15px/1.6 var(--body); -webkit-font-smoothing: antialiased;
@@ -412,10 +412,10 @@
     <div class="badge" style="grid-column: 1 / -1">install</div>
 
     <div class="cmds" id="cmds">
-      <div class="cmd"><span class="for"><svg aria-hidden="true"><use href="#i-anthropic"/></svg>Claude Code</span><code data-lenis-prevent>/plugin marketplace add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
-      <div class="cmd"><span class="for"></span><code data-lenis-prevent>/plugin install paw-mascot@paw-mascot</code><button class="copy">Copy</button></div>
-      <div class="cmd"><span class="for"><svg aria-hidden="true"><use href="#i-openai"/></svg>Codex</span><code data-lenis-prevent>codex plugin marketplace add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
-      <div class="cmd"><span class="for"><svg aria-hidden="true"><use href="#i-paw"/></svg>Any agent</span><code data-lenis-prevent>npx skills add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
+      <div class="cmd"><span class="for"><svg aria-hidden="true"><use href="#i-anthropic"/></svg>Claude Code</span><code>/plugin marketplace add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
+      <div class="cmd"><span class="for"></span><code>/plugin install paw-mascot@paw-mascot</code><button class="copy">Copy</button></div>
+      <div class="cmd"><span class="for"><svg aria-hidden="true"><use href="#i-openai"/></svg>Codex</span><code>codex plugin marketplace add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
+      <div class="cmd"><span class="for"><svg aria-hidden="true"><use href="#i-paw"/></svg>Any agent</span><code>npx skills add qbtrix/paw-mascot</code><button class="copy">Copy</button></div>
       <div class="or">or paste this into your agent</div>
       <div class="prompt"><code>Set up the Paw desktop mascot (github.com/qbtrix/paw-mascot) on this Mac, built from source:
 1. Clone https://github.com/qbtrix/paw-mascot into a folder that will stay put, like ~/src/paw-mascot. The hooks point into it, so not a temp folder.
@@ -479,20 +479,6 @@ function replay(id) {
   const now = ctl.clock();
   ctl.engine.setState("idle", now);
   ctl.engine.setState(id, now);
-}
-
-// Scrolling and the tiles redrawing compete for the same frames, and the
-// smooth scroll moves the page from the main thread. So the tiles hold still
-// while the page moves and pick up again once it stops. Nothing is lost: the
-// pose is a function of time, so they resume on the right frame.
-{
-  let resume = null;
-  const setFps = (fps) => { for (const t of tiles.values()) t.update({ fps }); };
-  addEventListener("scroll", () => {
-    if (!resume) setFps(0.5);
-    clearTimeout(resume);
-    resume = setTimeout(() => { resume = null; setFps(24); }, 150);
-  }, { passive: true });
 }
 
 // And a slow wave across the grid, so the page is never a wall of statues:
@@ -675,25 +661,6 @@ for (const btn of document.querySelectorAll(".copy")) {
     catch { btn.textContent = "Select it"; }
     setTimeout(() => (btn.textContent = "Copy"), 1400);
   };
-}
-</script>
-<script type="module">
-// Smooth wheel scrolling, and smooth jumps for in-page links. Its own script,
-// so if it fails to load the page script above is untouched. Skipped for
-// reduced motion. Anything that scrolls inside the page carries
-// data-lenis-prevent so the wheel still scrolls it.
-if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
-  const { default: Lenis } = await import("/lenis.mjs");
-  const lenis = new Lenis({ autoRaf: true });
-  // Lenis's own anchors option lets the browser jump first and then glides,
-  // which flashes the target for a frame. Cancel the jump, glide only.
-  document.addEventListener("click", (ev) => {
-    const a = ev.target.closest('a[href^="#"]');
-    const to = a && a.hash.length > 1 && document.querySelector(a.hash);
-    if (!to) return;
-    ev.preventDefault();
-    lenis.scrollTo(to);
-  });
 }
 </script>
 </body>

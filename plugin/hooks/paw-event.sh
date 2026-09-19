@@ -9,7 +9,9 @@
 #
 # The line is the hook payload with the bulky fields dropped. tool_input can
 # be an entire file's contents on a Write; the mascot does not need to know
-# what you wrote, only that you wrote.
+# what you wrote, only that you wrote. Since 2026-09-19 the line also keeps cwd
+# and transcript_path -- where the session lives, so a reader can offer "open
+# this session's folder". Still no command text, no file contents, no prompts.
 #
 # Everything ends in `|| true`. A hook that fails can block Claude Code, and
 # a mascot is never a reason to block anything.
@@ -37,7 +39,9 @@ if command -v jq >/dev/null 2>&1; then
     tool: .tool_name,
     notification: .notification_type,
     agent: .agent_type,
-    ok: (if .hook_event_name == "PostToolUseFailure" then false else true end)
+    ok: (if .hook_event_name == "PostToolUseFailure" then false else true end),
+    cwd: .cwd,
+    transcript_path: .transcript_path
   }' >> "$PAW_DIR/events.jsonl" 2>/dev/null || true
 elif command -v python3 >/dev/null 2>&1; then
   python3 - "$PAW_DIR/events.jsonl" <<'PY' 2>/dev/null || true
@@ -54,6 +58,8 @@ line = {
     "notification": p.get("notification_type"),
     "agent": p.get("agent_type"),
     "ok": p.get("hook_event_name") != "PostToolUseFailure",
+    "cwd": p.get("cwd"),
+    "transcript_path": p.get("transcript_path"),
 }
 with open(sys.argv[1], "a") as f:
     f.write(json.dumps(line) + "\n")

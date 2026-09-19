@@ -268,19 +268,23 @@ async function webhook(request, env, ctx) {
     // One statement: the seat is counted inside the insert, so two webhooks
     // landing together cannot both read the same count. seat is UNIQUE, so if
     // they somehow do, one fails and Dodo retries it. A repeat delivery of the
-    // same payment conflicts on the primary key and returns nothing.
+    // same payment touches nothing and hands back the seat it already has --
+    // the same no-op upsert signup uses -- so if the mint failed last time,
+    // the retry picks up that seat and finishes the job.
     row = await env.DB.prepare(
       `INSERT INTO licenses (payment_id, email, seat, key_id, created_at)
        VALUES (?, ?, (SELECT COUNT(*) + 1 FROM licenses), '', ?)
-       ON CONFLICT(payment_id) DO NOTHING
-       RETURNING seat`
+       ON CONFLICT(payment_id) DO UPDATE SET payment_id = payment_id
+       RETURNING seat, key_id`
     ).bind(paymentId, email, new Date().toISOString()).first();
   } catch (err) {
     // A 500 asks Dodo to retry, which is what we want: the buyer has paid.
     console.error("license insert failed:", err.message);
     return json({ error: "Could not record that." }, 500);
   }
-  if (!row) return json({ received: true, state: "already-minted" });
+  // A key already on the row means this payment is done. Anything else is
+  // either the first delivery or a retry after a mint that did not finish.
+  if (row.key_id) return json({ received: true, state: "already-minted" });
 
   let key;
   try {
@@ -288,8 +292,9 @@ async function webhook(request, env, ctx) {
     await env.DB.prepare("UPDATE licenses SET key_id = ? WHERE payment_id = ?")
       .bind(key, paymentId).run();
   } catch (err) {
-    // The seat is taken but there is no key. Retrying would find the row and
-    // do nothing, so this is loud: the captain mints by hand and resends.
+    // Seat taken, no key yet. The 500 asks Dodo to retry, and the retry comes
+    // back to this same seat, so a signing key that was missing for a minute
+    // does not leave a paying founder with nothing.
     console.error("MINT FAILED for seat", row.seat, "--", err.message);
     return json({ error: "Could not mint." }, 500);
   }

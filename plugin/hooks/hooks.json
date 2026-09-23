@@ -1,5 +1,5 @@
 {
-  "_comment": "Every event the mascot reacts to, all routed through one script. Matchers are broad on purpose: the MAPPING from event to state lives in the app, where it can be tuned without touching anyone's settings.",
+  "_comment": "Changes: 2026-09-24, PreCompact added so the pet can go dizzy while a session compacts. Every event the mascot reacts to, all routed through one script. Matchers are broad on purpose: the MAPPING from event to state lives in the app, where it can be tuned without touching anyone's settings.",
   "hooks": {
     "SessionStart":       [{ "matcher": "*", "hooks": [{ "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/paw-event.sh" }] }],
     "UserPromptSubmit":   [{ "hooks": [{ "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/paw-event.sh" }] }],
@@ -10,6 +10,7 @@
     "Notification":       [{ "matcher": "*", "hooks": [{ "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/paw-event.sh" }] }],
     "SubagentStart":      [{ "hooks": [{ "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/paw-event.sh" }] }],
     "SubagentStop":       [{ "hooks": [{ "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/paw-event.sh" }] }],
+    "PreCompact":         [{ "matcher": "*", "hooks": [{ "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/paw-event.sh" }] }],
     "Stop":               [{ "hooks": [{ "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/paw-event.sh" }] }],
     "SessionEnd":         [{ "hooks": [{ "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/paw-event.sh" }] }]
   }

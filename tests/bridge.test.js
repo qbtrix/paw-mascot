@@ -1,4 +1,6 @@
-// Changes: 2026-09-23 -- the bridge is now also RUN, once through jq and once
+// Changes: 2026-09-24 -- PreCompact passes through, and `source` is projected
+// only when the payload has one.
+// 2026-09-23 -- the bridge is now also RUN, once through jq and once
 // through the python fallback, because the fallback had been writing nothing
 // (its heredoc took over stdin) and no test ran it.
 //
@@ -44,6 +46,20 @@ test.each(BRANCHES)("the bridge writes one line per event through %s", (_, PATH)
   });
   expect(Object.keys(line)).toEqual(LINE_KEYS); // and never tool_input
   expect(line).toMatchObject({ session: "s1", event: "PreToolUse", tool: "Edit", ok: true, cwd: "/w" });
+});
+
+test.each(BRANCHES)("source rides along only when the payload has one, through %s", (_, PATH) => {
+  // SessionStart says why the session started; "compact" is the one the pet
+  // needs, to stop being dizzy. PreCompact has no source, and its line keeps
+  // exactly the keys every other line has.
+  const [pre, back] = runBridge(PATH,
+    { session_id: "s1", hook_event_name: "PreCompact", trigger: "auto", custom_instructions: "" },
+    { session_id: "s1", hook_event_name: "SessionStart", source: "compact" },
+  );
+  expect(pre.event).toBe("PreCompact");
+  expect(Object.keys(pre)).toEqual(LINE_KEYS);
+  expect(back).toMatchObject({ event: "SessionStart", source: "compact" });
+  expect(Object.keys(back)).toEqual([...LINE_KEYS, "source"]);
 });
 
 // --- the two copies of the bridge --------------------------------------------

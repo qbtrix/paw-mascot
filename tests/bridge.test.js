@@ -1,12 +1,50 @@
+// Changes: 2026-09-23 -- the bridge is now also RUN, once through jq and once
+// through the python fallback, because the fallback had been writing nothing
+// (its heredoc took over stdin) and no test ran it.
+//
 // The bridge ships twice -- once inside the skill, once inside the plugin --
 // and Codex sends a narrower set of events than Claude Code does. Both of those
 // are things that break quietly, so both get a test.
 import { test, expect } from "bun:test";
-import { readFileSync } from "node:fs";
+import { readFileSync, mkdtempSync, symlinkSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { derive, T } from "../web/mapping.js";
 
 const root = new URL("..", import.meta.url).pathname;
 const ev = (event, ts, extra = {}) => ({ ts, session: "s", event, tool: null, notification: null, agent: null, ok: true, ...extra });
+
+// --- running the bridge --------------------------------------------------------
+// jq if the machine has it, python if not. Both paths get run: the python one
+// under a PATH that holds python3 and the two commands the script needs, and
+// nothing that could be jq.
+const bridge = `${root}skills/paw-mascot/scripts/paw-event.sh`;
+function pythonOnlyPath() {
+  const bin = mkdtempSync(join(tmpdir(), "paw-bin-"));
+  for (const c of ["python3", "date", "mkdir"]) symlinkSync(Bun.which(c), join(bin, c));
+  return bin;
+}
+const BRANCHES = [
+  ...(Bun.which("jq") ? [["jq", process.env.PATH]] : []),
+  ...(Bun.which("python3") ? [["python3", pythonOnlyPath()]] : []),
+];
+function runBridge(PATH, ...payloads) {
+  const home = mkdtempSync(join(tmpdir(), "paw-home-"));
+  for (const p of payloads) {
+    Bun.spawnSync(["/bin/bash", bridge], { stdin: Buffer.from(JSON.stringify(p)), env: { PATH, HOME: home, PAW_HOME: home } });
+  }
+  return readFileSync(join(home, "events.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l));
+}
+const LINE_KEYS = ["ts", "session", "event", "tool", "notification", "agent", "ok", "cwd", "transcript_path"];
+
+test.each(BRANCHES)("the bridge writes one line per event through %s", (_, PATH) => {
+  const [line] = runBridge(PATH, {
+    session_id: "s1", hook_event_name: "PreToolUse", tool_name: "Edit",
+    tool_input: { file_path: "/x", content: "a whole file" }, cwd: "/w", transcript_path: "/t.jsonl",
+  });
+  expect(Object.keys(line)).toEqual(LINE_KEYS); // and never tool_input
+  expect(line).toMatchObject({ session: "s1", event: "PreToolUse", tool: "Edit", ok: true, cwd: "/w" });
+});
 
 // --- the two copies of the bridge --------------------------------------------
 // skills/ is the source of truth, because that is what `npx skills add` installs.

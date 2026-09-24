@@ -21,9 +21,17 @@
 // mail.pocketpaw.xyz subdomain so bounces and any spam complaints stay off
 // the main domain.
 //
+// 2026-09-19: the licence server. Three routes under /api/license: checkout
+// starts a Dodo Checkout Session, webhook mints a key on a paid payment and
+// emails it, resend re-sends a key someone lost. Mint and webhook verification
+// live in ./license.js. Test mode only so far -- the Dodo account is not
+// verified, so nothing here has taken a real payment.
+//
 // Everything else on this site is a static asset. Cloudflare serves assets
 // first and only calls this Worker when nothing matches, so every page keeps
 // being served exactly as it was before this file existed.
+import { mintKey, verifyWebhook } from "./license.js";
+
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
 
@@ -86,11 +94,19 @@ const receiptMail = (n) => {
   };
 };
 
+// True when this IP has run out of tries. Shared by every endpoint that can
+// send mail, which is the thing worth throttling. The webhook is not throttled:
+// it comes from Dodo, and dropping one loses a sale.
+async function rateLimited(request, env) {
+  if (!env.SIGNUP_LIMIT) return false;
+  const ip = request.headers.get("cf-connecting-ip") || "local";
+  const { success } = await env.SIGNUP_LIMIT.limit({ key: ip });
+  return !success;
+}
+
 async function signup(request, env, origin) {
-  if (env.SIGNUP_LIMIT) {
-    const ip = request.headers.get("cf-connecting-ip") || "local";
-    const { success } = await env.SIGNUP_LIMIT.limit({ key: ip });
-    if (!success) return json({ error: "Too many tries. Wait a minute." }, 429);
+  if (await rateLimited(request, env)) {
+    return json({ error: "Too many tries. Wait a minute." }, 429);
   }
 
   let body;
@@ -155,6 +171,173 @@ async function confirm(env, ctx, url) {
   }
 }
 
+const licenseMail = (key, seat) => ({
+  subject: `Your Paw Pro licence key (founder #${seat})`,
+  text:
+    "Hi there,\n\n" +
+    "Thank you for buying Paw Pro. Here is your licence key:\n\n" +
+    `${key}\n\n` +
+    "Open Paw, go to Settings, and paste it into the Licence field.\n\n" +
+    "Keep this email -- the key is tied to your purchase, not to a device. " +
+    "If you lose it, ask for it again from the Pro page and we will send it back to this address.\n\n" +
+    SIGNATURE
+});
+
+// Starts a Dodo Checkout Session and hands the browser the URL to go to.
+// The API base comes from env so switching to live payments is a secret
+// change, not a deploy of new code. Nothing here trusts the browser: the
+// price and the product are ours, and the sale is only real once the webhook
+// says so.
+async function checkout(request, env, origin) {
+  if (await rateLimited(request, env)) {
+    return json({ error: "Too many tries. Wait a minute." }, 429);
+  }
+  if (!env.DODO_API_KEY || !env.DODO_PRODUCT_ID) {
+    console.error("checkout: DODO_API_KEY or DODO_PRODUCT_ID not set");
+    return json({ error: "Checkout is not open yet." }, 503);
+  }
+
+  let body = {};
+  try { body = await request.json(); } catch { /* email is optional, prefill only */ }
+  const email = String(body.email ?? "").trim().toLowerCase();
+
+  try {
+    const res = await fetch(`${env.DODO_API_BASE || "https://test.dodopayments.com"}/checkouts`, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${env.DODO_API_KEY}`,
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        product_cart: [{ product_id: env.DODO_PRODUCT_ID, quantity: 1 }],
+        // Prefilled only when it looks like an address; a typo here would
+        // strand the buyer on a checkout page they cannot correct.
+        ...(looksLikeEmail(email) ? { customer: { email } } : {}),
+        // Read back in the webhook, so a payment for some other product on
+        // this account can never mint a Pro licence.
+        metadata: { plan: "founder" },
+        return_url: `${origin}/pro?paid=1`
+      })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.checkout_url) {
+      console.error("checkout failed:", res.status, JSON.stringify(data).slice(0, 300));
+      return json({ error: "Could not start checkout. Try again in a moment." }, 500);
+    }
+    return json({ url: data.checkout_url });
+  } catch (err) {
+    console.error("checkout error:", err.message);
+    return json({ error: "Could not start checkout. Try again in a moment." }, 500);
+  }
+}
+
+// Dodo calls this. It is the only thing that decides a sale happened -- the
+// return_url redirect proves nothing, since anyone can visit it.
+//
+// Idempotent on payment_id: Dodo retries until it gets a 200, so the same
+// payment can arrive several times, and the INSERT simply finds nothing to do
+// on the second one. The mail goes out after the row is safely written.
+async function webhook(request, env, ctx) {
+  const raw = await request.text();
+  if (!(await verifyWebhook(env.DODO_WEBHOOK_SECRET, request.headers, raw))) {
+    return json({ error: "Bad signature" }, 401);
+  }
+
+  let event;
+  try { event = JSON.parse(raw); } catch { return json({ error: "Send JSON." }, 400); }
+
+  // Anything else is acknowledged and ignored: a 200 stops Dodo retrying an
+  // event we were never going to act on.
+  if (event.type !== "payment.succeeded") return json({ received: true });
+
+  const data = event.data || {};
+  const forPro =
+    data.metadata?.plan === "founder" ||
+    (data.product_cart || []).some((p) => p.product_id === env.DODO_PRODUCT_ID);
+  if (!forPro) return json({ received: true });
+
+  const email = String(data.customer?.email ?? "").trim().toLowerCase();
+  const paymentId = String(data.payment_id ?? "");
+  if (!paymentId || !looksLikeEmail(email)) {
+    console.error("webhook: payment.succeeded without a usable payment_id or email");
+    return json({ error: "Unusable payload" }, 400);
+  }
+
+  let row;
+  try {
+    // One statement: the seat is counted inside the insert, so two webhooks
+    // landing together cannot both read the same count. seat is UNIQUE, so if
+    // they somehow do, one fails and Dodo retries it. A repeat delivery of the
+    // same payment touches nothing and hands back the seat it already has --
+    // the same no-op upsert signup uses -- so if the mint failed last time,
+    // the retry picks up that seat and finishes the job.
+    row = await env.DB.prepare(
+      `INSERT INTO licenses (payment_id, email, seat, key_id, created_at)
+       VALUES (?, ?, (SELECT COUNT(*) + 1 FROM licenses), '', ?)
+       ON CONFLICT(payment_id) DO UPDATE SET payment_id = payment_id
+       RETURNING seat, key_id`
+    ).bind(paymentId, email, new Date().toISOString()).first();
+  } catch (err) {
+    // A 500 asks Dodo to retry, which is what we want: the buyer has paid.
+    console.error("license insert failed:", err.message);
+    return json({ error: "Could not record that." }, 500);
+  }
+  // A key already on the row means this payment is done. Anything else is
+  // either the first delivery or a retry after a mint that did not finish.
+  if (row.key_id) return json({ received: true, state: "already-minted" });
+
+  let key;
+  try {
+    key = await mintKey(env, row.seat);
+    await env.DB.prepare("UPDATE licenses SET key_id = ? WHERE payment_id = ?")
+      .bind(key, paymentId).run();
+  } catch (err) {
+    // Seat taken, no key yet. The 500 asks Dodo to retry, and the retry comes
+    // back to this same seat, so a signing key that was missing for a minute
+    // does not leave a paying founder with nothing.
+    console.error("MINT FAILED for seat", row.seat, "--", err.message);
+    return json({ error: "Could not mint." }, 500);
+  }
+
+  // Same shape as the confirm receipt: the mail is sent after the answer, and
+  // a bounced email never un-sells the licence. Resend is the recovery path.
+  ctx.waitUntil(
+    sendMail(env, email, licenseMail(key, row.seat)).catch((err) =>
+      console.error("licence mail failed:", err.code || "", err.message))
+  );
+  return json({ received: true, state: "minted" });
+}
+
+// "I lost my key." Always answers the same thing, whether or not the address
+// bought anything, so this cannot be used to find out who is a customer. It
+// also never reports a failure to the person: worst case they get no mail and
+// ask again, which is better than a page that says try later and means it.
+async function resend(request, env, ctx) {
+  const generic = json({ ok: true, message: "If that address has a licence, the key is on its way." });
+  if (await rateLimited(request, env)) {
+    return json({ error: "Too many tries. Wait a minute." }, 429);
+  }
+  try {
+    const body = await request.json();
+    const email = String(body.email ?? "").trim().toLowerCase();
+    if (!looksLikeEmail(email)) return generic;
+
+    // Newest first: someone who bought twice gets their latest seat back.
+    const row = await env.DB.prepare(
+      "SELECT key_id, seat FROM licenses WHERE email = ? AND key_id != '' ORDER BY seat DESC LIMIT 1"
+    ).bind(email).first();
+    if (!row) return generic;
+
+    ctx.waitUntil(
+      sendMail(env, email, licenseMail(row.key_id, row.seat)).catch((err) =>
+        console.error("resend mail failed:", err.code || "", err.message))
+    );
+  } catch (err) {
+    console.error("resend failed:", err.message);
+  }
+  return generic;
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -171,6 +354,13 @@ export default {
       } catch {
         return json({ error: "No counter yet." }, 500);
       }
+    }
+    if (pathname.startsWith("/api/license/")) {
+      if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
+      if (pathname === "/api/license/checkout") return checkout(request, env, url.origin);
+      if (pathname === "/api/license/webhook") return webhook(request, env, ctx);
+      if (pathname === "/api/license/resend") return resend(request, env, ctx);
+      return new Response("Not found", { status: 404 });
     }
     if (pathname === "/confirm") {
       if (request.method !== "GET") return new Response("Method not allowed", { status: 405 });

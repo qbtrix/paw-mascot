@@ -69,7 +69,7 @@ Run one command in your agent. The mascot should react. If it does not,
 
 | Agent | Works | Notes |
 |-------|-------|-------|
-| Claude Code | yes | all eleven events |
+| Claude Code | yes | all twelve events |
 | Codex CLI | yes | ships as an [Agent Plugins](https://agent-plugins.org) package; no `Notification` or `PostToolUseFailure`, so no "waiting for you" and no flinch on a failed tool |
 | DeepSeek Harness | probably | it runs a Claude Code `hooks.json` through a compatibility package; we have not run it end to end |
 | Cursor, Gemini CLI, OpenCode, Copilot, … | no | the skill installs, but these have no lifecycle hooks, so the mascot never hears from them |
@@ -80,7 +80,7 @@ those agents, not a setting you can find.
 ## Layout
 
 ```
-plugin/     the Claude Code plugin: eleven hooks routed through one script
+plugin/     the Claude Code plugin: twelve hooks routed through one script
             that appends a line per event to ~/.paw/events.jsonl
 skills/     the same bridge as a portable Agent Skill, plus an installer that
             writes the right hooks config for whichever agent it lands in
@@ -96,6 +96,8 @@ tests/      the mapping, because it is the part that can be wrong
 `web/mapping.js` is a pure function of `(events, now)`: no DOM, no timers. It runs in Bun for the tests, in a browser tab for tuning, and in the Tauri webview for the app, and gives the same answer in all three. Rust that knew what "working" meant would be Rust that had to be rebuilt to change a timing, so Rust does not know.
 
 Two ideas hold it together. A **state** is what the mascot is doing; a **reaction** is something that just happened — a failed tool is a flinch, then back to whatever it was doing, which is what stops it twitching on every event. And transient states carry a **hold**: `Stop` is a two-second wink, then idle. A wink that lasts until the next event is a mascot that got stuck.
+
+Compaction gets the same care. `PreCompact` knocks the pet dizzy until that session comes back, which Claude Code announces as a `SessionStart` whose `source` is `compact`. If that never arrives, the spell ends after two minutes.
 
 The mood overlay is where the mood space earns its keep: arousal is the event rate over the last minute, so a busy session *looks* busy; attention is whether it is blocked on you.
 
@@ -122,6 +124,8 @@ The Rust side is deliberately small: it tails the file on a 250ms poll — one s
 ## The bridge
 
 `skills/paw-mascot/scripts/paw-event.sh` is the whole of it. The agent hands it the hook payload on stdin; it appends one line with the bulky fields dropped and exits 0 no matter what, because a hook that fails can block the agent and a mascot is never a reason to block anything. `jq` if present, `python3` if not, and silence if neither.
+
+Each line keeps `ts`, `session`, `event`, `tool`, `notification`, `agent`, `ok`, `cwd` and `transcript_path`, plus `source` when the payload has one (`SessionStart` says `startup`, `resume`, `clear` or `compact`). The events it is registered for are `SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`, `PostToolUseFailure`, `PermissionRequest`, `Notification`, `SubagentStart`, `SubagentStop`, `PreCompact`, `Stop` and `SessionEnd`.
 
 It needed no fork for Codex. Codex sends the same payload fields as Claude Code — `session_id`, `hook_event_name`, `tool_name` — and reads the same `hooks.json` shape, so one script covers both and only the config path differs.
 

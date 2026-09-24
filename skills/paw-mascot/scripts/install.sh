@@ -1,6 +1,9 @@
 #!/bin/bash
 # install.sh — put the mascot bridge into whichever harness is on this machine.
 #
+# Changes: 2026-09-24 -- Claude Code also gets PreCompact (twelve events), so the
+# pet can go dizzy while a session compacts. Re-running adds just that one.
+#
 # A skill is a prompt; it cannot observe tool calls. The mascot needs a hooks
 # config, and every harness keeps that somewhere different. So this walks the
 # ones we know, merges our entry into each, and says exactly what it wrote.
@@ -44,9 +47,10 @@ if ! command -v python3 >/dev/null 2>&1; then
   exit 1
 fi
 
-# All eleven the bridge understands. Codex has no Notification or
-# PostToolUseFailure, so it gets the subset it can actually fire.
-CLAUDE_EVENTS="SessionStart UserPromptSubmit PreToolUse PostToolUse PostToolUseFailure PermissionRequest Notification SubagentStart SubagentStop Stop SessionEnd"
+# All twelve the bridge understands. Codex has no Notification or
+# PostToolUseFailure, so it gets the subset it can actually fire. PreCompact is
+# registered for Claude Code only.
+CLAUDE_EVENTS="SessionStart UserPromptSubmit PreToolUse PostToolUse PostToolUseFailure PermissionRequest Notification SubagentStart SubagentStop PreCompact Stop SessionEnd"
 CODEX_EVENTS="SessionStart UserPromptSubmit PreToolUse PostToolUse PermissionRequest SubagentStart SubagentStop Stop SessionEnd"
 
 merge() { # merge <config-file> <events...>

@@ -1,5 +1,9 @@
 // mapping.js — hook events in, a mascot state out.
 //
+// Changes: 2026-09-24 -- PreCompact makes the pet dizzy until that session
+// comes back (a SessionStart with source "compact", or any later line from it),
+// or for T.compact at most. A SessionStart from compaction is idle, not excited.
+//
 // This is the part that can be WRONG, which is why it is a pure function of
 // (events, now) with no DOM and no timers: it runs in Bun for the tests, in a
 // browser for the dev page, and in the Tauri webview for the app, and it
@@ -35,6 +39,7 @@ export const T = {
   failWindow: 60,     // failures within this window count together
   failsToAnnoy: 3,
   rateWindow: 60,     // arousal is events per this window
+  compact: 120,       // dizzy at most this long, if a compaction's return is never seen
   forced: 6           // how long `paw say` holds before letting go
 };
 
@@ -100,6 +105,16 @@ export function derive(events, now) {
     return recentFails >= T.failsToAnnoy ? out("annoyed", `${recentFails} failures`) : out("confused", "a tool failed");
   }
 
+  // --- compaction: dizzy while a session squeezes its context ------------
+  // PreCompact goes quiet while the session summarises itself, then it comes
+  // back as a SessionStart with source "compact". Any later line from that
+  // session means it is back; lines from other sessions do not. T.compact is
+  // for the return we never see, so a dizzy spell cannot strand the pet.
+  const compacting = events.some(
+    (e, i) => e.event === "PreCompact" && now - e.ts < T.compact && !events.slice(i + 1).some((l) => l.session === e.session)
+  );
+  if (compacting) return out("dizzy", "compacting");
+
   // --- subagents: creative while any are out ----------------------------
   const open = events.reduce((n, e) => (e.event === "SubagentStart" ? n + 1 : e.event === "SubagentStop" ? Math.max(0, n - 1) : n), 0);
   if (open > 0) return out("creative", `${open} subagent(s) out`);
@@ -112,7 +127,9 @@ export function derive(events, now) {
     return age < T.toolAfter ? out(toolState(last.tool), `finished ${last.tool}`) : out("thinking", "between tools");
   }
 
-  if (last.event === "SessionStart") return out("excited", "session started");
+  if (last.event === "SessionStart") {
+    return last.source === "compact" ? out("idle", "back from compacting") : out("excited", "session started");
+  }
   return out("idle", `no rule for ${last.event}`);
 
   function out(state, why, moodOver = {}) {

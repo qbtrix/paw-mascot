@@ -1,3 +1,5 @@
+// Changes: 2026-09-24 -- cases for PreCompact -> dizzy -> SessionStart(compact).
+//
 // The mapping is the part that can be wrong, so it is the part with tests.
 // Every case is a short event history and a clock, and the assertion is a
 // state -- the same call the page makes, with no DOM in the way.
@@ -69,6 +71,30 @@ test("subagents out means creative, until they are all back", () => {
   expect(derive(out, 10).state).toBe("creative");
   const back = [...out, ev("SubagentStop", 20, { agent: "explore" }), ev("PreToolUse", 21, { tool: "Edit" })];
   expect(derive(back, 21).state).toBe("working");
+});
+
+test("compaction is dizzy, until that session comes back from it", () => {
+  const h = [ev("PostToolUse", 5, { tool: "Edit" }), ev("PreCompact", 10)];
+  expect(derive(h, 10).state).toBe("dizzy");
+  expect(derive(h, 70).state).toBe("dizzy"); // a big context takes a while
+  const back = [...h, ev("SessionStart", 75, { source: "compact" })];
+  expect(derive(back, 75).state).toBe("idle"); // recovered, not a new session
+  expect(derive([...back, ev("PreToolUse", 76, { tool: "Edit" })], 76).state).toBe("working");
+});
+
+test("another session's lines do not end a dizzy spell", () => {
+  const h = [ev("PreCompact", 10), ev("PostToolUse", 12, { session: "other", tool: "Edit" })];
+  expect(derive(h, 12).state).toBe("dizzy");
+  expect(derive([...h, ev("SessionStart", 20, { session: "other", source: "compact" })], 20).state).toBe("dizzy");
+});
+
+test("a compaction whose return is never seen lets go after T.compact", () => {
+  expect(derive([ev("PreCompact", 10)], 10 + T.compact - 1).state).toBe("dizzy");
+  expect(derive([ev("PreCompact", 10)], 10 + T.compact + 1).state).not.toBe("dizzy");
+});
+
+test("a fresh session is still excited", () => {
+  expect(derive([ev("SessionStart", 10, { source: "startup" })], 10).state).toBe("excited");
 });
 
 test("a rate limit is gloomy, not attentive", () => {

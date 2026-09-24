@@ -1,6 +1,8 @@
 # Harnesses: what each one reads, and what it can see
 
-<!-- Created 2026-09-14 with the cross-harness slice. Facts checked against the
+<!-- Changes: 2026-09-24, Claude Code gets PreCompact too (twelve events);
+     Codex is unchanged.
+     Created 2026-09-14 with the cross-harness slice. Facts checked against the
      official Codex hooks page and the Claude Code plugin docs that day; the
      DeepSeek Harness row comes from a source read on 2026-08-23 and is the one
      row here that has not been run end to end. -->
@@ -18,7 +20,8 @@ harness below fires the same script; only the config file differs.
   does it.
 - **Do not do both.** Two registrations mean two lines per event, which reads to
   the mascot as twice the activity.
-- **Events:** all eleven the bridge knows.
+- **Events:** all twelve the bridge knows, including `PreCompact`, which makes
+  the pet dizzy while a session compacts.
 
 ## Codex CLI
 
@@ -65,7 +68,8 @@ matters: one `paw-event.sh`, one event stream, one mascot.
 The hooks files are separate for two reasons, not one. The obvious one is the
 root variable -- `${CLAUDE_PLUGIN_ROOT}` against `${PLUGIN_ROOT}`. The other is
 that Codex has no `Notification` or `PostToolUseFailure`, so its file declares
-nine events where Claude's declares eleven. Listing an event a harness never
+nine events where Claude's declares twelve (Claude's also carries `PreCompact`,
+which Codex's file leaves out). Listing an event a harness never
 fires is harmless; listing one it rejects is not.
 
 Which side gets the DEFAULT filename is deliberate. Both harnesses

@@ -1,6 +1,14 @@
 #!/bin/bash
 # paw-event.sh — the whole bridge between Claude Code and the mascot.
 #
+# Changes: 2026-09-24 -- the line keeps the payload's `source` when it has one
+# (SessionStart says startup, resume, clear or compact), so the pet can tell a
+# session coming back from compaction from a new one. Lines without a source
+# are unchanged. PreCompact needed nothing here: every event passes through.
+# 2026-09-23 -- the python fallback runs its script with -c. It was a
+# heredoc, which took over stdin, so the payload never arrived and the fallback
+# wrote nothing on a machine without jq.
+#
 # Claude Code runs this on every hook event and hands the event as JSON on
 # stdin. We append ONE line to ~/.paw/events.jsonl and get out of the way.
 # The app tails that file. No port, no daemon, no socket: a file survives the
@@ -42,9 +50,10 @@ if command -v jq >/dev/null 2>&1; then
     ok: (if .hook_event_name == "PostToolUseFailure" then false else true end),
     cwd: .cwd,
     transcript_path: .transcript_path
-  }' >> "$PAW_DIR/events.jsonl" 2>/dev/null || true
+  } + (if .source != null then {source: .source} else {} end)' >> "$PAW_DIR/events.jsonl" 2>/dev/null || true
 elif command -v python3 >/dev/null 2>&1; then
-  python3 - "$PAW_DIR/events.jsonl" <<'PY' 2>/dev/null || true
+  # -c, not a heredoc: a heredoc IS python's stdin, and the payload is too.
+  python3 -c '
 import json, sys, time
 try:
     p = json.load(sys.stdin)
@@ -61,8 +70,10 @@ line = {
     "cwd": p.get("cwd"),
     "transcript_path": p.get("transcript_path"),
 }
+if p.get("source") is not None:
+    line["source"] = p["source"]
 with open(sys.argv[1], "a") as f:
     f.write(json.dumps(line) + "\n")
-PY
+' "$PAW_DIR/events.jsonl" 2>/dev/null || true
 fi
 exit 0
